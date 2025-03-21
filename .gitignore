@@ -7,3 +7,7 @@
 
 ### VS Code ###
 .vscode/
+
+### upload folder ###
+.uploads/
+.uploads
