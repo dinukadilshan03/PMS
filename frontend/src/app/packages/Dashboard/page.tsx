@@ -1,5 +1,8 @@
 "use client"; // Important to mark this as a client component
 
+import "../globals.css"; // Import global styles
+import "../Dashboard/page.css"; // Import the custom Dashboard styles
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -24,13 +27,15 @@ interface Package {
         }>;
         thankYouCards: number;
     };
+    image: string;
 }
 
 const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-    const [totalPrice, setTotalPrice] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
     const [customizing, setCustomizing] = useState<boolean>(false);
+
     const router = useRouter();
 
     // Fetch packages on component mount
@@ -42,202 +47,125 @@ const CustomerDashboard = () => {
                 setPackages(data);
             } catch (error) {
                 console.error("Error fetching packages:", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchPackages();
     }, []);
 
-    // Select a package for viewing details or customization
+    // Select a package for viewing details
     const handleSelectPackage = (pkg: Package) => {
         setSelectedPackage(pkg);
         setCustomizing(false); // Reset to default view
-        updatePrice(pkg); // Update the price based on selected package
     };
 
-    // Handle form submission to save the updated package
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const updatedPackageData = {
-            name: selectedPackage!.name,
-            servicesIncluded: selectedPackage!.servicesIncluded,
-            additionalItems: selectedPackage!.additionalItems,
-            investment: selectedPackage!.investment,
-            packageType: selectedPackage!.packageType,
-        };
-
-        try {
-            const res = await fetch(`http://localhost:8080/api/packages/${selectedPackage!.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(updatedPackageData),
-            });
-
-            if (res.ok) {
-                alert("Package updated successfully!");
-                router.push("/"); // Redirect to homepage or package list
-            } else {
-                alert("Failed to update package.");
-            }
-        } catch (error) {
-            alert("An error occurred while updating the package.");
-            console.error(error);
-        }
-    };
-
-    // Calculate the total price based on selected services, albums, etc.
-    const updatePrice = (pkg: Package | null) => {
-        if (pkg) {
-            let price = pkg.investment;
-
-            // Calculate price based on services
-            price += pkg.servicesIncluded.length * 1000; // Example price per service
-
-            // Calculate price based on albums and framed portraits
-            pkg.additionalItems.albums.forEach(album => {
-                price += album.spreadCount * 200; // Example price per album spread
-            });
-
-            pkg.additionalItems.framedPortraits.forEach(portrait => {
-                price += portrait.quantity * 1500; // Example price per framed portrait
-            });
-
-            setTotalPrice(price);
-        }
-    };
-
-    // Customize the selected package
     const handleCustomize = () => {
         setCustomizing(true); // Allow customization
     };
 
-    const handleServiceChange = (index: number, value: string) => {
-        const updatedServices = [...(selectedPackage?.servicesIncluded || [])];
-        updatedServices[index] = value;
-        setSelectedPackage({
-            ...selectedPackage!,
-            servicesIncluded: updatedServices,
-        });
-        updatePrice(selectedPackage);
+    const handleSelect = () => {
+        alert(`Selected Package: ${selectedPackage?.name}`);
+        // You can navigate to a booking page or trigger another action here
     };
 
-    const addService = () => setSelectedPackage({
-        ...selectedPackage!,
-        servicesIncluded: [...selectedPackage!.servicesIncluded, ""]
-    });
-
-    const removeService = (index: number) => {
-        const updatedServices = selectedPackage!.servicesIncluded.filter((_, i) => i !== index);
-        setSelectedPackage({ ...selectedPackage!, servicesIncluded: updatedServices });
-        updatePrice(selectedPackage);
-    };
-
-    if (!selectedPackage) {
+    if (loading) {
         return <div>Loading...</div>;
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold mb-4">Customer Dashboard</h1>
+        <div className="dashboard-container">
+            <h1 className="heading">Customer Dashboard</h1>
 
             {/* List Available Packages */}
-            <h2 className="text-2xl mb-4">Available Packages</h2>
-            <ul className="space-y-4">
+            <h2 className="subheading">Available Packages</h2>
+            <div className="packages-container">
                 {packages.map((pkg) => (
-                    <li
+                    <div
                         key={pkg.id}
-                        className="bg-gray-100 p-4 rounded shadow-md cursor-pointer"
+                        className="package-card"
                         onClick={() => handleSelectPackage(pkg)}
                     >
-                        <h3 className="text-xl font-semibold">{pkg.name}</h3>
-                        <p>{pkg.packageType}</p>
-                        <p>Price: {pkg.investment} LKR</p>
-                    </li>
-                ))}
-            </ul>
-
-            {/* Display Selected Package Details */}
-            {selectedPackage && (
-                <div className="mt-8">
-                    <h2 className="text-2xl mb-4">Package: {selectedPackage.name}</h2>
-
-                    {/* Show customization options */}
-                    {!customizing ? (
-                        <div>
-                            <button onClick={handleCustomize} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-                                Customize This Package
-                            </button>
-                            <p>Price: {totalPrice} LKR</p>
+                        <img src={pkg.image} alt={pkg.name} className="package-image" />
+                        <div className="package-info">
+                            <h3>{pkg.name}</h3>
+                            <p>{pkg.packageType}</p>
+                            <p>Price: {pkg.investment} LKR</p>
                         </div>
-                    ) : (
-                        <form onSubmit={handleSubmit}>
-                            <div>
-                                <label>Services Included:</label>
+                    </div>
+                ))}
+            </div>
+
+            {/* Show Detailed Package Information */}
+            {selectedPackage && (
+                <div className="package-details">
+                    <h3>Package Details: {selectedPackage.name}</h3>
+                    <div className="package-details-container">
+                        <div className="image-container">
+                            <img
+                                src={selectedPackage.image}
+                                alt={selectedPackage.name}
+                                className="details-image"
+                            />
+                        </div>
+
+                        <div className="details-container">
+                            <h4>Photography Services Include:</h4>
+                            <ul className="details-list">
                                 {selectedPackage.servicesIncluded.map((service, index) => (
-                                    <div key={index} className="flex space-x-2">
-                                        <input
-                                            type="text"
-                                            value={service}
-                                            onChange={(e) => handleServiceChange(index, e.target.value)}
-                                            className="p-2 border"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeService(index)}
-                                            className="text-red-500"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
+                                    <li key={index}>{service}</li>
                                 ))}
-                                <button type="button" onClick={addService} className="text-blue-500">
-                                    Add Service
-                                </button>
-                            </div>
+                            </ul>
 
-                            <div>
-                                <label>Albums:</label>
+                            <h4>Additional Items:</h4>
+                            <p>
+                                <strong>Edited Images:</strong> {selectedPackage.additionalItems.editedImages}
+                            </p>
+                            <p>
+                                <strong>Unedited Images:</strong> {selectedPackage.additionalItems.uneditedImages}
+                            </p>
+
+                            <h4>Albums:</h4>
+                            <ul>
                                 {selectedPackage.additionalItems.albums.map((album, index) => (
-                                    <div key={index}>
-                                        <input
-                                            type="text"
-                                            value={album.size}
-                                            onChange={(e) => {
-                                                const updatedAlbums = [...selectedPackage!.additionalItems.albums];
-                                                updatedAlbums[index].size = e.target.value;
-                                                setSelectedPackage({
-                                                    ...selectedPackage!,
-                                                    additionalItems: { ...selectedPackage!.additionalItems, albums: updatedAlbums }
-                                                });
-                                                updatePrice(selectedPackage);
-                                            }}
-                                        />
-                                        <input
-                                            type="number"
-                                            value={album.spreadCount}
-                                            onChange={(e) => {
-                                                const updatedAlbums = [...selectedPackage!.additionalItems.albums];
-                                                updatedAlbums[index].spreadCount = parseInt(e.target.value);
-                                                setSelectedPackage({
-                                                    ...selectedPackage!,
-                                                    additionalItems: { ...selectedPackage!.additionalItems, albums: updatedAlbums }
-                                                });
-                                                updatePrice(selectedPackage);
-                                            }}
-                                        />
-                                    </div>
+                                    <li key={index}>
+                                        {album.size} {album.type} (Spread Count: {album.spreadCount})
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
 
-                            <div>
-                                <p>Total Price: {totalPrice} LKR</p>
-                            </div>
+                            <h4>Framed Portraits:</h4>
+                            <ul>
+                                {selectedPackage.additionalItems.framedPortraits.map((portrait, index) => (
+                                    <li key={index}>
+                                        {portrait.size} (Quantity: {portrait.quantity})
+                                    </li>
+                                ))}
+                            </ul>
 
-                            <button type="submit">Save Changes</button>
-                        </form>
-                    )}
+                            <p>
+                                <strong>Thank You Cards:</strong> {selectedPackage.additionalItems.thankYouCards}
+                            </p>
+
+                            <h4>Total Price: {selectedPackage.investment} LKR</h4>
+                        </div>
+                    </div>
+
+                    {/* Select and Customize Buttons */}
+                    <div className="buttons-container">
+                        <button
+                            onClick={handleSelect}
+                            className="select-btn"
+                        >
+                            Select Package
+                        </button>
+                        <button
+                            onClick={handleCustomize}
+                            className="customize-btn"
+                        >
+                            Customize Package
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
