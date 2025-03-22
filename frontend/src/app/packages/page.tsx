@@ -38,7 +38,7 @@ const HomePage = () => {
             <h1 className="text-3xl font-bold mb-4">Photography Packages</h1>
 
             {/* Create Package Link */}
-            <Link href="/create" className="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">
+            <Link href="/packages/create" className="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">
                 Create Package
             </Link>
 
@@ -59,7 +59,7 @@ const HomePage = () => {
 
                                 <div className="mt-2 flex space-x-4">
                                     {/* Edit link */}
-                                    <Link href={`/edit/${pkg.id}`} className="text-blue-500">
+                                    <Link href={`/packages/edit/${pkg.id}`} className="text-blue-500">
                                         Edit
                                     </Link>
 

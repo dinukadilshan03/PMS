@@ -1,0 +1,225 @@
+/* General Dashboard Styles */
+.dashboard-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.heading {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.subheading {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.packages-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.package-card {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    text-align: center;
+}
+
+.package-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.package-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.package-info {
+    margin-top: 15px;
+}
+
+.package-info h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* Selected Package Details */
+.package-details {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.package-details .image-container {
+    flex: 1;
+}
+
+.package-details .details-container {
+    flex: 2;
+}
+
+.details-container h3,
+.details-container h4 {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.details-list {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.details-list li {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+/* Pop effect for details like services, albums, portraits */
+.details-container > div {
+    margin-bottom: 20px;
+}
+
+.details-container > div:hover {
+    background-color: #f7f7f7;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.details-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.details-image:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+
+.buttons-container {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.select-btn,
+.customize-btn {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    width: 120px;
+    transition: background-color 0.3s;
+}
+
+.select-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.select-btn:hover {
+    background-color: #2980b9;
+}
+
+.customize-btn {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.customize-btn:hover {
+    background-color: #27ae60;
+}
+
+.select-btn:active,
+.customize-btn:active {
+    transform: scale(0.98);
+}
+
+/* Additional Items and Services Input */
+.additional-items {
+    margin-bottom: 20px;
+}
+
+.additional-items h4 {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.additional-items p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.additional-items ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.additional-items ul li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.additional-items ul li:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Service Input and Remove Buttons */
+.service-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.service-input input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.remove-service-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.remove-service-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Flex Centered Layout */
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
