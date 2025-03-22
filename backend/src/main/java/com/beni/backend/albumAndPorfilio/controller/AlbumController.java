@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/albums")
+@RequestMapping("/api/albums")
 public class AlbumController {
 
     @Autowired
@@ -33,7 +33,7 @@ public class AlbumController {
         return albumService.getAllAlbums();
     }
 
-    @GetMapping("/getAlbum/{id}")
+    @GetMapping("/{id}")
     public Album getAlbum(@PathVariable String id) {
         return albumService.getAlbumById(id);
     }
@@ -58,7 +58,7 @@ public class AlbumController {
         return ResponseEntity.ok(updatedAlbum);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public boolean deleteAlbum(@PathVariable String id){
         return albumService.deleteAlbums(id);
     }
