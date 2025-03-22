@@ -12,7 +12,7 @@
 //    public void addCorsMappings(CorsRegistry registry) {
 //        // Allow requests from the Next.js frontend (on port 3000)
 //        registry.addMapping("/**")
-//                .allowedOrigins("http://localhost:3001")  // Allow Next.js frontend on localhost:3000
+//                .allowedOrigins("http://localhost:3001")  // Allow Next.js frontend on localhost:3001
 //                .allowedMethods("GET", "POST", "PUT", "DELETE")  // Allowed HTTP methods
 //                .allowedHeaders("*")  // Allow all headers
 //                .allowCredentials(true);  // Allow credentials (cookies, authorization headers, etc.)

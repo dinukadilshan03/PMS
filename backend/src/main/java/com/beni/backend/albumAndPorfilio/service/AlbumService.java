@@ -55,9 +55,89 @@ public class AlbumService {
                 .orElseThrow(() -> new RuntimeException("Album not found with ID: " + id));
     }
 
-    //Delete All Albums Method
-    public boolean deleteAlbums(String id){
+    // Update Album Method
+    public Album updateAlbum(
+            String id,
+            String name,
+            String description,
+            List<MultipartFile> images,
+            MultipartFile coverImage,
+            String category,
+            String location,
+            String status) {
+
+        // Fetch the existing album from the database
+        Album existingAlbum = albumRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Album not found with ID: " + id));
+
+        // Update the album's fields only if new values are provided
+        if (name != null && !name.isEmpty()) {
+            existingAlbum.setName(name);
+        }
+        if (description != null && !description.isEmpty()) {
+            existingAlbum.setDescription(description);
+        }
+        if (category != null && !category.isEmpty()) {
+            existingAlbum.setCategory(category);
+        }
+        if (location != null && !location.isEmpty()) {
+            existingAlbum.setLocation(location);
+        }
+        if (status != null && !status.isEmpty()) {
+            existingAlbum.setStatus(status);
+        }
+
+        // Handle image updates only if new images are provided
+        if (images != null && !images.isEmpty()) {
+            // Delete old images
+            if (existingAlbum.getImages() != null && !existingAlbum.getImages().isEmpty()) {
+                for (String oldImagePath : existingAlbum.getImages()) {
+                    if (oldImagePath != null && !oldImagePath.isEmpty()) {
+                        fileStorageService.deleteFile(oldImagePath);
+                    }
+                }
+            }
+            // Save new images
+            List<String> imagePaths = fileStorageService.saveFiles(images);
+            existingAlbum.setImages(imagePaths);
+        }
+
+        // Handle cover image update only if a new cover image is provided
+        if (coverImage != null && !coverImage.isEmpty()) {
+            // Delete old cover image
+            if (existingAlbum.getCoverImage() != null && !existingAlbum.getCoverImage().isEmpty()) {
+                fileStorageService.deleteFile(existingAlbum.getCoverImage());
+            }
+            // Save new cover image
+            String coverImagePath = fileStorageService.saveFile(coverImage);
+            existingAlbum.setCoverImage(coverImagePath);
+        }
+
+        // Save the updated album back to the database
+        return albumRepository.save(existingAlbum);
+    }
+
+    //Delete Album Method
+    public boolean deleteAlbums(String id) {
+        // Fetch the album to get the image paths
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Album not found with ID: " + id));
+
+        // Delete the cover image
+        if (album.getCoverImage() != null && !album.getCoverImage().isEmpty()) {
+            fileStorageService.deleteFile(album.getCoverImage());
+        }
+
+        // Delete all images in the album
+        if (album.getImages() != null && !album.getImages().isEmpty()) {
+            for (String imagePath : album.getImages()) {
+                fileStorageService.deleteFile(imagePath);
+            }
+        }
+
+        // Delete the album from the database
         albumRepository.deleteById(id);
+
         return true;
     }
 }
