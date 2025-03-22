@@ -3,6 +3,7 @@ package com.beni.backend.albumAndPorfilio.controller;
 import com.beni.backend.albumAndPorfilio.model.Album;
 import com.beni.backend.albumAndPorfilio.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +36,26 @@ public class AlbumController {
     @GetMapping("/getAlbum/{id}")
     public Album getAlbum(@PathVariable String id) {
         return albumService.getAlbumById(id);
+    }
+
+    // Update Album Endpoint
+    @PutMapping("/{id}")
+    public ResponseEntity<Album> updateAlbum(
+            @PathVariable String id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) List<MultipartFile> images,
+            @RequestParam(required = false) MultipartFile coverImage,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String status) {
+
+        // Call the service method to update the album
+        Album updatedAlbum = albumService.updateAlbum(
+                id, name, description, images, coverImage, category, location, status);
+
+        // Return the updated album with HTTP 200 OK
+        return ResponseEntity.ok(updatedAlbum);
     }
 
     @DeleteMapping("/delete/{id}")
