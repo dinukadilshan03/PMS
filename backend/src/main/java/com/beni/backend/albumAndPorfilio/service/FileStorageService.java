@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
 
-    private final Path rootLocation = Paths.get("uploads/images");
+    private final Path rootLocation = Paths.get("backend/uploads/images");
 
     //Default Constructor
     public FileStorageService() {
