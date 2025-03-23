@@ -57,6 +57,17 @@ const CustomerDashboard = () => {
         setSelectedPackage(pkg); // Update selected package
     };
 
+    // Handle Add to Cart and Customize actions
+    const handleAddToCart = (pkg: Package) => {
+        alert(`Added ${pkg.name} to the cart!`);
+        // You can implement the add to cart functionality here
+    };
+
+    const handleCustomizePackage = (pkg: Package) => {
+        alert(`Customizing package: ${pkg.name}`);
+        // You can implement the customize package functionality here
+    };
+
     if (loading) {
         return <div>Loading packages...</div>; // Show loading message while fetching data
     }
@@ -146,13 +157,13 @@ const CustomerDashboard = () => {
                         {/* Buttons to either select or customize */}
                         <div className="mt-4">
                             <button
-                                onClick={() => alert(`Selected package: ${selectedPackage.name}`)}
+                                onClick={() => handleAddToCart(selectedPackage)}
                                 className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
                             >
-                                Select Package
+                                Add to Cart
                             </button>
                             <button
-                                onClick={() => alert(`Customizing package: ${selectedPackage.name}`)}
+                                onClick={() => handleCustomizePackage(selectedPackage)}
                                 className="bg-green-500 text-white px-4 py-2 rounded"
                             >
                                 Customize Package
