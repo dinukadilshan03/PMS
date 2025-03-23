@@ -1,10 +1,11 @@
-import UploadAlbumPage from "@/app/Album-Portfolio/pages/UploadAlbumPage";
-
+import Link from "next/link";
 
 export default function Home() {
-  return (
-   <div>
-        <UploadAlbumPage />
-   </div>
-  );
+    return (
+        <div>
+            <Link href={"/try"}>
+                Try Page
+            </Link>
+        </div>
+    );
 }
