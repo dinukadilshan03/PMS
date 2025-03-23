@@ -63,4 +63,39 @@ public class BookingService {
 
         return availableSlots;
     }
+
+     // 1. Get all bookings with filters
+    public List<Booking> getAllBookings(String status, String paymentStatus, String startDate, String endDate) {
+        if (status == null && paymentStatus == null && startDate == null && endDate == null) {
+            return bookingRepository.findAll(); // No filters, return all bookings
+        }
+        return bookingRepository.findBookingsWithFilters(status, paymentStatus, startDate, endDate);
+    }
+
+    // 2. Modify booking
+    public Booking modifyBooking(String id, Booking modifiedBooking) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setDateTime(modifiedBooking.getDateTime());
+        booking.setPackageId(modifiedBooking.getPackageId());
+        booking.setPhoneNumber(modifiedBooking.getPhoneNumber());
+        booking.setEmail(modifiedBooking.getEmail());
+        return bookingRepository.save(booking);
+    }
+
+    // 3. Cancel booking
+    public Booking cancelBooking(String id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setStatus("Cancelled");
+        return bookingRepository.save(booking);
+    }
+
+    // 4. Set payment status
+    public Booking setPaymentStatus(String id, String paymentStatus) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setPaymentStatus(paymentStatus);
+        return bookingRepository.save(booking);
+    }
 }
