@@ -10,26 +10,20 @@ import java.util.Optional;
 
 @Service
 public class StaffService {
-
     @Autowired
     private StaffRepository staffRepository;
 
-    // Get all staff members
     public List<Staff> getAllStaff() {
         return staffRepository.findAll();
     }
-
-    // Get staff by ID
     public Optional<Staff> getStaffById(String id) {
         return staffRepository.findById(id);
     }
-
-    // Add a new staff member
+    // Add
     public Staff addStaff(Staff staff) {
         return staffRepository.save(staff);
     }
-
-    // Update staff details (including availability and events)
+    // Update staff
     public Staff updateStaff(String id, Staff updatedStaff) {
         return staffRepository.findById(id).map(staff -> {
             staff.setName(updatedStaff.getName());
@@ -46,43 +40,38 @@ public class StaffService {
         }).orElse(null);
     }
 
-    // Delete staff by ID
+    // Delete staff
     public void deleteStaff(String id) {
         staffRepository.deleteById(id);
     }
-
-    // Get the availability of a specific staff member
     public List<Staff.Availability> getStaffAvailability(String id) {
         Optional<Staff> staff = staffRepository.findById(id);
-        return staff.map(Staff::getAvailability).orElse(null); // Return list of availability slots
+        return staff.map(Staff::getAvailability).orElse(null);
     }
-
-    // Update the availability of a specific staff member
     public Staff updateAvailability(String id, List<Staff.Availability> updatedAvailability) {
         Optional<Staff> staff = staffRepository.findById(id);
         if (staff.isPresent()) {
             Staff s = staff.get();
-            s.setAvailability(updatedAvailability); // Update availability slots
+            s.setAvailability(updatedAvailability);
             return staffRepository.save(s);
         }
         return null;
     }
-
     // Admin: Assign photographer to event (only if available)
     public Staff assignPhotographerToEvent(String id, String eventName) {
         Optional<Staff> staff = staffRepository.findById(id);
         if (staff.isPresent()) {
             Staff s = staff.get();
 
-            // Check availability for the event date
+
             for (Staff.Availability slot : s.getAvailability()) {
                 if (slot.isAvailable()) {
-                    s.getAssignedEvents().add(eventName);  // Assign the event
-                    slot.setAvailable(false);  // Set to unavailable after assignment
-                    return staffRepository.save(s); // Save the updated staff details
+                    s.getAssignedEvents().add(eventName);
+                    slot.setAvailable(false);
+                    return staffRepository.save(s);
                 }
             }
         }
-        return null; // Return null if no availability found
+        return null;
     }
 }
