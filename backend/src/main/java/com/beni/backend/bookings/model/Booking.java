@@ -19,5 +19,6 @@ public class Booking {
     private String paymentStatus;
     private String phoneNumber;
     private String email;
+    private String location;
 
 }

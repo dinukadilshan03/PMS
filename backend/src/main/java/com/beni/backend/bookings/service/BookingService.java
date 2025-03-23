@@ -80,6 +80,7 @@ public class BookingService {
         booking.setPackageId(modifiedBooking.getPackageId());
         booking.setPhoneNumber(modifiedBooking.getPhoneNumber());
         booking.setEmail(modifiedBooking.getEmail());
+        booking.setLocation(modifiedBooking.getLocation());
         return bookingRepository.save(booking);
     }
 
