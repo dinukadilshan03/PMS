@@ -2,6 +2,10 @@
 
 /* Reset some default browser styles */
 * {
+
+
+/* Add Tailwind styles here or customize */
+=======
   margin: 0;
   padding: 0;
   box-sizing: border-box;
