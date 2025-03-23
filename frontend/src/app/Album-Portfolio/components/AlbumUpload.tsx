@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { uploadAlbum } from "@/app/Album-Portfolio/utils/api";
 
-export default function UploadAlbumPage() {
+export default function AlbumUpload() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
