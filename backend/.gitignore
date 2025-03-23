@@ -37,3 +37,5 @@ build/
 
 /uploads/
 
+### webconfig port file ###
+/src/main/java/com/beni/backend/WebConfig.java
