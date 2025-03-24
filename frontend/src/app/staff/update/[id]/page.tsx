@@ -1,63 +1,57 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router"; // For getting the ID from the URL
-import { updateStaff, getStaffById } from "@/app/staff/utils/api"; // Import the API functions
+import { useRouter, useParams } from "next/navigation";
+import axios from "axios"; // Use for routing
 
-const UpdateStaffDetails: React.FC = () => {
-    const router = useRouter();
-    const { id } = router.query;  // Getting staff ID from the URL
-
-    const [staffData, setStaffData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        experience: "",
-        hourlyRate: 0,
-        specialization: "",
-        availability: true,
-    });
-
-    const [loading, setLoading] = useState<boolean>(true);
+const UpdateStaffPage: React.FC = () => {
+    const { id } = useParams(); // Get the staff ID from the URL
+    const [staffData, setStaffData] = useState<any>(null); // Initialize as null
     const [error, setError] = useState<string>("");
+    const router = useRouter();
 
+    // Fetch staff data on page load
     useEffect(() => {
-        if (id) {
-            const fetchStaffData = async () => {
-                try {
-                    const data = await getStaffById(id as string); // Fetch staff details by ID
-                    setStaffData(data);
-                    setLoading(false);
-                } catch (err) {
-                    setError("Failed to fetch staff details");
-                    setLoading(false);
-                }
-            };
-
-            fetchStaffData();
-        }
+        const fetchStaffData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/staff/${id}`);
+                setStaffData(response.data); // Populate the form fields with staff data
+            } catch (err) {
+                setError("Failed to fetch staff data.");
+                console.error(err);
+            }
+        };
+        fetchStaffData();
     }, [id]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setStaffData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
+    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!staffData) return; // Don't submit if data is null
+
         try {
-            await updateStaff(id as string, staffData); // Send updated data to the backend
-            alert("Staff details updated successfully!");
-            router.push("/staff/list");  // Redirect to the staff list page
-        } catch (err) {
-            setError("Failed to update staff details");
+            const res = await axios.put(`http://localhost:8080/api/staff/${id}`, staffData);
+
+            if (res.status >= 200 && res.status < 300) {
+                alert("Staff updated successfully!");
+                router.push("/staff/stafflist"); // Redirect to staff list page
+            } else {
+                alert("Failed to update staff.");
+            }
+        } catch (error) {
+            alert("An error occurred while updating the staff.");
+            console.error(error);
         }
     };
 
-    if (loading) {
+    // Handle field changes
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setStaffData({ ...staffData, [name]: value });
+    };
+
+    if (!staffData) {
+        // Loading state while fetching staff data
         return <div>Loading...</div>;
     }
 
@@ -97,21 +91,33 @@ const UpdateStaffDetails: React.FC = () => {
                     />
                 </div>
                 <div>
+                    <label>Address:</label>
+                    <input
+                        type="text"
+                        name="address"
+                        value={staffData.address}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
                     <label>Experience:</label>
                     <input
                         type="text"
                         name="experience"
                         value={staffData.experience}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div>
-                    <label>Hourly Rate:</label>
+                    <label>Hourly Rate (in LKR):</label>
                     <input
                         type="number"
                         name="hourlyRate"
                         value={staffData.hourlyRate}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div>
@@ -121,6 +127,7 @@ const UpdateStaffDetails: React.FC = () => {
                         name="specialization"
                         value={staffData.specialization}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div>
@@ -140,4 +147,4 @@ const UpdateStaffDetails: React.FC = () => {
     );
 };
 
-export default UpdateStaffDetails;
+export default UpdateStaffPage;
