@@ -42,4 +42,9 @@ public class PortfolioService {
     public List<Portfolio> getPortfolios() {
         return portfolioRepository.findAll();
     }
+
+    public boolean deleteImage(String id){
+        portfolioRepository.deleteById(id);
+        return true;
+    }
 }

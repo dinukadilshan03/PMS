@@ -31,11 +31,6 @@ public class BookingController {
         return bookingService.getAvailableSlots(parsedDate);
     }
 
-    @GetMapping("/user/{userId}")
-    public List<Booking> getUserBookings(@PathVariable String userId) {
-        return bookingService.getUserBookings(userId);
-    }
-
     @PutMapping("/{bookingId}/cancel")
     public Booking cancelUserBooking(@PathVariable String bookingId) {
         return bookingService.cancelBooking(bookingId);

@@ -100,15 +100,12 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    public List<Booking> getUserBookings(String userId) {
-        return bookingRepository.findByUserId(userId);
-    }
 
     public Booking rescheduleBooking(String bookingId, LocalDateTime newDateTime) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // Check if the new time is available
+        //Check if the new time is available
         if (!isTimeSlotAvailable(newDateTime)) {
             throw new RuntimeException("The selected time slot is not available");
         }
