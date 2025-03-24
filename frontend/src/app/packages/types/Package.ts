@@ -1,8 +1,7 @@
-export interface Package {
+interface Package {
   id: string;
   name: string;
-  description: string;
-  investment: number; // Package price in LKR
+  investment: number;
   packageType: string;
   servicesIncluded: string[];
   additionalItems: {
@@ -19,4 +18,5 @@ export interface Package {
     }>;
     thankYouCards: number;
   };
+  image: string;  // This will store the URL for each package's image
 }
