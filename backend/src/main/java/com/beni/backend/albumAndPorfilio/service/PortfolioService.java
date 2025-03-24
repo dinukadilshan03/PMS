@@ -18,6 +18,7 @@ public class PortfolioService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    //Upload Image for Portfolio method
     public Portfolio createPortfolio(
             String albumName,
             String description,
@@ -59,5 +60,46 @@ public class PortfolioService {
 
     public Optional<Portfolio> getPortfolio(String id) {
         return portfolioRepository.findById(id);
+    }
+
+    //Update method for portfolio
+    public Portfolio updatePortfolio(
+            String id,
+            String albumName,
+            String description,
+            String photographerName,
+            String category,
+            MultipartFile image
+    ) {
+
+        Portfolio existingImage = portfolioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Album not found with ID: " + id));
+
+        if (albumName != null && !albumName.isEmpty()) {
+            existingImage.setAlbumName(albumName);
+        }
+        if (description != null && !description.isEmpty()) {
+            existingImage.setDescription(description);
+        }
+        if (photographerName != null && !photographerName.isEmpty()) {
+            existingImage.setPhotographerName(photographerName);
+        }
+        if (photographerName != null && !photographerName.isEmpty()) {
+            existingImage.setPhotographerName(photographerName);
+        }
+        if (category != null && !category.isEmpty()) {
+            existingImage.setCategory(category);
+        }
+        if (image != null && !image.isEmpty()) {
+            // Delete old cover image
+            if (existingImage.getImageUrl() != null && !existingImage.getImageUrl().isEmpty()) {
+                fileStorageService.deleteFile(existingImage.getImageUrl());
+            }
+            // Save new cover image
+            String imageUrl = fileStorageService.saveFile(image);
+            existingImage.setImageUrl(imageUrl);
+        }
+
+        return portfolioRepository.save(existingImage);
     }
 }
