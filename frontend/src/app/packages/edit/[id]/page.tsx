@@ -9,8 +9,8 @@ const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [investment, setInvestment] = useState("");
     const [packageType, setPackageType] = useState("");
     const [servicesIncluded, setServicesIncluded] = useState<string[]>([]);
-    const [editedImages, setEditedImages] = useState("");
-    const [uneditedImages, setUneditedImages] = useState("");
+    const [editedImages, setEditedImages] = useState("");  // Edited images as string
+    const [uneditedImages, setUneditedImages] = useState("");  // Unedited images as string
     const [albums, setAlbums] = useState([{ size: "", type: "", spreadCount: "" }]);
     const [framedPortraits, setFramedPortraits] = useState([{ size: "", quantity: "" }]);
     const [thankYouCards, setThankYouCards] = useState("");
@@ -77,12 +77,12 @@ const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
             alert("At least one service is required.");
             return false;
         }
-        if (!editedImages || isNaN(Number(editedImages)) || Number(editedImages) < 0) {
-            alert("Edited images must be a valid non-negative number.");
+        if (!editedImages.trim()) {
+            alert("Edited images field is required.");
             return false;
         }
-        if (!uneditedImages || isNaN(Number(uneditedImages)) || Number(uneditedImages) < 0) {
-            alert("Unedited images must be a valid non-negative number.");
+        if (!uneditedImages.trim()) {
+            alert("Unedited images field is required.");
             return false;
         }
         if (albums.some(album => !album.size.trim() || !album.type.trim() || isNaN(Number(album.spreadCount)) || Number(album.spreadCount) < 0)) {

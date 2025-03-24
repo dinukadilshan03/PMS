@@ -1,0 +1,93 @@
+/* styles.css */
+
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container for the form */
+.container {
+    width: 80%;
+    margin: 50px auto;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Title */
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Form elements */
+label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="submit"] {
+    width: 100%;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Input field error */
+input.error {
+    border-color: red;
+}
+
+button[type="button"] {
+    background-color: #f44336;
+    margin-top: 10px;
+    width: auto;
+}
+
+button[type="button"]:hover {
+    background-color: #d32f2f;
+}
+
+/* For adding/removing services, albums, and portraits */
+div {
+    margin-bottom: 15px;
+}
+
+/* Form input row for adding/removing services/albums */
+div > button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 15px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #007BFF;
+    outline: none;
+}

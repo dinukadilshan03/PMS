@@ -1,14 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import "../create/page.css";
 const CreatePackage = () => {
     const [name, setName] = useState("");
     const [investment, setInvestment] = useState("");
     const [packageType, setPackageType] = useState("");
     const [servicesIncluded, setServicesIncluded] = useState<string[]>([]);
-    const [editedImages, setEditedImages] = useState("");
-    const [uneditedImages, setUneditedImages] = useState("");
+    const [editedImages, setEditedImages] = useState("");  // Edited images as string
+    const [uneditedImages, setUneditedImages] = useState("");  // Unedited images as string
     const [albums, setAlbums] = useState([{ size: "", type: "", spreadCount: "" }]);
     const [framedPortraits, setFramedPortraits] = useState([{ size: "", quantity: "" }]);
     const [thankYouCards, setThankYouCards] = useState("");
@@ -32,12 +32,12 @@ const CreatePackage = () => {
             alert("At least one service is required.");
             return false;
         }
-        if (!editedImages || isNaN(Number(editedImages)) || Number(editedImages) < 0) {
-            alert("Edited images must be a valid number.");
+        if (!editedImages.trim()) {
+            alert("Edited images field is required.");
             return false;
         }
-        if (!uneditedImages || isNaN(Number(uneditedImages)) || Number(uneditedImages) < 0) {
-            alert("Unedited images must be a valid number.");
+        if (!uneditedImages.trim()) {
+            alert("Unedited images field is required.");
             return false;
         }
         if (albums.some(album => !album.size.trim() || !album.type.trim() || isNaN(Number(album.spreadCount)) || Number(album.spreadCount) < 0)) {
@@ -111,82 +111,98 @@ const CreatePackage = () => {
     };
 
     return (
-        <div>
-            <h1>Create a New Photography Package</h1>
+        <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+            <h1 className="text-3xl font-bold text-center mb-8">Create a New Photography Package</h1>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Package Name:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Package Name:</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
 
-                <div>
-                    <label>Investment (in LKR):</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Investment (in LKR):</label>
                     <input
                         type="number"
                         value={investment}
                         onChange={(e) => setInvestment(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
 
-                <div>
-                    <label>Package Type:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Package Type:</label>
                     <input
                         type="text"
                         value={packageType}
                         onChange={(e) => setPackageType(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
 
-                <div>
-                    <label>Services Included:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Services Included:</label>
                     {servicesIncluded.map((service, index) => (
-                        <div key={index}>
+                        <div key={index} className="flex items-center mb-4">
                             <input
                                 type="text"
                                 value={service}
                                 onChange={(e) => handleServiceChange(e, index)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder={`Service #${index + 1}`}
                                 required
                             />
-                            <button type="button" onClick={() => removeService(index)}>
+                            <button
+                                type="button"
+                                onClick={() => removeService(index)}
+                                className="ml-4 text-red-500 hover:text-red-700"
+                            >
                                 Remove Service
                             </button>
                         </div>
                     ))}
-                    <button type="button" onClick={addService}>Add Service</button>
+                    <button
+                        type="button"
+                        onClick={addService}
+                        className="text-blue-500 hover:text-blue-700"
+                    >
+                        Add Service
+                    </button>
                 </div>
 
-                <div>
-                    <label>Edited Images:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Edited Images:</label>
                     <input
                         type="text"
                         value={editedImages}
                         onChange={(e) => setEditedImages(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
 
-                <div>
-                    <label>Unedited Images:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Unedited Images:</label>
                     <input
                         type="text"
                         value={uneditedImages}
                         onChange={(e) => setUneditedImages(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
 
-                <div>
-                    <label>Albums:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Albums:</label>
                     {albums.map((album, index) => (
-                        <div key={index}>
+                        <div key={index} className="flex mb-4">
                             <input
                                 type="text"
                                 placeholder="Size"
@@ -196,6 +212,7 @@ const CreatePackage = () => {
                                     updatedAlbums[index].size = e.target.value;
                                     setAlbums(updatedAlbums);
                                 }}
+                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <input
                                 type="text"
@@ -206,6 +223,7 @@ const CreatePackage = () => {
                                     updatedAlbums[index].type = e.target.value;
                                     setAlbums(updatedAlbums);
                                 }}
+                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <input
                                 type="number"
@@ -216,18 +234,23 @@ const CreatePackage = () => {
                                     updatedAlbums[index].spreadCount = e.target.value;
                                     setAlbums(updatedAlbums);
                                 }}
+                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     ))}
-                    <button type="button" onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}>
+                    <button
+                        type="button"
+                        onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}
+                        className="text-blue-500 hover:text-blue-700"
+                    >
                         Add Album
                     </button>
                 </div>
 
-                <div>
-                    <label>Framed Portraits:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Framed Portraits:</label>
                     {framedPortraits.map((portrait, index) => (
-                        <div key={index}>
+                        <div key={index} className="flex mb-4">
                             <input
                                 type="text"
                                 placeholder="Size"
@@ -237,6 +260,7 @@ const CreatePackage = () => {
                                     updatedPortraits[index].size = e.target.value;
                                     setFramedPortraits(updatedPortraits);
                                 }}
+                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <input
                                 type="number"
@@ -247,25 +271,33 @@ const CreatePackage = () => {
                                     updatedPortraits[index].quantity = e.target.value;
                                     setFramedPortraits(updatedPortraits);
                                 }}
+                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     ))}
-                    <button type="button" onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}>
+                    <button
+                        type="button"
+                        onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}
+                        className="text-blue-500 hover:text-blue-700"
+                    >
                         Add Framed Portrait
                     </button>
                 </div>
 
-                <div>
-                    <label>Thank You Cards:</label>
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-medium">Thank You Cards:</label>
                     <input
                         type="number"
                         value={thankYouCards}
                         onChange={(e) => setThankYouCards(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
 
-                <button type="submit">Create Package</button>
+                <button type="submit" className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                    Create Package
+                </button>
             </form>
         </div>
     );
