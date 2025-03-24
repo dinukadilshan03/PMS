@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/portfolio")
@@ -30,6 +31,11 @@ public class PortfolioController {
     @GetMapping
     public List<Portfolio> getAllPortfolios() {
         return portfolioService.getPortfolios();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Portfolio> getPortfolioById(@PathVariable String id) {
+        return portfolioService.getPortfolio(id);
     }
 
     @DeleteMapping("/{id}")
