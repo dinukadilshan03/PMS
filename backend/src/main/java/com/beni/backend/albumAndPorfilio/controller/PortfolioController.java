@@ -31,4 +31,9 @@ public class PortfolioController {
     public List<Portfolio> getAllPortfolios() {
         return portfolioService.getPortfolios();
     }
+
+    @DeleteMapping("/{id}")
+    public boolean deleteImage(@PathVariable String id) {
+        return portfolioService.deleteImage(id);
+    }
 }
