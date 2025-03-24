@@ -1,9 +1,10 @@
 "use client"; // Important to mark this as a client component
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";  // Correct import for routing
+import { useRouter } from "next/navigation";
 
-const EditPackage = ({ params }: { params: { id: string } }) => {
+// Use React.use() to handle the Promise
+const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [name, setName] = useState("");
     const [investment, setInvestment] = useState("");
     const [packageType, setPackageType] = useState("");
@@ -17,35 +18,93 @@ const EditPackage = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
 
     // Fetch the package details when the component loads
+    const [unwrappedParams, setUnwrappedParams] = useState<{ id: string } | null>(null);
+
     useEffect(() => {
-        const fetchPackage = async () => {
-            try {
-                const res = await fetch(`http://localhost:8080/api/packages/${params.id}`);
-                const data = await res.json();
-                if (data) {
-                    setName(data.name);
-                    setInvestment(data.investment.toString());
-                    setPackageType(data.packageType);
-                    setServicesIncluded(data.servicesIncluded);
-                    setEditedImages(data.additionalItems.editedImages);
-                    setUneditedImages(data.additionalItems.uneditedImages);
-                    setAlbums(data.additionalItems.albums);
-                    setFramedPortraits(data.additionalItems.framedPortraits);
-                    setThankYouCards(data.additionalItems.thankYouCards.toString());
-                }
-            } catch (error) {
-                console.error("Error fetching package:", error);
-            } finally {
-                setLoading(false);
-            }
+        // Unwrap the params Promise
+        const getParams = async () => {
+            const resolvedParams = await params;
+            setUnwrappedParams(resolvedParams);
         };
 
-        fetchPackage();
-    }, [params.id]);
+        getParams();
+    }, [params]);
+
+    // Fetch package details once params are unwrapped
+    useEffect(() => {
+        if (unwrappedParams) {
+            const fetchPackage = async () => {
+                try {
+                    const res = await fetch(`http://localhost:8080/api/packages/${unwrappedParams.id}`);
+                    const data = await res.json();
+                    if (data) {
+                        setName(data.name);
+                        setInvestment(data.investment.toString());
+                        setPackageType(data.packageType);
+                        setServicesIncluded(data.servicesIncluded);
+                        setEditedImages(data.additionalItems.editedImages);
+                        setUneditedImages(data.additionalItems.uneditedImages);
+                        setAlbums(data.additionalItems.albums);
+                        setFramedPortraits(data.additionalItems.framedPortraits);
+                        setThankYouCards(data.additionalItems.thankYouCards.toString());
+                    }
+                } catch (error) {
+                    console.error("Error fetching package:", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchPackage();
+        }
+    }, [unwrappedParams]);
+
+    // Form validation logic
+    const validateForm = () => {
+        if (!name.trim()) {
+            alert("Package name is required.");
+            return false;
+        }
+        if (!investment || isNaN(Number(investment)) || Number(investment) <= 0) {
+            alert("Investment must be a valid positive number.");
+            return false;
+        }
+        if (!packageType.trim()) {
+            alert("Package type is required.");
+            return false;
+        }
+        if (servicesIncluded.length === 0 || servicesIncluded.some(service => !service.trim())) {
+            alert("At least one service is required.");
+            return false;
+        }
+        if (!editedImages || isNaN(Number(editedImages)) || Number(editedImages) < 0) {
+            alert("Edited images must be a valid non-negative number.");
+            return false;
+        }
+        if (!uneditedImages || isNaN(Number(uneditedImages)) || Number(uneditedImages) < 0) {
+            alert("Unedited images must be a valid non-negative number.");
+            return false;
+        }
+        if (albums.some(album => !album.size.trim() || !album.type.trim() || isNaN(Number(album.spreadCount)) || Number(album.spreadCount) < 0)) {
+            alert("Each album must have a valid size, type, and spread count (non-negative).");
+            return false;
+        }
+        if (framedPortraits.some(portrait => !portrait.size.trim() || isNaN(Number(portrait.quantity)) || Number(portrait.quantity) <= 0)) {
+            alert("Each framed portrait must have a valid size and positive quantity.");
+            return false;
+        }
+        if (!thankYouCards || isNaN(Number(thankYouCards)) || Number(thankYouCards) <= 0) {
+            alert("Thank You Cards must be a valid positive number.");
+            return false;
+        }
+        return true;
+    };
 
     // Handle form submission to update the package
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateForm()) return;
 
         const updatedPackageData = {
             name,
@@ -62,7 +121,7 @@ const EditPackage = ({ params }: { params: { id: string } }) => {
         };
 
         try {
-            const res = await fetch(`http://localhost:8080/api/packages/${params.id}`, {
+            const res = await fetch(`http://localhost:8080/api/packages/${unwrappedParams?.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
