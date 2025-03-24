@@ -1,22 +1,30 @@
-interface Package {
+export interface Package {
+  description: string;
+
   id: string;
   name: string;
   investment: number;
   packageType: string;
   servicesIncluded: string[];
-  additionalItems: {
-    editedImages: string;
-    uneditedImages: string;
-    albums: Array<{
-      size: string;
-      type: string;
-      spreadCount: number;
-    }>;
-    framedPortraits: Array<{
-      size: string;
-      quantity: number;
-    }>;
-    thankYouCards: number;
-  };
-  image: string;  // This will store the URL for each package's image
+  additionalItems: AdditionalItems;
+  image: string;
+}
+
+export interface AdditionalItems {
+  editedImages: string;
+  uneditedImages: string;
+  albums: Album[]; // Array of Album objects
+  framedPortraits: FramedPortrait[]; // Array of FramedPortrait objects
+  thankYouCards: number;
+}
+
+export interface Album {
+  size: string;
+  type: string;
+  spreadCount: number;
+}
+
+export interface FramedPortrait {
+  size: string;
+  quantity: number;
 }
