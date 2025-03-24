@@ -1,6 +1,5 @@
 package com.beni.backend.albumAndPorfilio.service;
 
-import com.beni.backend.albumAndPorfilio.model.Album;
 import com.beni.backend.albumAndPorfilio.model.Portfolio;
 import com.beni.backend.albumAndPorfilio.repository.AlbumRepository;
 import com.beni.backend.albumAndPorfilio.repository.PortfolioRepository;
@@ -19,8 +18,6 @@ public class PortfolioService {
 
     @Autowired
     private FileStorageService fileStorageService;
-    @Autowired
-    private AlbumRepository albumRepository;
 
     //Upload Image for Portfolio method
     public Portfolio createPortfolio(

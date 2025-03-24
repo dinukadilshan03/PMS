@@ -1,6 +1,5 @@
 package com.beni.backend.albumAndPorfilio.controller;
 
-import com.beni.backend.albumAndPorfilio.model.Album;
 import com.beni.backend.albumAndPorfilio.model.Portfolio;
 import com.beni.backend.albumAndPorfilio.service.PortfolioService;
 import org.springframework.beans.factory.annotation.Autowired;
