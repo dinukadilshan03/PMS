@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-// @ts-ignore
 import { Package } from '@/app/packages/types/Package';
 import { getPackages, deletePackage } from '@/app/packages/utils/api';
 import Link from 'next/link';
@@ -34,6 +33,47 @@ const HomePage = () => {
         }
     };
 
+    // Conditional check to ensure additionalItems is not null before rendering
+    const renderAdditionalItems = (pkg: Package) => {
+        if (pkg.additionalItems) {
+            return (
+                <>
+                    <div>
+                        <strong>Edited Images:</strong> {pkg.additionalItems.editedImages}
+                    </div>
+                    <div>
+                        <strong>Unedited Images:</strong> {pkg.additionalItems.uneditedImages}
+                    </div>
+                    <div>
+                        <strong>Albums:</strong>
+                        <ul>
+                            {pkg.additionalItems.albums?.map((album, index) => (
+                                <li key={index}>
+                                    {album.size} {album.type} (Spread Count: {album.spreadCount})
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>Framed Portraits:</strong>
+                        <ul>
+                            {pkg.additionalItems.framedPortraits?.map((portrait, index) => (
+                                <li key={index}>
+                                    {portrait.size} (Quantity: {portrait.quantity})
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>Thank You Cards:</strong> {pkg.additionalItems.thankYouCards}
+                    </div>
+                </>
+            );
+        } else {
+            return <div>No additional items available</div>;
+        }
+    };
+
     // @ts-ignore
     return (
         <div className="container mx-auto p-4">
@@ -58,6 +98,9 @@ const HomePage = () => {
                                 <p>{pkg.description}</p>
                                 <p>Price: {pkg.investment} LKR</p>
                                 <p>Status: {pkg.packageType}</p>
+
+                                {/* Render additional items safely */}
+                                {renderAdditionalItems(pkg)}
 
                                 <div className="mt-2 flex space-x-4">
                                     {/* Edit link */}
