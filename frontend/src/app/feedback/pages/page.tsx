@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllFeedback, deleteFeedback } from "@/services/feedbackService";
+import { getAllFeedback, deleteFeedback } from "@/app/feedback/services/feedbackService";
 import { Button } from "@/components/ui/button";
 
 interface Feedback {

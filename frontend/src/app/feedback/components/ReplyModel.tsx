@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { addReply } from "@/services/feedbackService";
-import { Button } from "@/components/ui/button";
+import { addReply } from "@/app/feedback/services/feedbackService";
+import { Button } from "@/app/feedback/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface ReplyModalProps {

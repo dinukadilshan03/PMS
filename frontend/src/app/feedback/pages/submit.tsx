@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { submitFeedback } from "@/services/feedbackService";
+import { submitFeedback } from "@/app/feedback/services/feedbackService";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/app/feedback/components/ui/button";
+import { Input } from "@/app/feedback/components/ui/input";
+import { Textarea } from "@/app/feedback/components/ui/textarea";
 
 export default function SubmitFeedback() {
     const router = useRouter();
