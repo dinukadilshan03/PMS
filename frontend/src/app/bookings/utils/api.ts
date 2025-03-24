@@ -1,4 +1,4 @@
-// utils/api.ts
+// utils/page.tsx
 import axios from 'axios';
 
 export const createBooking = async (data: never) => {
