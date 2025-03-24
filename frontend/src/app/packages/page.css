@@ -1,0 +1,195 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* Container for the main content */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+h1 {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #4A90E2;
+    animation: fadeIn 2s ease-in-out;
+}
+
+/* Create Package Button */
+a {
+    display: inline-block;
+    background-color: #4A90E2;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+a:hover {
+    background-color: #3070cc;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+a:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(72, 144, 226, 0.8);
+}
+
+/* Loading and Package List */
+ul {
+    list-style-type: none;
+}
+
+ul li {
+    background-color: #fff;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    animation: slideUp 0.5s ease-in-out;
+}
+
+ul li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+ul li h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+ul li p {
+    font-size: 16px;
+    color: #555;
+    margin: 10px 0;
+}
+
+ul li .mt-2 {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+/* Edit and Delete Buttons */
+button, a.text-blue-500 {
+    color: #007BFF;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+button:hover, a.text-blue-500:hover {
+    color: #0056b3;
+}
+
+/* Delete Button */
+button {
+    color: #ff3b30;
+    border: none;
+    background: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    color: #e0291d;
+}
+
+/* Empty State */
+ul li.no-packages {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Popup for confirmation dialog */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.popup.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+.popup-content h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.popup-content .btn {
+    padding: 10px 20px;
+    background-color: #4A90E2;
+    color: #fff;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.popup-content .btn:hover {
+    background-color: #3070cc;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

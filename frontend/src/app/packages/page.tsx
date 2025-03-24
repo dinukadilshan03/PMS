@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+// @ts-ignore
 import { Package } from '@/app/packages/types/Package';
 import { getPackages, deletePackage } from '@/app/packages/utils/api';
 import Link from 'next/link';
+import "./page.css";
 
 const HomePage = () => {
     const [packages, setPackages] = useState<Package[]>([]);
