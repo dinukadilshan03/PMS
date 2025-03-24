@@ -13,6 +13,7 @@ export default function AlbumShow() {
             try {
                 const data = await fetchAlbums();
                 setAlbums(data);
+                console.log(data)
             } catch (error) {
                 console.error("Error fetching albums:", error);
             }
