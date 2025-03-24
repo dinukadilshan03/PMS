@@ -99,4 +99,32 @@ public class BookingService {
         booking.setPaymentStatus(paymentStatus);
         return bookingRepository.save(booking);
     }
+
+    public List<Booking> getUserBookings(String userId) {
+        return bookingRepository.findByUserId(userId);
+    }
+
+    public Booking rescheduleBooking(String bookingId, LocalDateTime newDateTime) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Check if the new time is available
+        if (!isTimeSlotAvailable(newDateTime)) {
+            throw new RuntimeException("The selected time slot is not available");
+        }
+
+        booking.setDateTime(newDateTime);
+        return bookingRepository.save(booking);
+    }
+
+    private boolean isTimeSlotAvailable(LocalDateTime dateTime) {
+        // Get the start and end of the day
+        LocalDateTime startOfDay = dateTime.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = dateTime.toLocalDate().atTime(23, 59, 59);
+
+        // Check if there are any bookings at this time
+        List<Booking> existingBookings = bookingRepository.findByDateTimeBetween(startOfDay, endOfDay);
+        return existingBookings.stream()
+                .noneMatch(b -> b.getDateTime().equals(dateTime));
+    }
 }

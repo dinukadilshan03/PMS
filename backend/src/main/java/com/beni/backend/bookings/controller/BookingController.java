@@ -30,4 +30,21 @@ public class BookingController {
         LocalDateTime parsedDate = LocalDateTime.parse(date + "T00:00:00");
         return bookingService.getAvailableSlots(parsedDate);
     }
+
+    @GetMapping("/user/{userId}")
+    public List<Booking> getUserBookings(@PathVariable String userId) {
+        return bookingService.getUserBookings(userId);
+    }
+
+    @PutMapping("/{bookingId}/cancel")
+    public Booking cancelUserBooking(@PathVariable String bookingId) {
+        return bookingService.cancelBooking(bookingId);
+    }
+
+    @PutMapping("/{bookingId}/reschedule")
+    public Booking rescheduleBooking(
+            @PathVariable String bookingId,
+            @RequestBody LocalDateTime newDateTime) {
+        return bookingService.rescheduleBooking(bookingId, newDateTime);
+    }
 }

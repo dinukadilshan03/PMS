@@ -1,4 +1,4 @@
-'use client';
+"use client"
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -21,10 +21,15 @@ export default function LoginPage() {
                 return;
             }
 
-            const data = await res.json();
+            const data = await res.json();  // Parse the JSON response
+            console.log('Login successful:', data);  // Log the response to inspect it
+
+            // Assuming the response contains 'userId' and 'role'
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('role', data.role);
-            router.push('/dashboard'); // or /bookings
+
+            router.push('/bookings'); // Navigate to /bookings after login
+
         } catch (err) {
             setError('Something went wrong');
             console.log(err);

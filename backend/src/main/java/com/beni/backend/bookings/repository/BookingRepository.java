@@ -17,4 +17,8 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
             String startDate,
             String endDate
     );
+
+    List<Booking> findByUserId(String userId);
+
+    Booking findByBookingId(String bookingId);
 }
