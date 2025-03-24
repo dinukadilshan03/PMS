@@ -7,6 +7,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document (collection = "portfolios")
 @Data
 @AllArgsConstructor
@@ -16,10 +18,13 @@ public class Portfolio {
 
     @Id
     private String id;
-    private String staffID;
+    private String albumName;
+    private String description;
+    private String photographerName;
     private String category;
-    private String imageURL;
+    private String imageUrl;
 
     @CreatedDate
-    private String dateUploaded;
+    private Date dateUploaded;
+
 }
