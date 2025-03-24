@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PortfolioService {
@@ -44,7 +45,19 @@ public class PortfolioService {
     }
 
     public boolean deleteImage(String id){
+        Portfolio image = portfolioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Album not found with ID: " + id));
+
+        // Delete the cover image
+        if (image.getImageUrl() != null && !image.getImageUrl().isEmpty()) {
+            fileStorageService.deleteFile(image.getImageUrl());
+        }
+
         portfolioRepository.deleteById(id);
         return true;
+    }
+
+    public Optional<Portfolio> getPortfolio(String id) {
+        return portfolioRepository.findById(id);
     }
 }
