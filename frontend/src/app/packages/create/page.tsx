@@ -1,7 +1,6 @@
-"use client"; // Important to mark this as a client component
-import { createPackage } from "@/app/packages/utils/api";
+"use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";  // Updated import for next/navigation
+import { useRouter } from "next/navigation";
 
 const CreatePackage = () => {
     const [name, setName] = useState("");
@@ -15,9 +14,52 @@ const CreatePackage = () => {
     const [thankYouCards, setThankYouCards] = useState("");
     const router = useRouter();
 
+    // Validate form fields
+    const validateForm = () => {
+        if (!name.trim()) {
+            alert("Package name is required.");
+            return false;
+        }
+        if (!investment || isNaN(Number(investment)) || Number(investment) <= 0) {
+            alert("Investment must be a valid positive number.");
+            return false;
+        }
+        if (!packageType.trim()) {
+            alert("Package type is required.");
+            return false;
+        }
+        if (servicesIncluded.length === 0 || servicesIncluded.some(service => !service.trim())) {
+            alert("At least one service is required.");
+            return false;
+        }
+        if (!editedImages || isNaN(Number(editedImages)) || Number(editedImages) < 0) {
+            alert("Edited images must be a valid number.");
+            return false;
+        }
+        if (!uneditedImages || isNaN(Number(uneditedImages)) || Number(uneditedImages) < 0) {
+            alert("Unedited images must be a valid number.");
+            return false;
+        }
+        if (albums.some(album => !album.size.trim() || !album.type.trim() || isNaN(Number(album.spreadCount)) || Number(album.spreadCount) < 0)) {
+            alert("Each album must have a valid size, type, and spread count greater than or equal to 0.");
+            return false;
+        }
+        if (framedPortraits.some(portrait => !portrait.size.trim() || isNaN(Number(portrait.quantity)) || Number(portrait.quantity) <= 0)) {
+            alert("Each framed portrait must have a valid size and quantity.");
+            return false;
+        }
+        if (!thankYouCards || isNaN(Number(thankYouCards)) || Number(thankYouCards) <= 0) {
+            alert("Thank You Cards must be a valid positive number.");
+            return false;
+        }
+        return true;
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateForm()) return;
 
         const packageData = {
             name,
@@ -44,7 +86,7 @@ const CreatePackage = () => {
 
             if (res.ok) {
                 alert("Package created successfully!");
-                router.push("/"); // Redirect to homepage or package list
+                router.push("/");
             } else {
                 alert("Failed to create package.");
             }
@@ -54,7 +96,6 @@ const CreatePackage = () => {
         }
     };
 
-    // Handle changes in the form
     const handleServiceChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const { value } = e.target;
         const updatedServices = [...servicesIncluded];
