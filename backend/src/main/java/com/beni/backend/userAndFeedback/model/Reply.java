@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 public class Reply {
-    private String staffId; // ID of the photographer or staff who replied
-    private String message;
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private String staffId;            // ID of the photographer who replied
+    private String message;           // The reply message
+    private LocalDateTime timestamp = LocalDateTime.now();            // Timestamp when the reply was created (defaults to current time)
 }

@@ -12,8 +12,8 @@ import java.util.List;
 
 @Setter
 @Getter
-@AllArgsConstructor
-@Document(collection = "feedbacks")
+@AllArgsConstructor           // Generates a constructor with all fields as arguments
+@Document(collection = "feedbacks")          // Specifies the collection name in MongoDB
 public class Feedback {
 
     @Id
@@ -23,25 +23,27 @@ public class Feedback {
     private String message;
     private int rating; // e.g., 1-5 stars
     private String category; // e.g., "Photography", "Service", "Price"
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp = LocalDateTime.now();                // Timestamp when the feedback was created
 
     private List<Reply> replies = new ArrayList<>(); // List of replies
 
-    // Constructors
+    // Default constructor (for Lombok and MongoDB)
     public Feedback() {}
 
+    // Constructor to initialize a new Feedback object with necessary fields
     public Feedback(String customerId, String bookingId, String message, int rating, String category) {
         this.clientId = customerId;
         this.bookingId = bookingId;
         this.message = message;
         this.rating = rating;
         this.category = category;
-        this.timestamp = LocalDateTime.now();
-        this.replies = new ArrayList<>();
+        this.timestamp = LocalDateTime.now();         // Set current timestamp when feedback is created
+        this.replies = new ArrayList<>();             // Initialize empty replies list
     }
 
+    // Method to add a reply to the feedback
     public void addReply(Reply reply) {
-        this.replies.add(reply);
+        this.replies.add(reply);             // Add the given reply to the list of replies
     }
 
 }

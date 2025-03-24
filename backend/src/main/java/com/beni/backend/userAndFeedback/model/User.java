@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @Getter
 @Document(collection = "users")
-@Data
+@Data               // Lombok annotation that generates getters, setters
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {

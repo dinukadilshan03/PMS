@@ -13,20 +13,28 @@ import java.util.Optional;
 public class FeedbackService {
 
     @Autowired
-    private FeedbackRepo feedbackRepo;
+    private FeedbackRepo feedbackRepo;         // Autowire the FeedbackRepo for interaction with the database
 
+
+    // Method to add new feedback
     public Feedback addFeedback(Feedback feedback) {
         return feedbackRepo.save(feedback);
     }
 
+
+    // Method to retrieve all feedbacks
     public List<Feedback> getAllFeedbacks() {
         return feedbackRepo.findAll();
     }
 
+
+    // Method to retrieve feedback by its category
     public List<Feedback> getFeedbackByCategory(String category) {
         return feedbackRepo.findByCategory(category);
     }
 
+
+    // Method to delete feedback by ID
     public boolean deleteFeedback(String id) {
         Optional<Feedback> feedback = feedbackRepo.findById(id);
         if (feedback.isPresent()) {

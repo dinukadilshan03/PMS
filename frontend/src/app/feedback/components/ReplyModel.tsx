@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { addReply } from "@/app/feedback/services/feedbackService";
-import { Button } from "@/app/feedback/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {Button} from "@/app/feedback/components/ui/Button";
+import { Input } from "@/app/feedback/components/ui/input";
 
 interface ReplyModalProps {
     feedbackId: string;
