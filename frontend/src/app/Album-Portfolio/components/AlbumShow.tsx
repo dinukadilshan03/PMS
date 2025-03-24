@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { fetchAlbums } from "@/app/Album-Portfolio/utils/api";
 import { Album } from "@/app/Album-Portfolio/types/types";
 
-export default function AlbumsShow() {
+export default function AlbumShow() {
     // State to store the list of albums
     const [albums, setAlbums] = useState<Album[]>([]);
 
