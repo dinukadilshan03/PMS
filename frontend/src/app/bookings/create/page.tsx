@@ -1,4 +1,4 @@
-// app/bookings/create/api.ts
+// app/bookings/create/page.tsx
 "use client"
 import React, { useState } from 'react';
 import BookingForm from '@/app/bookings/components/BookingForm';

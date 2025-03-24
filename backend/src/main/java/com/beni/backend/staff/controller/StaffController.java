@@ -48,19 +48,13 @@ public class StaffController {
 
     // Staff: Get own availability schedule
     @GetMapping("/availability/{id}")
-    public List<Staff.Availability> getStaffAvailability(@PathVariable String id) {
+    public Staff getStaffAvailability(@PathVariable String id) {
         return staffService.getStaffAvailability(id);
     }
 
-    // Staff: Update own availability (staff can change this on their page)
+    // Staff: Update own availability (staff can change their availability)
     @PutMapping("/availability/{id}")
-    public Staff updateAvailability(@PathVariable String id, @RequestBody List<Staff.Availability> updatedAvailability) {
-        return staffService.updateAvailability(id, updatedAvailability);
-    }
-
-    // Admin: Assign photographer to event (only if available)
-    @PutMapping("/assign/{id}")
-    public Staff assignPhotographerToEvent(@PathVariable String id, @RequestBody String eventName) {
-        return staffService.assignPhotographerToEvent(id, eventName);
+    public Staff updateAvailability(@PathVariable String id, @RequestBody boolean availability) {
+        return staffService.updateAvailability(id, availability);
     }
 }

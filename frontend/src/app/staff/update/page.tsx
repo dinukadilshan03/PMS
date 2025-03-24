@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router"; // For getting the ID from the URL
+import { updateStaff, getStaffById } from "@/app/staff/utils/api"; // Import the API functions
 
 const UpdateStaffDetails: React.FC = () => {
     const router = useRouter();
@@ -17,15 +18,19 @@ const UpdateStaffDetails: React.FC = () => {
         availability: true,
     });
 
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>("");
+
     useEffect(() => {
         if (id) {
             const fetchStaffData = async () => {
                 try {
-                    const response = await fetch(`http://localhost:8080/api/staff/${id}`);
-                    const data = await response.json();
+                    const data = await getStaffById(id as string); // Fetch staff details by ID
                     setStaffData(data);
+                    setLoading(false);
                 } catch (err) {
-                    console.error("Failed to fetch staff data", err);
+                    setError("Failed to fetch staff details");
+                    setLoading(false);
                 }
             };
 
@@ -44,28 +49,22 @@ const UpdateStaffDetails: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:8080/api/staff/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(staffData),
-            });
-
-            if (response.ok) {
-                alert("Staff details updated successfully!");
-                router.push("/staff/list");  // Redirect to the staff list page
-            } else {
-                alert("Failed to update staff details");
-            }
+            await updateStaff(id as string, staffData); // Send updated data to the backend
+            alert("Staff details updated successfully!");
+            router.push("/staff/list");  // Redirect to the staff list page
         } catch (err) {
-            console.error("Error updating staff", err);
+            setError("Failed to update staff details");
         }
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
             <h1>Update Staff Details</h1>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Name:</label>

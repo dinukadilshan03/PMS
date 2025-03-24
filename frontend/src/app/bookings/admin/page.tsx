@@ -1,4 +1,4 @@
-// app/bookings/admin/api.ts
+// app/bookings/admin/page.tsx
 import AdminBookingsList from '@/app/bookings/components/AdminBookingsList';
 
 const AdminBookingsPage: React.FC = () => {

@@ -9,11 +9,8 @@ import java.util.List;
 @Repository
 public interface StaffRepository extends MongoRepository<Staff, String> {
 
-    // Find available staff members
-    List<Staff> findByAvailabilityIsAvailableTrue();
-
-    // Find staff available on a specific date
-    List<Staff> findByAvailabilityDateAndAvailabilityIsAvailableTrue(String date);
+    // Find all staff members who are available (availability is true)
+    List<Staff> findByAvailabilityTrue();
 
     // Find staff by specialization (e.g., Portraits, Weddings, Events)
     List<Staff> findBySpecialization(String specialization);

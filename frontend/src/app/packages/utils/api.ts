@@ -1,4 +1,4 @@
-// app/utils/api.ts
+// app/utils/page.tsx
 import { Package } from '../types/Package';
 
 // Function to fetch all packages from the backend
