@@ -28,13 +28,13 @@ public class StaffController {
         return staffService.getStaffById(id);
     }
 
-    // Admin: Add a new staff member
+    // Admin: Add a new staff member (including name, email, phone, address, experience, hourly rate, specialization, availability)
     @PostMapping
     public Staff addStaff(@RequestBody Staff staff) {
         return staffService.addStaff(staff);
     }
 
-    // Admin: Update staff details (including availability, assigned events, etc.)
+    // Admin: Update staff details (including name, email, phone, address, experience, hourly rate, specialization, availability)
     @PutMapping("/{id}")
     public Staff updateStaff(@PathVariable String id, @RequestBody Staff updatedStaff) {
         return staffService.updateStaff(id, updatedStaff);
