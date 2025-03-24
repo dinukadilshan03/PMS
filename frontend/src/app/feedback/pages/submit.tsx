@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { submitFeedback } from "@/app/feedback/services/feedbackService";
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/feedback/components/ui/button";
+import { Button } from "@/app/feedback/components/ui/Button";
 import { Input } from "@/app/feedback/components/ui/input";
 import { Textarea } from "@/app/feedback/components/ui/textarea";
 

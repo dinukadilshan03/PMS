@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getAllFeedback, deleteFeedback } from "@/app/feedback/services/feedbackService";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/feedback/components/ui/Button";
 
 interface Feedback {
     id: string;
