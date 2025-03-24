@@ -33,6 +33,7 @@ const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isExpanded, setIsExpanded] = useState<string | null>(null);
     const router = useRouter();
 
     // Fetch packages from the backend (MongoDB)
@@ -52,20 +53,22 @@ const CustomerDashboard = () => {
         fetchPackages();
     }, []); // Only run on mount
 
-    // Select a package for viewing details or customization
-    const handleSelectPackage = (pkg: Package) => {
-        setSelectedPackage(pkg); // Update selected package
+    // Toggle the expanded package on click
+    const handleToggleExpand = (pkgId: string) => {
+        if (isExpanded === pkgId) {
+            setIsExpanded(null); // Collapse the package if it's already expanded
+        } else {
+            setIsExpanded(pkgId); // Expand the clicked package
+        }
     };
 
     // Handle Add to Cart and Customize actions
     const handleAddToCart = (pkg: Package) => {
         alert(`Added ${pkg.name} to the cart!`);
-        // You can implement the add to cart functionality here
     };
 
     const handleCustomizePackage = (pkg: Package) => {
         alert(`Customizing package: ${pkg.name}`);
-        // You can implement the customize package functionality here
     };
 
     if (loading) {
@@ -73,105 +76,65 @@ const CustomerDashboard = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold mb-4">Customer Dashboard</h1>
+        <div className="container mx-auto p-6">
+            <h1 className="text-4xl font-bold text-center mb-8">Photography Packages</h1>
 
             {/* List Available Packages */}
-            <h2 className="text-2xl mb-4">Available Packages</h2>
-            <ul className="space-y-4">
+            <div className="package-list">
                 {packages.map((pkg) => (
-                    <li
+                    <div
                         key={pkg.id}
-                        className="bg-gray-100 p-4 rounded shadow-md cursor-pointer"
-                        onClick={() => handleSelectPackage(pkg)}
+                        className={`package-card p-4 cursor-pointer transform transition-all duration-300 ease-in-out ${
+                            isExpanded === pkg.id ? "scale-105" : "scale-100"
+                        }`}
+                        onClick={() => handleToggleExpand(pkg.id)}
                     >
-                        <h3 className="text-xl font-semibold">{pkg.name}</h3>
-                        <p><strong>Type:</strong> {pkg.packageType}</p>
-                        <p><strong>Price:</strong> {pkg.investment} LKR</p>
-                        {/* Display the image */}
                         <img
-                            src={pkg.image}  // Use the image URL from MongoDB
+                            src={'/images/pic.jpg'}  // Use the image URL from MongoDB
                             alt={pkg.name}
-                            className="w-full h-48 object-cover mt-4 rounded shadow-md"
+                            className="package-image"
                         />
-                    </li>
-                ))}
-            </ul>
-
-            {/* Display Selected Package Details */}
-            {selectedPackage && (
-                <div className="mt-8 flex gap-8">
-                    <div className="w-1/2">
-                        {/* Display the image of the selected package */}
-                        <img
-                            src={selectedPackage.image}  // Use the image URL from MongoDB
-                            alt={selectedPackage.name}
-                            className="w-full h-auto rounded shadow-lg"
-                        />
-                    </div>
-
-                    <div className="w-1/2">
-                        <h2 className="text-3xl font-semibold mb-4">{selectedPackage.name}</h2>
-
-                        {/* Display Services Included */}
-                        <h3 className="text-xl font-semibold mb-2">Photography Services Include</h3>
-                        <ul className="list-disc pl-6 mb-4">
-                            {selectedPackage.servicesIncluded.map((service, index) => (
-                                <li key={index}>{service}</li>
-                            ))}
-                        </ul>
-
-                        {/* Display Additional Items */}
-                        <h3 className="text-xl font-semibold mb-2">Additional Items</h3>
-                        <div className="mb-4">
-                            <p><strong>Edited Images:</strong> {selectedPackage.additionalItems.editedImages}</p>
-                            <p><strong>Unedited Images:</strong> {selectedPackage.additionalItems.uneditedImages}</p>
-                        </div>
-
-                        {/* Display Albums */}
-                        <h4 className="text-lg font-semibold mb-2">Albums</h4>
-                        <ul className="list-disc pl-6 mb-4">
-                            {selectedPackage.additionalItems.albums.map((album, index) => (
-                                <li key={index}>
-                                    {album.size} {album.type} (Spread Count: {album.spreadCount})
-                                </li>
-                            ))}
-                        </ul>
-
-                        {/* Display Framed Portraits */}
-                        <h4 className="text-lg font-semibold mb-2">Framed Portraits</h4>
-                        <ul className="list-disc pl-6 mb-4">
-                            {selectedPackage.additionalItems.framedPortraits.map((portrait, index) => (
-                                <li key={index}>
-                                    {portrait.size} (Quantity: {portrait.quantity})
-                                </li>
-                            ))}
-                        </ul>
-
-                        {/* Display Thank You Cards */}
-                        <p><strong>Thank You Cards:</strong> {selectedPackage.additionalItems.thankYouCards}</p>
-
-                        {/* Display Price */}
-                        <h3 className="text-xl font-semibold mt-4">Investment: {selectedPackage.investment} LKR</h3>
-
-                        {/* Buttons to either select or customize */}
                         <div className="mt-4">
-                            <button
-                                onClick={() => handleAddToCart(selectedPackage)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-                            >
-                                Add to Cart
-                            </button>
-                            <button
-                                onClick={() => handleCustomizePackage(selectedPackage)}
-                                className="bg-green-500 text-white px-4 py-2 rounded"
-                            >
-                                Customize Package
-                            </button>
+                            <h3 className="text-xl font-semibold">{pkg.name}</h3>
+                            <p><strong>Type:</strong> {pkg.packageType}</p>
+                            <p><strong>Price:</strong> {pkg.investment} LKR</p>
                         </div>
+
+                        {/* Expanded Package Details */}
+                        {isExpanded === pkg.id && (
+                            <div className="package-details mt-4 transition-all duration-300 ease-in-out">
+                                <h3 className="text-xl font-semibold mb-2">Photography Services Include</h3>
+                                <ul className="list-disc pl-6 mb-4">
+                                    {pkg.servicesIncluded.map((service, index) => (
+                                        <li key={index}>{service}</li>
+                                    ))}
+                                </ul>
+
+                                {/* Additional Items */}
+                                <h3 className="text-xl font-semibold mb-2">Additional Items</h3>
+                                <p><strong>Edited Images:</strong> {pkg.additionalItems.editedImages}</p>
+                                <p><strong>Unedited Images:</strong> {pkg.additionalItems.uneditedImages}</p>
+
+                                {/* Buttons */}
+                                <div className="mt-4 flex gap-4">
+                                    <button
+                                        onClick={() => handleAddToCart(pkg)}
+                                        className="btn btn-blue"
+                                    >
+                                        Add to Cart
+                                    </button>
+                                    <button
+                                        onClick={() => handleCustomizePackage(pkg)}
+                                        className="btn btn-green"
+                                    >
+                                        Customize Package
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                </div>
-            )}
+                ))}
+            </div>
         </div>
     );
 };
