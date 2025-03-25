@@ -52,96 +52,117 @@ const UpdateStaffPage: React.FC = () => {
 
     if (!staffData) {
         // Loading state while fetching staff data
-        return <div>Loading...</div>;
+        return <div className="text-center text-xl mt-10">Loading...</div>;
     }
 
     return (
-        <div>
-            <h1>Update Staff Details</h1>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <form onSubmit={handleSubmit}>
+        <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg mt-10">
+            <h1 className="text-xl font-bold mb-4 text-center text-blue-600">Update Staff Details</h1>
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                    <label>Name:</label>
+                    <label className="block text-xs font-medium text-gray-700">Name:</label>
                     <input
                         type="text"
                         name="name"
                         value={staffData.name}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Email:</label>
+                    <label className="block text-xs font-medium text-gray-700">Email:</label>
                     <input
                         type="email"
                         name="email"
                         value={staffData.email}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Phone:</label>
+                    <label className="block text-xs font-medium text-gray-700">Phone:</label>
                     <input
                         type="text"
                         name="phone"
                         value={staffData.phone}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Address:</label>
+                    <label className="block text-xs font-medium text-gray-700">Address:</label>
                     <input
                         type="text"
                         name="address"
                         value={staffData.address}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Experience:</label>
+                    <label className="block text-xs font-medium text-gray-700">Experience:</label>
                     <input
                         type="text"
                         name="experience"
                         value={staffData.experience}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Hourly Rate (in LKR):</label>
+                    <label className="block text-xs font-medium text-gray-700">Hourly Rate (in LKR):</label>
                     <input
                         type="number"
                         name="hourlyRate"
                         value={staffData.hourlyRate}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Specialization:</label>
+                    <label className="block text-xs font-medium text-gray-700">Specialization:</label>
                     <input
                         type="text"
                         name="specialization"
                         value={staffData.specialization}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
                     />
                 </div>
+
                 <div>
-                    <label>Availability:</label>
+                    <label className="block text-xs font-medium text-gray-700">Availability:</label>
                     <select
                         name="availability"
                         value={staffData.availability.toString()}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                     >
                         <option value="true">Available</option>
                         <option value="false">Busy</option>
                     </select>
                 </div>
-                <button type="submit">Update Staff</button>
+
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-700 mt-4"
+                >
+                    Update Staff
+                </button>
             </form>
         </div>
     );

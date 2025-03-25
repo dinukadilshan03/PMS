@@ -34,7 +34,7 @@ const StaffProfilePage: React.FC = () => {
 
             if (res.status >= 200 && res.status < 300) {
                 alert("Staff updated successfully!");
-                router.push(`/staff/staffprofile/${id}`); // Redirect to staff list page
+                router.push(`/staff/staffprofile/${id}`); // Redirect to staff profile page
             } else {
                 alert("Failed to update staff.");
             }
@@ -52,66 +52,76 @@ const StaffProfilePage: React.FC = () => {
 
     if (!staffData) {
         // Loading state while fetching staff data
-        return <div>Loading...</div>;
+        return <div className="text-center text-xl mt-10">Loading...</div>;
     }
 
     return (
-        <div>
-            <h1>Staff Profile</h1>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <form onSubmit={handleSubmit}>
+        <div className="container mx-auto p-6">
+            <h1 className="text-3xl font-bold text-center mb-6">Staff Profile</h1>
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md space-y-4">
                 <div>
-                    <label>Name:</label>
+                    <label className="block text-lg font-medium text-gray-700">Name:</label>
                     <input
                         type="text"
                         name="name"
                         value={staffData.name}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-2"
                         required
                     />
                 </div>
                 <div>
-                    <label>Email:</label>
+                    <label className="block text-lg font-medium text-gray-700">Email:</label>
                     <input
                         type="email"
                         name="email"
                         value={staffData.email}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-2"
                         required
                     />
                 </div>
                 <div>
-                    <label>Phone:</label>
+                    <label className="block text-lg font-medium text-gray-700">Phone:</label>
                     <input
                         type="text"
                         name="phone"
                         value={staffData.phone}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-2"
                         required
                     />
                 </div>
                 <div>
-                    <label>Address:</label>
+                    <label className="block text-lg font-medium text-gray-700">Address:</label>
                     <input
                         type="text"
                         name="address"
                         value={staffData.address}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-2"
                         required
                     />
                 </div>
                 <div>
-                    <label>Availability:</label>
+                    <label className="block text-lg font-medium text-gray-700">Availability:</label>
                     <select
                         name="availability"
                         value={staffData.availability.toString()}
                         onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-2"
                     >
                         <option value="true">Available</option>
                         <option value="false">Busy</option>
                     </select>
                 </div>
-                <button type="submit">Save Changes</button>
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-4"
+                >
+                    Save Changes
+                </button>
             </form>
         </div>
     );
