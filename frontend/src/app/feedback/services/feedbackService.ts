@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/feedback"; // Update if needed
+const API_URL = "http://localhost:8080/api/feedback";
 
 // Submit feedback
 export const submitFeedback = async (feedback: any) => {
