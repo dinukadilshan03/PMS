@@ -35,11 +35,11 @@ export default function SubmitFeedback() {
         <div className="p-6">
             <h1 className="text-2xl font-bold">Submit Feedback</h1>
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-                <Input name="clientId" placeholder="Client ID" onChange={handleChange} required />
-                <Input name="bookingId" placeholder="Booking ID" onChange={handleChange} required />
-                <Textarea name="message" placeholder="Message" onChange={handleChange} required />
-                <Input name="category" placeholder="Category (Photography, Service, etc.)" onChange={handleChange} required />
-                <Input type="number" name="rating" min="1" max="5" onChange={handleChange} required />
+                <Input name="clientId" placeholder="Client ID" value={feedback.clientId} onChange={handleChange} required />
+                <Input name="bookingId" placeholder="Booking ID" value={feedback.bookingId} onChange={handleChange} required />
+                <Textarea name="message" placeholder="Message" value={feedback.message} onChange={handleChange} required />
+                <Input name="category" placeholder="Category (Photography, Service, etc.)" value={feedback.category} onChange={handleChange} required />
+                <Input type="number" name="rating" min="1" max="5" value={feedback.rating} onChange={handleChange} required />
                 <Button type="submit" className="bg-blue-500">Submit</Button>
             </form>
         </div>
