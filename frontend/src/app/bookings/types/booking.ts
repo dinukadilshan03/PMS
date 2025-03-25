@@ -1,13 +1,12 @@
 // types/booking.ts
 export interface Booking {
-    bookingId: string;
+    id: string;
     dateTime: string;
     clientId: string;
-    packageId: string;
-    status: string;
+    bookingStatus: string;
     paymentStatus: string;
     phoneNumber: string;
     email: string;
     location: string;
-
+    packageName: string;
 }

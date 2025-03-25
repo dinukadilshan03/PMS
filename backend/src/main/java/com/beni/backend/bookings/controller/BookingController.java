@@ -2,8 +2,11 @@ package com.beni.backend.bookings.controller;
 
 import com.beni.backend.bookings.model.Booking;
 import com.beni.backend.bookings.service.BookingService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,32 +17,44 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @PostMapping
-    public Booking createBooking(@RequestBody Booking booking) {
-        return bookingService.createBooking(booking);
+    // Create booking endpoint
+    @PostMapping("/create")
+    public ResponseEntity<Booking> createBooking(@RequestBody Booking booking, @RequestHeader("Userid") String clientId) {
+        // Ensure the userId is provided in the request header
+        if (clientId == null || clientId.isEmpty()) {
+            return ResponseEntity.status(400).body(null); // Bad Request if userId is not provided
+        }
+
+        // Set the clientId for the booking
+        booking.setClientId(clientId);
+
+        // Create the booking
+        Booking createdBooking = bookingService.createBooking(booking);
+        return ResponseEntity.ok(createdBooking);
     }
 
-    @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingService.getAllBookings();
+    @GetMapping("/client")
+    public ResponseEntity<List<Booking>> getBookingsForClient(@RequestHeader("userId") String clientId) {
+        // Ensure the userId is provided in the request header
+        if (clientId == null || clientId.isEmpty()) {
+            return ResponseEntity.status(400).body(null); // Bad Request if userId is not provided
+        }
+
+        List<Booking> bookings = bookingService.getBookingsForClient(clientId);
+        return ResponseEntity.ok(bookings);
     }
 
-    @GetMapping("/available-slots")
-    public List<LocalDateTime> getAvailableSlots(@RequestParam String date) {
-        // Parse the date received as a string (e.g., "2025-04-15")
-        LocalDateTime parsedDate = LocalDateTime.parse(date + "T00:00:00");
-        return bookingService.getAvailableSlots(parsedDate);
+
+    @PutMapping("/reschedule/{bookingId}")
+    public ResponseEntity<Booking> rescheduleBooking(@PathVariable String bookingId, @RequestBody String newDateTime, HttpSession session) {
+        LocalDateTime newDateTimeParsed = LocalDateTime.parse(newDateTime);
+        Booking updatedBooking = bookingService.rescheduleBooking(bookingId, newDateTimeParsed);
+        return ResponseEntity.ok(updatedBooking);
     }
 
-    @PutMapping("/{bookingId}/cancel")
-    public Booking cancelUserBooking(@PathVariable String bookingId) {
-        return bookingService.cancelBooking(bookingId);
-    }
-
-    @PutMapping("/{bookingId}/reschedule")
-    public Booking rescheduleBooking(
-            @PathVariable String bookingId,
-            @RequestBody LocalDateTime newDateTime) {
-        return bookingService.rescheduleBooking(bookingId, newDateTime);
+    @DeleteMapping("/cancel/{bookingId}")
+    public ResponseEntity<Void> cancelBooking(@PathVariable String bookingId) {
+        bookingService.cancelBooking(bookingId);
+        return ResponseEntity.noContent().build();
     }
 }
