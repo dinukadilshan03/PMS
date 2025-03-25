@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import '../[id]/page.css'
 // Use React.use() to handle the Promise
 const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [name, setName] = useState("");
