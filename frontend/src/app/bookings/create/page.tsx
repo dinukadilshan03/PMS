@@ -1,28 +1,13 @@
-// app/bookings/create/page.tsx
-"use client"
-import React, { useState } from 'react';
-import BookingForm from '@/app/bookings/components/BookingForm';
+// pages/bookings/create.tsx
+import CreateBookingForm from '@/app/bookings/components/BookingForm';
 
-const BookingCreatePage: React.FC = () => {
-    const [isBookingSuccess, setIsBookingSuccess] = useState(false);
-
-    const handleSuccess = () => {
-        setIsBookingSuccess(true);
-    };
-
+const CreateBookingPage = () => {
     return (
         <div>
-            <h1>Create a New Booking</h1>
-            {!isBookingSuccess ? (
-                <BookingForm onSuccess={handleSuccess} />
-            ) : (
-                <div>
-                    <h2>Booking Successful!</h2>
-                    <p>Your booking has been created successfully. A confirmation email has been sent to you.</p>
-                </div>
-            )}
+            <h1 className="text-2xl font-bold text-center mt-8">Create a Booking</h1>
+            <CreateBookingForm />
         </div>
     );
 };
 
-export default BookingCreatePage;
+export default CreateBookingPage;

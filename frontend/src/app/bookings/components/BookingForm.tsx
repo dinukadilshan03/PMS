@@ -1,113 +1,142 @@
-// components/BookingForm.tsx
-import React, { useState } from 'react';
-import axios from 'axios';
+// components/CreateBookingForm.tsx
+"use client"
+import { useState } from 'react';
 
-interface BookingFormProps {
-    onSuccess: () => void;
-}
-
-const BookingForm: React.FC<BookingFormProps> = ({ onSuccess }) => {
-    const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
-    const [packageId, setPackageId] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
+const CreateBookingForm = () => {
     const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [location, setLocation] = useState('');
-    const [error, setError] = useState('');
+    const [packageName, setPackageName] = useState('');
+    const [dateTime, setDateTime] = useState('');
+    const [error, setError] = useState<string>('');
+    const [packages, setPackages] = useState([
+        { id: '1', name: 'Package A' },
+        { id: '2', name: 'Package B' },
+        { id: '3', name: 'Package C' },
+    ]);
 
-    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!date || !time || !packageId || !phoneNumber || !email) {
-            setError('Please fill all fields.');
+        // Retrieve userId from localStorage
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            setError('You must be logged in to make a booking');
             return;
         }
 
-        const formattedDateTime = `${date}T${time}`;
-
+        // Prepare the booking data
+        const bookingData = {
+            email,
+            phoneNumber,
+            location,
+            packageName,
+            dateTime,
+        };
 
         try {
-            await axios.post('http://localhost:8080/api/bookings', {
-                dateTime: formattedDateTime,
-                packageId,
-                phoneNumber,
-                email,
-                location,
-
+            const response = await fetch('http://localhost:8080/api/bookings/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': userId, // Add userId from localStorage to headers
+                },
+                body: JSON.stringify(bookingData),
             });
 
-            onSuccess(); // Call success callback
+            if (!response.ok) {
+                throw new Error('Booking creation failed');
+            }
+
+            // Handle success
+            alert('Booking created successfully!');
+            setEmail('');
+            setPhoneNumber('');
+            setLocation('');
+            setPackageName('');
+            setDateTime('');
         } catch (err) {
-            setError('Booking failed. Please try again.');
-            console.log(err);
+            setError('Error creating booking: ' + err.message);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="booking-form">
-            <div>
-                <label>
-                    Date:
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-                </label>
-            </div>
+        <div className="max-w-lg mx-auto p-4">
+            <h2 className="text-xl font-semibold mb-4">Create a New Booking</h2>
 
-            <div>
-                <label>
-                    Time:
-                    <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
-                </label>
-            </div>
+            {error && <p className="text-red-500">{error}</p>}
 
-            <div>
-                <label>
-                    Package:
-                    <select value={packageId} onChange={(e) => setPackageId(e.target.value)} required>
-                        <option value="">Select a package</option>
-                        <option value="basic">Basic Package</option>
-                        <option value="premium">Premium Package</option>
-                        <option value="deluxe">Deluxe Package</option>
-                    </select>
-                </label>
-            </div>
-
-            <div>
-                <label>
-                    Phone Number:
+            <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                     <input
-                        type="text"
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                        required
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input
+                        type="tel"
+                        id="phoneNumber"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                         required
                     />
-                </label>
-            </div>
+                </div>
 
-            <div>
-                <label>
-                    Email:
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                </label>
-            </div>
-
-            <div>
-                <label>
-                    Location:
+                <div className="mb-4">
+                    <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
                     <input
                         type="text"
+                        id="location"
                         value={location}
-                        onChange={(e) => setLocation(e.target.value)}  // Update location
+                        onChange={(e) => setLocation(e.target.value)}
+                        className="mt-1 p-2 w-full border border-gray-300 rounded-md"
                         required
                     />
-                </label>
-            </div>
+                </div>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+                <div className="mb-4">
+                    <label htmlFor="package" className="block text-sm font-medium text-gray-700">Package</label>
+                    <select
+                        id="package"
+                        value={packageName}
+                        onChange={(e) => setPackageName(e.target.value)}
+                        className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                        required
+                    >
+                        <option value="">Select a package</option>
+                        {packages.map((pkg) => (
+                            <option key={pkg.id} value={pkg.name}>{pkg.name}</option>
+                        ))}
+                    </select>
+                </div>
 
-            <button type="submit">Create Booking</button>
-        </form>
+                <div className="mb-4">
+                    <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">Date & Time</label>
+                    <input
+                        type="datetime-local"
+                        id="dateTime"
+                        value={dateTime}
+                        onChange={(e) => setDateTime(e.target.value)}
+                        className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                        required
+                    />
+                </div>
+
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">
+                    Create Booking
+                </button>
+            </form>
+        </div>
     );
 };
 
-export default BookingForm;
+export default CreateBookingForm;

@@ -17,15 +17,13 @@ public class AuthenticationController {
     @Autowired
     private UserRepository userRepository;
 
-    // Simple login endpoint
+    // Login endpoint
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDTO loginDTO, HttpSession session) {
         User user = userRepository.findByEmail(loginDTO.getEmail());
 
         if (user != null && user.getPassword().equals(loginDTO.getPassword())) {
-            session.setAttribute("userId", user.getId()); // Store the user ID in session
-
-            // Return userId and role as a JSON response
+            session.setAttribute("userId", user.getId()); // Store the userId in session
             LoginResponseDTO response = new LoginResponseDTO(user.getId(), user.getRole());
             return ResponseEntity.ok(response);
         }
