@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -47,14 +48,47 @@ public class BookingController {
 
     @PutMapping("/reschedule/{bookingId}")
     public ResponseEntity<Booking> rescheduleBooking(@PathVariable String bookingId, @RequestBody String newDateTime, HttpSession session) {
-        LocalDateTime newDateTimeParsed = LocalDateTime.parse(newDateTime);
-        Booking updatedBooking = bookingService.rescheduleBooking(bookingId, newDateTimeParsed);
-        return ResponseEntity.ok(updatedBooking);
+        // Remove any extra quotes or whitespace around the date-time string
+        newDateTime = newDateTime.trim().replaceAll("^\"|\"$", "");
+
+        try {
+            // Parse the cleaned-up date-time string into a LocalDateTime
+            LocalDateTime newDateTimeParsed = LocalDateTime.parse(newDateTime);
+
+            // Proceed with the reschedule logic
+            Booking updatedBooking = bookingService.rescheduleBooking(bookingId, newDateTimeParsed);
+            return ResponseEntity.ok(updatedBooking);
+
+        } catch (DateTimeParseException e) {
+            // Handle invalid date-time format
+            return ResponseEntity.status(400).body(null); // Bad Request if the date format is incorrect
+        }
     }
 
-    @DeleteMapping("/cancel/{bookingId}")
-    public ResponseEntity<Void> cancelBooking(@PathVariable String bookingId) {
+
+    @DeleteMapping("/delete/{bookingId}")
+    public ResponseEntity<Void> DeleteBooking(@PathVariable String bookingId) {
         bookingService.cancelBooking(bookingId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/cancel/{bookingId}")
+    public ResponseEntity<Booking> cancelBooking(@PathVariable String bookingId) {
+        // Fetch the booking by ID
+        Booking booking = bookingService.getBookingById(bookingId);
+
+        if (booking == null) {
+            return ResponseEntity.status(404).body(null); // Not Found if booking does not exist
+        }
+
+        // Set the booking status to "Cancelled"
+        booking.setBookingStatus("Cancelled");
+
+        // Save the updated booking back to the database
+        Booking updatedBooking = bookingService.saveBooking(booking);
+
+        return ResponseEntity.ok(updatedBooking); // Return the updated booking
+    }
+
+
 }
