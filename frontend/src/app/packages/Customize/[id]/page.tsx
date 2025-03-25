@@ -3,29 +3,32 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { jsPDF } from "jspdf";
 import './page.css';
+import {Package} from "@/app/packages/types/Package";
 
-interface Package {
-    id: string;
-    name: string;
-    investment: number;
-    packageType: string;
-    servicesIncluded: string[];
-    additionalItems: {
-        editedImages: string;
-        uneditedImages: string;
-        albums: Array<{
-            size: string;
-            type: string;
-            spreadCount: number;
-        }> | null;
-        framedPortraits: Array<{
-            size: string;
-            quantity: number;
-        }> | null;
-        thankYouCards: number | null;
-    };
-    image: string | null;
-}
+
+// interface Package {
+//     id: string;
+//     name: string;
+//     investment: number;
+//     packageType: string;
+//     servicesIncluded: string[]; // List of services that are initially included
+//     additionalItems: {
+//         editedImages: string;
+//         uneditedImages: string;
+//         albums: Array<{
+//             size: string;
+//             type: string;
+//             spreadCount: number;
+//         }> | null;
+//         framedPortraits: Array<{
+//             size: string;
+//             quantity: number;
+//         }> | null;
+//         thankYouCards: number | null;
+//     };
+//     image: string | null; // Image URL or path
+// }
+
 
 const CustomizePackage = () => {
     const { id } = useParams();

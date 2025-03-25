@@ -5,30 +5,31 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { jsPDF } from "jspdf";  // Import jsPDF for PDF generation
 import'../Dashboard/page.css'
+import {Package} from "@/app/packages/types/Package";
 
-// Define a package type interface
-interface Package {
-    id: string;
-    name: string;
-    investment: number;
-    packageType: string;
-    servicesIncluded: string[];
-    additionalItems: {
-        editedImages: string | null;
-        uneditedImages: string | null;
-        albums: Array<{
-            size: string;
-            type: string;
-            spreadCount: number;
-        }> | null;
-        framedPortraits: Array<{
-            size: string;
-            quantity: number;
-        }> | null;
-        thankYouCards: number | null;
-    };
-    image: string | null; // This will be the URL to the package image
-}
+// // Define a package type interface
+// interface Package {
+//     id: string;
+//     name: string;
+//     investment: number;
+//     packageType: string;
+//     servicesIncluded: string[];
+//     additionalItems: {
+//         editedImages: string | null;
+//         uneditedImages: string | null;
+//         albums: Array<{
+//             size: string;
+//             type: string;
+//             spreadCount: number;
+//         }> | null;
+//         framedPortraits: Array<{
+//             size: string;
+//             quantity: number;
+//         }> | null;
+//         thankYouCards: number | null;
+//     };
+//     image: string | null; // This will be the URL to the package image
+// }
 
 const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
