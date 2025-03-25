@@ -1,8 +1,9 @@
 'use client'; // Important to mark this as a client component
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';  // Correct import for dynamic routing
-import './page.css'
+import { useParams } from 'next/navigation'; // Correct import for dynamic routing
+import { jsPDF } from "jspdf";  // Import jsPDF
+import './page.css';
 
 interface Package {
     id: string;
@@ -28,11 +29,11 @@ interface Package {
 }
 
 const CustomizePackage = () => {
-    const { id } = useParams();  // useParams() to get the dynamic 'id'
+    const { id } = useParams(); // useParams() to get the dynamic 'id'
     const [packageData, setPackageData] = useState<Package | null>(null);
     const [price, setPrice] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const servicePrice = 500;  // Set the price increase when a service is selected
+    const servicePrice = 500; // Set the price increase when a service is selected
 
     useEffect(() => {
         // Fetch package data only if the `id` is available
@@ -93,6 +94,60 @@ const CustomizePackage = () => {
                 thankYouCards: updatedThankYouCards
             }
         });
+    };
+
+    const handleDownloadPDF = () => {
+        const doc = new jsPDF();
+
+        doc.setFontSize(22);
+        doc.text(packageData?.name || '', 10, 10);
+        doc.setFontSize(16);
+
+        // Package details
+        doc.text(`Package Type: ${packageData?.packageType}`, 10, 20);
+        doc.text(`Price: ${price} LKR`, 10, 30);
+
+        // List services included
+        doc.text('Services Included:', 10, 40);
+        packageData?.servicesIncluded.forEach((service, index) => {
+            doc.text(`${index + 1}. ${service}`, 10, 50 + (index * 10));
+        });
+
+        // Additional items
+        let yOffset = 50 + (packageData?.servicesIncluded.length || 0) * 10;
+        doc.text('Additional Items:', 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Edited Images: ${packageData?.additionalItems.editedImages}`, 10, yOffset);
+        yOffset += 10;
+        doc.text(`Unedited Images: ${packageData?.additionalItems.uneditedImages}`, 10, yOffset);
+        yOffset += 10;
+
+        // Albums
+        if (packageData?.additionalItems.albums) {
+            doc.text('Albums:', 10, yOffset);
+            yOffset += 10;
+            packageData.additionalItems.albums.forEach((album, index) => {
+                doc.text(`${index + 1}. Size: ${album.size}, Type: ${album.type}, Spread Count: ${album.spreadCount}`, 10, yOffset);
+                yOffset += 10;
+            });
+        }
+
+        // Framed Portraits
+        if (packageData?.additionalItems.framedPortraits) {
+            doc.text('Framed Portraits:', 10, yOffset);
+            yOffset += 10;
+            packageData.additionalItems.framedPortraits.forEach((portrait, index) => {
+                doc.text(`${index + 1}. Size: ${portrait.size}, Quantity: ${portrait.quantity}`, 10, yOffset);
+                yOffset += 10;
+            });
+        }
+
+        // Thank You Cards
+        doc.text(`Thank You Cards: ${packageData?.additionalItems.thankYouCards}`, 10, yOffset);
+
+        // Save PDF
+        doc.save(`${packageData?.name || 'custom-package'}.pdf`);
     };
 
     if (loading) return <div>Loading...</div>; // Return loading message if package data is not yet fetched
@@ -201,7 +256,10 @@ const CustomizePackage = () => {
                 className="border p-2"
             />
 
-            <button className="mt-6 p-2 bg-blue-500 text-white rounded">Finalize Customization</button>
+            <button className="mt-6 p-2 bg-blue-500 text-white rounded" onClick={handleDownloadPDF}>Download PDF</button>
+
+            {/* Book Now Button */}
+            <button className="mt-6 p-2 bg-green-500 text-white rounded">Book Now</button>
         </div>
     );
 };
