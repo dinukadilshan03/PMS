@@ -45,7 +45,7 @@ const CreateBookingForm = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Booking creation failed');
+                throw new Error('booking limit reached for this day');
             }
 
             // Handle success
