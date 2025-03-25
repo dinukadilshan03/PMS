@@ -50,24 +50,26 @@ const BookingList = () => {
 
         try {
             const response = await fetch(`http://localhost:8080/api/bookings/cancel/${bookingId}`, {
-                method: 'PATCH',
+                method: 'PATCH', // Use PATCH for status update
                 headers: {
                     'userId': userId,
-
                     'Content-Type': 'application/json',
                 },
             });
 
             if (!response.ok) {
-                throw new Error('Failed to cancel the booking');
+                const errorMessage = await response.text(); // Capture error message from backend
+                throw new Error(errorMessage);
             }
 
-            // Update the status of the booking to "Cancelled" instead of deleting it
+            // After successful cancellation, update the booking status in the UI
             setBookings(bookings.map(booking =>
                 booking.id === bookingId ? { ...booking, bookingStatus: 'Cancelled' } : booking
             ));
         } catch (err) {
-            setError('Error canceling the booking: ' + err.message);
+            // Display error message in pop-up or alert
+            setError(err.message); // Set error message from backend
+            alert(err.message); // Show the error in an alert (can be replaced with a pop-up or notification)
             console.error(err);
         }
     };
@@ -100,19 +102,25 @@ const BookingList = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to reschedule the booking');
+                const errorMessage = await response.text(); // Capture error message from backend
+                throw new Error(errorMessage); // If not successful, throw error with backend message
             }
 
+            // After successful rescheduling, update the booking in the UI
             const updatedBooking = await response.json();
             setBookings(bookings.map(booking =>
                 booking.id === updatedBooking.id ? updatedBooking : booking
             ));
+
+            // Close the modal after rescheduling
             setIsRescheduleModalOpen(false);
         } catch (err) {
-            setError('Error rescheduling the booking: ' + err.message);
+            setError('Error rescheduling the booking: ' + 'booking limit reached for this day'); // Set error message to state
+            alert(err.message); // Show the error message to the user in an alert (replace with custom modal if needed)
             console.error(err);
         }
     };
+
 
     return (
         <div>
