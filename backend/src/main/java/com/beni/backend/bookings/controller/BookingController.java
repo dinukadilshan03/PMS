@@ -36,7 +36,7 @@ public class BookingController {
     }
 
     @GetMapping("/client")
-    public ResponseEntity<List<Booking>> getBookingsForClient(@RequestHeader("userId") String clientId) {
+    public ResponseEntity<List<Booking>> getBookingsForClient(@RequestHeader("Userid") String clientId) {
         // Ensure the userId is provided in the request header
         if (clientId == null || clientId.isEmpty()) {
             return ResponseEntity.status(400).body(null); // Bad Request if userId is not provided
