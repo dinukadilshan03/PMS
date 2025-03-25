@@ -1,4 +1,3 @@
-// StaffList.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -10,6 +9,7 @@ const AdminStaffList: React.FC = () => {
     const [error, setError] = useState<string>("");
     const router = useRouter();
 
+    // Fetch the list of staff members
     useEffect(() => {
         const fetchStaffList = async () => {
             try {
@@ -23,9 +23,24 @@ const AdminStaffList: React.FC = () => {
         fetchStaffList();
     }, []);
 
-    // Function to redirect to the update page
+    // Redirect to update page
     const goToUpdatePage = (id: string) => {
         router.push(`/staff/update/${id}`);
+    };
+
+    // Toggle availability status
+    const updateAvailability = async (id: string, availability: boolean) => {
+        try {
+            await axios.put(`http://localhost:8080/api/staff/availability/${id}`, {
+                availability,
+            });
+            // Re-fetch the staff list after updating availability
+            const response = await axios.get<Staff[]>("http://localhost:8080/api/staff");
+            setStaffList(response.data);
+        } catch (err) {
+            setError("Failed to update availability.");
+            console.log(err);
+        }
     };
 
     return (
@@ -58,12 +73,20 @@ const AdminStaffList: React.FC = () => {
                             <td>{staff.experience}</td>
                             <td>{staff.hourlyRate}</td>
                             <td>{staff.specialization}</td>
-                            <td>{staff.availability ? "Available" : "Busy"}</td>
                             <td>
-                                {/* Toggle availability */}
-                                <button onClick={() => {/* Toggle availability logic here */}}>
-                                    Toggle Availability
-                                </button>
+                                {staff.availability ? (
+                                    <>
+                                        <span style={{ marginRight: "10px" }}>Available</span>
+                                        <button onClick={() => updateAvailability(staff.id, !staff.availability)}>
+                                            Toggle Availability
+                                        </button>
+                                    </>
+                                ) : (
+                                    <span>Busy</span>
+                                )}
+                            </td>
+
+                            <td>
                                 {/* Update Staff */}
                                 <button onClick={() => goToUpdatePage(staff.id)}>
                                     Update
