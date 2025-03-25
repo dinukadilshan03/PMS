@@ -5,6 +5,8 @@ import { Package } from '@/app/packages/types/Package';
 import { getPackages, deletePackage } from '@/app/packages/utils/api';
 import Link from 'next/link';
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
+
+// Import necessary CSS files
 import "../Ad_View/page.css";
 import "../globals.css";
 
@@ -35,7 +37,6 @@ const HomePage = () => {
         }
     };
 
-    // Conditional check to ensure additionalItems is not null before rendering
     const renderAdditionalItems = (pkg: Package) => {
         if (pkg.additionalItems) {
             return (
@@ -71,12 +72,10 @@ const HomePage = () => {
                     </div>
                 </div>
             );
-        } else {
-            return <div>No additional items available</div>;
         }
+        return <div>No additional items available</div>;
     };
 
-    // Generate PDF for each package
     const handleDownloadPDF = (pkg: Package) => {
         const doc = new jsPDF();
 
@@ -84,11 +83,8 @@ const HomePage = () => {
         doc.text(pkg.name, 10, 10);
         doc.setFontSize(16);
 
-        // Package details
         doc.text(`Package Type: ${pkg.packageType}`, 10, 20);
         doc.text(`Price: ${pkg.investment} LKR`, 10, 30);
-
-        // List services included
         doc.text('Services Included:', 10, 40);
         pkg.servicesIncluded.forEach((service, index) => {
             doc.text(`${index + 1}. ${service}`, 10, 50 + (index * 10));
@@ -124,19 +120,20 @@ const HomePage = () => {
             });
         }
 
-        // Thank You Cards
         doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards || 'N/A'}`, 10, yOffset);
-
-        // Save PDF
         doc.save(`${pkg.name || 'custom-package'}.pdf`);
     };
 
     return (
-        <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
+        <div className="container mx-auto p-6 bg-gradient-to-br from-blue-100 to-indigo-200">  {/* Added background color */}
             <h1 className="text-3xl font-bold mb-6 text-center">Photography Packages</h1>
 
             {/* Create Package Link */}
-            <Link href="/packages/create" className="bg-blue-500 text-white px-6 py-3 rounded mb-6 inline-block hover:bg-blue-700 transition">
+            <Link
+                href="/packages/create"
+                className="bg-blue-500 text-white px-6 py-3 rounded mb-6 inline-block hover:bg-blue-700 transition duration-200"
+            >
                 Create Package
             </Link>
 
@@ -149,35 +146,35 @@ const HomePage = () => {
                         <li className="text-center">No packages available.</li>
                     ) : (
                         packages.map((pkg) => (
-                            <li key={pkg.id} className="package-card p-6 bg-gray-100 rounded-lg shadow-lg">
+                            <li key={pkg.id} className="package-card p-6 bg-white rounded-lg shadow-lg transition-transform transform hover:scale-105">
                                 <div className="package-header mb-4">
                                     <h2 className="text-2xl font-semibold text-gray-800">{pkg.name}</h2>
                                     <p className="text-xl text-gray-600">Price: {pkg.investment} LKR</p>
                                     <p className="text-lg text-gray-600">{pkg.packageType}</p>
                                 </div>
 
-                                {/* Render additional items safely */}
                                 {renderAdditionalItems(pkg)}
 
                                 {/* Action Buttons */}
                                 <div className="package-actions mt-6 flex justify-between space-x-6">
-                                    <Link href={`/packages/edit/${pkg.id}`} className="btn-edit text-blue-500 hover:text-blue-700 transition">
+                                    <Link
+                                        href={`/packages/edit/${pkg.id}`}
+                                        className="btn-edit text-blue-500 hover:text-blue-700 transition duration-200"
+                                    >
                                         Edit
                                     </Link>
 
                                     <div className="flex space-x-4">
-                                        {/* Delete Button */}
                                         <button
                                             onClick={() => handleDelete(pkg.id)}
-                                            className="btn-delete text-red-500 hover:text-red-700 transition"
+                                            className="btn-delete text-red-500 hover:text-red-700 transition duration-200"
                                         >
                                             Delete
                                         </button>
 
-                                        {/* Add Download PDF Button */}
                                         <button
                                             onClick={() => handleDownloadPDF(pkg)}
-                                            className="btn-download text-purple-500 hover:text-purple-700 transition"
+                                            className="btn-download text-purple-500 hover:text-purple-700 transition duration-200"
                                         >
                                             Download PDF
                                         </button>
@@ -188,6 +185,7 @@ const HomePage = () => {
                     )}
                 </ul>
             )}
+        </div>
         </div>
     );
 };
