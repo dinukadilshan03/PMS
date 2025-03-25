@@ -5,6 +5,7 @@ import { Package } from '@/app/packages/types/Package';
 import { getPackages, deletePackage } from '@/app/packages/utils/api';
 import Link from 'next/link';
 import "./page.css";
+import "./globals.css"
 
 const HomePage = () => {
     const [packages, setPackages] = useState<Package[]>([]);

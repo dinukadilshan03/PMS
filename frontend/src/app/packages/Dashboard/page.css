@@ -1,112 +1,175 @@
-/* Global Styles - Add this to your Tailwind configuration (globals.css) */
-body {
-    font-family: 'Inter', sans-serif; /* Clean and modern font */
-    background-color: #f9fafb; /* Light background color for the page */
-}
-
+/* General Container Styling */
 .container {
-    max-width: 1280px; /* Centering content */
-    margin: 0 auto; /* Center content */
-    padding: 1rem; /* Adding padding */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
+/* Header Styling */
 h1 {
-    color: #1f2937; /* Dark color for the heading */
-    font-weight: 700; /* Bold text */
-}
-
-h2 {
-    color: #1f2937;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2C3E50;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 h3 {
-    color: #374151; /* Subtle heading color */
+    font-size: 1.5rem;
+    color: #34495E;
+    margin-bottom: 10px;
 }
 
-button {
-    transition: all 0.3s ease; /* Smooth button hover transition */
+h4 {
+    font-size: 1.2rem;
+    color: #34495E;
+    margin-bottom: 8px;
 }
 
-button:hover {
-    transform: scale(1.05); /* Slight zoom on hover */
+p {
+    font-size: 1rem;
+    color: #7F8C8D;
+    margin-bottom: 10px;
 }
 
-/* Style for Package Cards */
+/* Input Fields Styling */
+input[type="text"],
+input[type="number"] {
+    padding: 8px;
+    font-size: 1rem;
+    width: 200px;
+    border: 2px solid #BDC3C7;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: #2980B9;
+}
+
+/* Filter Section */
+.mb-6 {
+    margin-bottom: 20px;
+}
+
+/* Package Card */
+.package-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
 .package-card {
-    background-color: #ffffff; /* White background */
-    border-radius: 15px; /* Rounded corners for a modern look */
-    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    overflow: hidden; /* Prevent overflow */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: all 0.3s ease; /* Smooth transition */
+    background-color: #ECF0F1;
+    border-radius: 10px;
+    padding: 20px;
+    transition: transform 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .package-card:hover {
-    transform: scale(1.05); /* Scale effect on hover */
+    transform: scale(1.05);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Styling for the Image */
 .package-image {
     width: 100%;
-    height: 200px; /* Fixed height for image consistency */
-    object-fit: cover; /* Make sure image is cropped well */
-    border-radius: 15px; /* Rounded corners for the image */
-    transition: opacity 0.3s ease;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-.package-image:hover {
-    opacity: 0.85; /* Subtle hover effect for images */
-}
-
-/* Details Section for Expanded Package */
 .package-details {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.package-details ul {
+    padding-left: 20px;
+}
+
+.package-card .package-details {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 2rem;
+    align-items: flex-start;
 }
 
-.package-details .image {
-    flex: 1;
-    max-width: 50%;
+.package-card .package-details p,
+.package-card .package-details ul {
+    margin-bottom: 15px;
 }
 
-.package-details .info {
-    flex: 1;
-    max-width: 50%;
-}
-
-/* Action Buttons */
+/* Buttons */
 .btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: bold;
-    color: white;
-    transition: all 0.3s ease;
+    padding: 12px 25px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .btn-blue {
-    background-color: #3b82f6; /* Blue button for 'Add to Cart' */
+    background-color: #3498DB;
+    color: #fff;
+    border: none;
 }
 
 .btn-blue:hover {
-    background-color: #2563eb; /* Darker blue on hover */
+    background-color: #2980B9;
+    transform: scale(1.05);
 }
 
 .btn-green {
-    background-color: #10b981; /* Green button for 'Customize' */
+    background-color: #2ECC71;
+    color: #fff;
+    border: none;
 }
 
 .btn-green:hover {
-    background-color: #059669; /* Darker green on hover */
+    background-color: #27AE60;
+    transform: scale(1.05);
 }
 
-/* For larger screen, we may need grid layout for listing packages */
-@media (min-width: 640px) {
+/* Flex for Buttons */
+.flex {
+    display: flex;
+    gap: 15px;
+}
+
+/* Empty State for No Packages */
+.no-packages {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #E74C3C;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
     .package-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Grid layout */
-        gap: 2rem; /* Space between the cards */
+        grid-template-columns: 1fr; /* Stack packages in a single column */
+    }
+
+    .package-image {
+        height: 150px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .flex {
+        flex-direction: column;
     }
 }
