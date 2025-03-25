@@ -35,7 +35,10 @@ const BookingList = () => {
                 const data = await response.json();
                 setBookings(data);
             } catch (err) {
-                setError('Error fetching bookings: ' + err.message);
+                const errorMessage = err instanceof Error
+                    ? `Error fetching bookings: ${err.message}`
+                    : 'Error fetching bookings: An unknown error occurred';
+                setError(errorMessage);
                 console.error(err);
             }
         };
@@ -119,8 +122,9 @@ const BookingList = () => {
                 booking.id === bookingId ? { ...booking, bookingStatus: 'Cancelled' } : booking
             ));
         } catch (err) {
-            setError(err.message);
-            alert(err.message);
+            const message = (err as Error).message;
+            setError(message);
+            alert(message);
             console.error(err);
         }
     };
@@ -165,9 +169,10 @@ const BookingList = () => {
             setIsRescheduleModalOpen(false);
             setNewDateTime('');
         } catch (err) {
-            setError('Error rescheduling the booking: ' + 'booking limit reached for this day');
-            alert(err.message);
-            console.error(err);
+            const errorMessage = 'Error rescheduling the booking: booking limit reached for this day';
+            setError(errorMessage);
+            alert(errorMessage);  // Alert the same message you set
+            console.error('Rescheduling error:', err);  // Log the actual error
         }
     };
 

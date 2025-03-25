@@ -80,7 +80,10 @@ const CreateBookingForm = () => {
             setSelectedPackage("");
             setDateTime("");
         } catch (err) {
-            setError("Error creating booking: " + err.message);
+            const errorMessage = err instanceof Error
+                ? `Error creating booking: ${err.message}`
+                : "Error creating booking: An unknown error occurred";
+            setError(errorMessage);
             console.error(err);
         }
     };
