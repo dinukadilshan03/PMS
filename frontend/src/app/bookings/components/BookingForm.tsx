@@ -1,26 +1,51 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const CreateBookingForm = () => {
-    const [email, setEmail] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [location, setLocation] = useState('');
-    const [packageName, setPackageName] = useState('');
-    const [dateTime, setDateTime] = useState('');
-    const [error, setError] = useState<string>('');
-    const [packages] = useState([
-        { id: '1', name: 'Package A' },
-        { id: '2', name: 'Package B' },
-        { id: '3', name: 'Package C' },
-    ]);
+    const searchParams = useSearchParams();
+    const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [location, setLocation] = useState("");
+    const [selectedPackage, setSelectedPackage] = useState("");
+    const [dateTime, setDateTime] = useState("");
+    const [error, setError] = useState("");
+    const [packages, setPackages] = useState<{id: string, name: string}[]>([]);
+
+    // Fetch packages from backend
+    useEffect(() => {
+        const fetchPackages = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/packages");
+                const data = await response.json();
+                setPackages(data);
+            } catch (error) {
+                console.error("Error fetching packages:", error);
+            }
+        };
+        fetchPackages();
+    }, []);
+
+    // Set the selected package when page loads or packages change
+    useEffect(() => {
+        const packageName = searchParams?.get("packageName");
+        if (packageName && packages.length > 0) {
+            const exists = packages.some(pkg => pkg.name === packageName);
+            if (exists) {
+                setSelectedPackage(packageName);
+            } else {
+                console.warn(`Package "${packageName}" not found`);
+            }
+        }
+    }, [searchParams, packages]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Retrieve userId from localStorage
-        const userId = localStorage.getItem('userId');
+        const userId = localStorage.getItem("userId");
         if (!userId) {
-            setError('You must be logged in to make a booking');
+            setError("You must be logged in to make a booking");
             return;
         }
 
@@ -29,33 +54,33 @@ const CreateBookingForm = () => {
             email,
             phoneNumber,
             location,
-            packageName,
+            packageName: selectedPackage,
             dateTime,
         };
 
         try {
-            const response = await fetch('http://localhost:8080/api/bookings/create', {
-                method: 'POST',
+            const response = await fetch("http://localhost:8080/api/bookings/create", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'userId': userId, // Add userId from localStorage to headers
+                    "Content-Type": "application/json",
+                    userId: userId, // Add userId from localStorage to headers
                 },
                 body: JSON.stringify(bookingData),
             });
 
             if (!response.ok) {
-                throw new Error('Booking limit reached for this day');
+                throw new Error("Booking limit reached for this day");
             }
 
             // Handle success
-            alert('Booking created successfully!');
-            setEmail('');
-            setPhoneNumber('');
-            setLocation('');
-            setPackageName('');
-            setDateTime('');
+            alert("Booking created successfully!");
+            setEmail("");
+            setPhoneNumber("");
+            setLocation("");
+            setSelectedPackage("");
+            setDateTime("");
         } catch (err) {
-            setError('Error creating booking: ' + err.message);
+            setError("Error creating booking: " + err.message);
             console.error(err);
         }
     };
@@ -108,14 +133,16 @@ const CreateBookingForm = () => {
                         <label htmlFor="package" className="block text-lg font-medium text-gray-700 mb-1">Package</label>
                         <select
                             id="package"
-                            value={packageName}
-                            onChange={(e) => setPackageName(e.target.value)}
+                            value={selectedPackage}
+                            onChange={(e) => setSelectedPackage(e.target.value)}
                             className="mt-1 p-3 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
                             required
                         >
                             <option value="">Select a package</option>
                             {packages.map((pkg) => (
-                                <option key={pkg.id} value={pkg.name}>{pkg.name}</option>
+                                <option key={pkg.id} value={pkg.name}>
+                                    {pkg.name}
+                                </option>
                             ))}
                         </select>
                     </div>
