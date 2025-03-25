@@ -15,12 +15,21 @@ interface Feedback {
     replies: { staffId: string; message: string; timestamp: string }[];
 }
 
+
+
 export default function FeedbackPage() {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
     useEffect(() => {
-        fetchFeedbacks();
-    }, []);
+        const loadFeedbacks = async () => {
+            try {
+                await fetchFeedbacks();
+            } catch (error) {
+                console.error("Error loading feedbacks:", error);
+            }
+        };
+        loadFeedbacks(); // Call the async function
+    }, []); // Only run on mount
 
     const fetchFeedbacks = async () => {
         try {
@@ -34,7 +43,7 @@ export default function FeedbackPage() {
     const handleDelete = async (id: string) => {
         try {
             await deleteFeedback(id);
-            fetchFeedbacks(); // Refresh list after delete
+            await fetchFeedbacks(); // Refresh list after delete
         } catch (error) {
             console.error("Error deleting feedback:", error);
         }
