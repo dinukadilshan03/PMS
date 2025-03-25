@@ -1,6 +1,7 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Booking } from '../types/booking';
+import { jsPDF } from "jspdf";
 
 const BookingList = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
@@ -8,6 +9,7 @@ const BookingList = () => {
     const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [newDateTime, setNewDateTime] = useState<string>('');
+    const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -40,6 +42,57 @@ const BookingList = () => {
 
         fetchBookings();
     }, []);
+
+    const generatePDF = () => {
+        if (!contentRef.current) return;
+
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Add title
+        doc.setFontSize(20);
+        doc.text('Your Bookings', 105, 20, { align: 'center' });
+
+        // Add current date
+        doc.setFontSize(12);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
+
+        let yPosition = 40;
+        const pageHeight = doc.internal.pageSize.height - 20;
+        const margin = 20;
+
+        // Add each booking
+        doc.setFontSize(12);
+        bookings.forEach((booking, index) => {
+            // Add new page if needed
+            if (yPosition > pageHeight) {
+                doc.addPage();
+                yPosition = margin;
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Booking #${index + 1}`, margin, yPosition);
+            yPosition += 8;
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Package: ${booking.packageName}`, margin, yPosition);
+            yPosition += 8;
+
+            doc.text(`Date: ${new Date(booking.dateTime).toLocaleString()}`, margin, yPosition);
+            yPosition += 8;
+
+            doc.text(`Status: ${booking.bookingStatus}`, margin, yPosition);
+            yPosition += 8;
+
+            // Add some space between bookings
+            yPosition += 10;
+        });
+
+        doc.save('bookings-list.pdf');
+    };
 
     const handleCancel = async (bookingId: string) => {
         const userId = localStorage.getItem('userId');
@@ -96,7 +149,7 @@ const BookingList = () => {
                     'userId': userId,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ dateTime: newDateTime }), // Send dateTime as an object
+                body: JSON.stringify({ dateTime: newDateTime }),
             });
 
             if (!response.ok) {
@@ -110,6 +163,7 @@ const BookingList = () => {
             ));
 
             setIsRescheduleModalOpen(false);
+            setNewDateTime('');
         } catch (err) {
             setError('Error rescheduling the booking: ' + 'booking limit reached for this day');
             alert(err.message);
@@ -119,31 +173,53 @@ const BookingList = () => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Your Bookings</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold text-gray-800">Your Bookings</h1>
+                <button
+                    onClick={generatePDF}
+                    className="bg-green-500 text-white px-4 py-2 rounded-md shadow hover:bg-green-600 transition"
+                >
+                    Download as PDF
+                </button>
+            </div>
+
             {error && <p className="text-red-500 mb-4">{error}</p>}
-            <ul className="space-y-4">
-                {bookings.map((booking) => (
-                    <li key={booking.id} className="border p-4 rounded-lg shadow-sm">
-                        <p className="text-lg font-semibold"><strong>Package:</strong> {booking.packageName}</p>
-                        <p className="text-gray-600"><strong>Date:</strong> {booking.dateTime}</p>
-                        <p className="text-gray-600"><strong>Status:</strong> {booking.bookingStatus}</p>
-                        <div className="flex mt-4">
-                            <button
-                                onClick={() => handleCancel(booking.id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md shadow mr-2 hover:bg-red-600 transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => handleReschedule(booking)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded-md shadow hover:bg-yellow-600 transition"
-                            >
-                                Reschedule
-                            </button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+
+            <div ref={contentRef}>
+                <ul className="space-y-4">
+                    {bookings.map((booking) => (
+                        <li key={booking.id} className="border p-4 rounded-lg shadow-sm">
+                            <p className="text-lg font-semibold"><strong>Package:</strong> {booking.packageName}</p>
+                            <p className="text-gray-600"><strong>Date:</strong> {new Date(booking.dateTime).toLocaleString()}</p>
+                            <p className="text-gray-600"><strong>Status:</strong>
+                                <span className={`ml-1 px-2 py-1 rounded text-xs font-medium ${
+                                    booking.bookingStatus === 'Confirmed' ? 'bg-green-100 text-green-800' :
+                                        booking.bookingStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                                            'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                    {booking.bookingStatus}
+                                </span>
+                            </p>
+                            <div className="flex mt-4">
+                                <button
+                                    onClick={() => handleCancel(booking.id)}
+                                    className="bg-red-500 text-white px-4 py-2 rounded-md shadow mr-2 hover:bg-red-600 transition"
+                                    disabled={booking.bookingStatus === 'Cancelled'}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleReschedule(booking)}
+                                    className="bg-yellow-500 text-white px-4 py-2 rounded-md shadow hover:bg-yellow-600 transition"
+                                    disabled={booking.bookingStatus === 'Cancelled'}
+                                >
+                                    Reschedule
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
 
             {/* Modal for Rescheduling */}
             {isRescheduleModalOpen && (
@@ -157,13 +233,23 @@ const BookingList = () => {
                                 value={newDateTime}
                                 onChange={(e) => setNewDateTime(e.target.value)}
                                 className="border p-2 rounded w-full mt-1"
+                                min={new Date().toISOString().slice(0, 16)}
                             />
                         </label>
                         <div className="flex justify-end mt-4">
-                            <button onClick={handleSubmitReschedule} className="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 transition">
+                            <button
+                                onClick={handleSubmitReschedule}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 transition"
+                            >
                                 Submit
                             </button>
-                            <button onClick={() => setIsRescheduleModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-md shadow ml-2 hover:bg-gray-600 transition">
+                            <button
+                                onClick={() => {
+                                    setIsRescheduleModalOpen(false);
+                                    setNewDateTime('');
+                                }}
+                                className="bg-gray-500 text-white px-4 py-2 rounded-md shadow ml-2 hover:bg-gray-600 transition"
+                            >
                                 Cancel
                             </button>
                         </div>
