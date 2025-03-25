@@ -30,8 +30,8 @@ export default function ReplyModal({ feedbackId, onClose }: ReplyModalProps) {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg">
                 <h2 className="text-lg font-bold">Reply to Feedback</h2>
-                <Input name="staffId" placeholder="Staff ID" onChange={handleChange} />
-                <Input name="message" placeholder="Reply Message" onChange={handleChange} />
+                <Input name="staffId" placeholder="Staff ID" value={reply.staffId} onChange={handleChange} />
+                <Input name="message" placeholder="Reply Message" value={reply.message} onChange={handleChange} />
                 <Button onClick={handleSubmit} className="mt-2 bg-green-500">Submit</Button>
                 <Button onClick={onClose} className="mt-2 bg-gray-500">Cancel</Button>
             </div>
