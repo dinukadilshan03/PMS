@@ -49,7 +49,7 @@ public class FeedbackService {
         Optional<Feedback> feedbackOpt = feedbackRepo.findById(feedbackId);
         if (feedbackOpt.isPresent()) {
             Feedback feedback = feedbackOpt.get();
-            feedback.addReply(reply);
+            //feedback.addReply(reply);
             return feedbackRepo.save(feedback);
         }
         return null; // if feedback not found

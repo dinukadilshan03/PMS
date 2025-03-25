@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/feedback") // Base URL for feedback-related endpoints
-@CrossOrigin("*") // Allow frontend access from any origin
+//@CrossOrigin("*") // Allow frontend access from any origin
 public class FeedbackController {
 
     @Autowired
