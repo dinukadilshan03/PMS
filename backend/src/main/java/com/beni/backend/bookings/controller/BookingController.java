@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -47,9 +48,20 @@ public class BookingController {
 
 
     @PutMapping("/reschedule/{bookingId}")
-    public ResponseEntity<Booking> rescheduleBooking(@PathVariable String bookingId, @RequestBody String newDateTime, HttpSession session) {
+    public ResponseEntity<Booking> rescheduleBooking(@PathVariable String bookingId, @RequestBody Map<String, String> requestBody, HttpSession session) {
+        // Extract the dateTime from the request body (now it's a Map)
+        String newDateTime = requestBody.get("dateTime");
+
+        // Log the received date-time string
+        System.out.println("Received newDateTime: " + newDateTime);
+
         // Remove any extra quotes or whitespace around the date-time string
         newDateTime = newDateTime.trim().replaceAll("^\"|\"$", "");
+
+        // Check if seconds are missing and add them
+        if (newDateTime.length() == 16) { // "yyyy-MM-dd'T'HH:mm" (missing seconds)
+            newDateTime += ":00"; // Add the missing seconds part
+        }
 
         try {
             // Parse the cleaned-up date-time string into a LocalDateTime
@@ -61,9 +73,11 @@ public class BookingController {
 
         } catch (DateTimeParseException e) {
             // Handle invalid date-time format
+            System.out.println("Error parsing date-time: " + e.getMessage());
             return ResponseEntity.status(400).body(null); // Bad Request if the date format is incorrect
         }
     }
+
 
 
     @DeleteMapping("/delete/{bookingId}")

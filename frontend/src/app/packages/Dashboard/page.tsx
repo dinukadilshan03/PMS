@@ -73,10 +73,12 @@ const CustomerDashboard = () => {
         handleFilter();
     }, [searchName, minPrice, maxPrice]); // Trigger filter when the search or price changes
 
-    // Handle Add to Cart and Customize actions
     const handleBooking = (pkg: Package) => {
-        alert(`Book ${pkg.name} package now!`);
+        // No need to call useRouter here - it's already declared at component level
+        const query = new URLSearchParams({ packageName: pkg.name }).toString();
+        router.push(`/bookings/create?${query}`);
     };
+
 
     const handleCustomizePackage = (pkg: Package) => {
         alert(`Customizing package: ${pkg.name}`);
