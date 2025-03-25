@@ -65,4 +65,14 @@ public class BookingService {
     public void cancelBooking(String bookingId) {
         bookingRepository.deleteById(bookingId);
     }
+
+    // Method to get a booking by ID
+    public Booking getBookingById(String bookingId) {
+        return bookingRepository.findById(bookingId).orElse(null);
+    }
+
+    // Method to save an updated booking
+    public Booking saveBooking(Booking booking) {
+        return bookingRepository.save(booking);
+    }
 }
