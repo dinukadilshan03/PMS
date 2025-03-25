@@ -1,3 +1,4 @@
+
 package com.beni.backend;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,3 +26,4 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 }
+
