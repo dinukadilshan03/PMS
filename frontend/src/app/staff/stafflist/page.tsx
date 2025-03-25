@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Staff } from "@/app/staff/types/staff"; // Import the correct Staff type
 import { useRouter } from "next/navigation"; // Import the router for navigation
-import './page.css';
+
 
 const AdminStaffList: React.FC = () => {
     const [staffList, setStaffList] = useState<Staff[]>([]);
