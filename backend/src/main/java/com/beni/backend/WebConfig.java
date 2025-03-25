@@ -1,3 +1,4 @@
+
 package com.beni.backend;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +18,13 @@ public class WebConfig implements WebMvcConfigurer {
         String frontendUrl = "http://localhost:" + frontendPort;
 
         registry.addMapping("/**")
-                .allowedOrigins(frontendUrl,"http://localhost:3000")  // Allow requests from frontend
+
+                .allowedOrigins(frontendUrl,"http://localhost:3000","http://localhost:3002")  // Allow requests from frontend
+
                 .allowedMethods("GET", "POST", "PUT", "DELETE","PATCH")
+
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
 }
+

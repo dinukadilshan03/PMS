@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from 'react';
 import { Booking } from '../types/booking';
 
@@ -53,21 +53,21 @@ const BookingList = () => {
                 method: 'PATCH',
                 headers: {
                     'userId': userId,
-
                     'Content-Type': 'application/json',
                 },
             });
 
             if (!response.ok) {
-                throw new Error('Failed to cancel the booking');
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
             }
 
-            // Update the status of the booking to "Cancelled" instead of deleting it
             setBookings(bookings.map(booking =>
                 booking.id === bookingId ? { ...booking, bookingStatus: 'Cancelled' } : booking
             ));
         } catch (err) {
-            setError('Error canceling the booking: ' + err.message);
+            setError(err.message);
+            alert(err.message);
             console.error(err);
         }
     };
@@ -96,44 +96,47 @@ const BookingList = () => {
                     'userId': userId,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newDateTime),
+                body: JSON.stringify({ dateTime: newDateTime }), // Send dateTime as an object
             });
 
             if (!response.ok) {
-                throw new Error('Failed to reschedule the booking');
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
             }
 
             const updatedBooking = await response.json();
             setBookings(bookings.map(booking =>
                 booking.id === updatedBooking.id ? updatedBooking : booking
             ));
+
             setIsRescheduleModalOpen(false);
         } catch (err) {
-            setError('Error rescheduling the booking: ' + err.message);
+            setError('Error rescheduling the booking: ' + 'booking limit reached for this day');
+            alert(err.message);
             console.error(err);
         }
     };
 
     return (
-        <div>
-            <h1>Your Bookings</h1>
-            {error && <p className="text-red-500">{error}</p>}
-            <ul>
+        <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Your Bookings</h1>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            <ul className="space-y-4">
                 {bookings.map((booking) => (
-                    <li key={booking.id} className="border-b p-4">
-                        <p><strong>Package:</strong> {booking.packageName}</p>
-                        <p><strong>Date:</strong> {booking.dateTime}</p>
-                        <p><strong>Status:</strong> {booking.bookingStatus}</p>
-                        <div className="mt-2">
+                    <li key={booking.id} className="border p-4 rounded-lg shadow-sm">
+                        <p className="text-lg font-semibold"><strong>Package:</strong> {booking.packageName}</p>
+                        <p className="text-gray-600"><strong>Date:</strong> {booking.dateTime}</p>
+                        <p className="text-gray-600"><strong>Status:</strong> {booking.bookingStatus}</p>
+                        <div className="flex mt-4">
                             <button
                                 onClick={() => handleCancel(booking.id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                                className="bg-red-500 text-white px-4 py-2 rounded-md shadow mr-2 hover:bg-red-600 transition"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={() => handleReschedule(booking)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded"
+                                className="bg-yellow-500 text-white px-4 py-2 rounded-md shadow hover:bg-yellow-600 transition"
                             >
                                 Reschedule
                             </button>
@@ -142,26 +145,28 @@ const BookingList = () => {
                 ))}
             </ul>
 
-            {/* Modal for Reschedule */}
+            {/* Modal for Rescheduling */}
             {isRescheduleModalOpen && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <h2>Reschedule Booking</h2>
-                        <label>
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                        <h2 className="text-xl font-bold mb-4">Reschedule Booking</h2>
+                        <label className="block mb-2">
                             New Date and Time:
                             <input
                                 type="datetime-local"
                                 value={newDateTime}
                                 onChange={(e) => setNewDateTime(e.target.value)}
-                                className="border p-2"
+                                className="border p-2 rounded w-full mt-1"
                             />
                         </label>
-                        <button onClick={handleSubmitReschedule} className="bg-blue-500 text-white px-4 py-2 mt-4">
-                            Submit
-                        </button>
-                        <button onClick={() => setIsRescheduleModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 mt-4 ml-2">
-                            Cancel
-                        </button>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={handleSubmitReschedule} className="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 transition">
+                                Submit
+                            </button>
+                            <button onClick={() => setIsRescheduleModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-md shadow ml-2 hover:bg-gray-600 transition">
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

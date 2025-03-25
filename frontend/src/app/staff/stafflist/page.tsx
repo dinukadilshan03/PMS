@@ -4,6 +4,7 @@ import axios from "axios";
 import { Staff } from "@/app/staff/types/staff"; // Import the correct Staff type
 import { useRouter } from "next/navigation"; // Import the router for navigation
 
+
 const AdminStaffList: React.FC = () => {
     const [staffList, setStaffList] = useState<Staff[]>([]);
     const [error, setError] = useState<string>("");
@@ -43,6 +44,26 @@ const AdminStaffList: React.FC = () => {
         }
     };
 
+    // Handle Delete functionality
+    const handleDelete = async (id: string) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this staff member?");
+
+        if (confirmDelete) {
+            try {
+                // Delete the staff member from the database
+                await axios.delete(`http://localhost:8080/api/staff/${id}`);
+
+                // Remove the staff member from the list
+                setStaffList(staffList.filter(staff => staff.id !== id));
+
+                alert("Staff deleted successfully!");
+            } catch (err) {
+                setError("Failed to delete staff.");
+                console.log(err);
+            }
+        }
+    };
+
     return (
         <div>
             {error && <p style={{ color: "red" }}>{error}</p>}
@@ -78,7 +99,7 @@ const AdminStaffList: React.FC = () => {
                                     <>
                                         <span style={{ marginRight: "10px" }}>Available</span>
                                         <button onClick={() => updateAvailability(staff.id, !staff.availability)}>
-                                            Toggle Availability
+                                            Assign to Booking
                                         </button>
                                     </>
                                 ) : (
@@ -92,7 +113,7 @@ const AdminStaffList: React.FC = () => {
                                     Update
                                 </button>
                                 {/* Delete Staff */}
-                                <button onClick={() => {/* Delete logic here */}}>
+                                <button className="delete" onClick={() => handleDelete(staff.id)}>
                                     Delete
                                 </button>
                             </td>

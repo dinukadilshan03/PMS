@@ -1,10 +1,10 @@
-"use client"; // Important to mark this as a client component
+'use client'; // Important to mark this as a client component
 
-import '../globals.css'; // Include Tailwind CSS or any global styles
-import '../Dashboard/page.css';
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { jsPDF } from "jspdf";  // Import jsPDF for PDF generation
+import'../Dashboard/page.css'
 
 // Define a package type interface
 interface Package {
@@ -57,15 +57,6 @@ const CustomerDashboard = () => {
         fetchPackages();
     }, []); // Only run on mount
 
-    // Handle Add to Cart and Customize actions
-    const handleAddToCart = (pkg: Package) => {
-        alert(`Added ${pkg.name} to the cart!`);
-    };
-
-    const handleCustomizePackage = (pkg: Package) => {
-        alert(`Customizing package: ${pkg.name}`);
-    };
-
     // Filter packages based on the name and price range
     const handleFilter = () => {
         let filtered = packages.filter((pkg) => {
@@ -80,6 +71,70 @@ const CustomerDashboard = () => {
     useEffect(() => {
         handleFilter();
     }, [searchName, minPrice, maxPrice]); // Trigger filter when the search or price changes
+
+    // Handle Add to Cart and Customize actions
+    const handleBooking = (pkg: Package) => {
+        alert(`Book ${pkg.name} package now!`);
+    };
+
+    const handleCustomizePackage = (pkg: Package) => {
+        alert(`Customizing package: ${pkg.name}`);
+    };
+
+    // Generate PDF for each package
+    const handleDownloadPDF = (pkg: Package) => {
+        const doc = new jsPDF();
+
+        doc.setFontSize(22);
+        doc.text(pkg.name, 10, 10);
+        doc.setFontSize(16);
+
+        // Package details
+        doc.text(`Package Type: ${pkg.packageType}`, 10, 20);
+        doc.text(`Price: ${pkg.investment} LKR`, 10, 30);
+
+        // List services included
+        doc.text('Services Included:', 10, 40);
+        pkg.servicesIncluded.forEach((service, index) => {
+            doc.text(`${index + 1}. ${service}`, 10, 50 + (index * 10));
+        });
+
+        // Additional items
+        let yOffset = 50 + (pkg.servicesIncluded.length || 0) * 10;
+        doc.text('Additional Items:', 10, yOffset);
+        yOffset += 10;
+
+        doc.text(`Edited Images: ${pkg.additionalItems.editedImages || 'N/A'}`, 10, yOffset);
+        yOffset += 10;
+        doc.text(`Unedited Images: ${pkg.additionalItems.uneditedImages || 'N/A'}`, 10, yOffset);
+        yOffset += 10;
+
+        // Albums
+        if (pkg.additionalItems.albums) {
+            doc.text('Albums:', 10, yOffset);
+            yOffset += 10;
+            pkg.additionalItems.albums.forEach((album, index) => {
+                doc.text(`${index + 1}. Size: ${album.size}, Type: ${album.type}, Spread Count: ${album.spreadCount}`, 10, yOffset);
+                yOffset += 10;
+            });
+        }
+
+        // Framed Portraits
+        if (pkg.additionalItems.framedPortraits) {
+            doc.text('Framed Portraits:', 10, yOffset);
+            yOffset += 10;
+            pkg.additionalItems.framedPortraits.forEach((portrait, index) => {
+                doc.text(`${index + 1}. Size: ${portrait.size}, Quantity: ${portrait.quantity}`, 10, yOffset);
+                yOffset += 10;
+            });
+        }
+
+        // Thank You Cards
+        doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards || 'N/A'}`, 10, yOffset);
+
+        // Save PDF
+        doc.save(`${pkg.name || 'custom-package'}.pdf`);
+    };
 
     if (loading) {
         return <div>Loading packages...</div>; // Show loading message while fetching data
@@ -121,11 +176,6 @@ const CustomerDashboard = () => {
                 ) : (
                     filteredPackages.map((pkg) => (
                         <div key={pkg.id} className="package-card p-4 cursor-pointer transform transition-all duration-300 ease-in-out scale-100">
-                            {/*<img*/}
-                            {/*    src={pkg.image || '/images/default-image.jpg'}  // Use the image URL from MongoDB, fallback to a default image*/}
-                            {/*    alt={pkg.name}*/}
-                            {/*    className="package-image"*/}
-                            {/*/>*/}
                             <div className="mt-4">
                                 <h3 className="text-xl font-semibold">{pkg.name}</h3>
                                 <p><strong>Type:</strong> {pkg.packageType}</p>
@@ -170,16 +220,26 @@ const CustomerDashboard = () => {
                                 <p><strong>Thank You Cards:</strong> {pkg.additionalItems?.thankYouCards || 'N/A'}</p>
 
                                 {/* Buttons */}
-                                <div className="mt-4 flex gap-4">
+                                <div className="mt-4 flex gap-2">
                                     <button
-                                        onClick={() => handleAddToCart(pkg)}
+                                        onClick={() => handleBooking(pkg)}
                                         className="btn btn-blue"
                                     >
-                                        Add to Cart
+                                        Book Now!
                                     </button>
-                                    <Link href={`/packages/Customize/${pkg.id}`} className="btn btn-green">
-                                        Customize Package
+                                </div>
+                                <div className="mt-4 flex gap-4">
+                                    <Link href={`/packages/Customize/${pkg.id}`} onClick={() => handleCustomizePackage(pkg)} className="btn btn-green">
+                                        Customize
                                     </Link>
+                                </div>
+                                <div className="mt-4 flex gap-4">
+                                    <button
+                                        onClick={() => handleDownloadPDF(pkg)}
+                                        className="btn btn-purple"
+                                    >
+                                        Download PDF
+                                    </button>
                                 </div>
                             </div>
                         </div>
