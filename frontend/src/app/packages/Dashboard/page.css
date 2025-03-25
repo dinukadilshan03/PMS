@@ -137,7 +137,7 @@ input[type="number"]:focus {
 /* Flex for Buttons */
 .flex {
     display: flex;
-    gap: 15px;
+    gap: 5px;
 }
 
 /* Empty State for No Packages */
