@@ -170,3 +170,26 @@ h1 {
         grid-template-columns: 1fr;
     }
 }
+/*!* styles.css *!*/
+
+/*!* Header Styles *!*/
+/*header {*/
+/*    background: linear-gradient(90deg, rgba(37, 99, 235, 1) 0%, rgba(37, 99, 235, 0.7) 100%);*/
+/*}*/
+
+/*header h1 {*/
+/*    transition: transform 0.2s;*/
+/*}*/
+
+/*header h1:hover {*/
+/*    transform: scale(1.05);*/
+/*}*/
+
+/*nav a {*/
+/*    transition: background-color 0.3s, transform 0.2s;*/
+/*}*/
+
+/*nav a:hover {*/
+/*    background-color: rgba(29, 78, 216, 1); !* Adjust hover color for links *!*/
+/*    transform: translateY(-2px);*/
+/*}*/
