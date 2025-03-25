@@ -7,10 +7,10 @@ import { Input } from "@/app/feedback/components/ui/input";
 
 interface ReplyModalProps {
     feedbackId: string;
-    onClose: () => void;
+    onCloseAction: () => void;
 }
 
-export default function ReplyModal({ feedbackId, onClose }: ReplyModalProps) {
+export default function ReplyModal({ feedbackId, onCloseAction }: ReplyModalProps) {
     const [reply, setReply] = useState({ staffId: "", message: "" });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +20,7 @@ export default function ReplyModal({ feedbackId, onClose }: ReplyModalProps) {
     const handleSubmit = async () => {
         try {
             await addReply(feedbackId, reply);
-            onClose(); // Close modal after success
+            onCloseAction(); // Close modal after success
         } catch (error) {
             console.error("Error adding reply:", error);
         }
@@ -33,7 +33,7 @@ export default function ReplyModal({ feedbackId, onClose }: ReplyModalProps) {
                 <Input name="staffId" placeholder="Staff ID" value={reply.staffId} onChange={handleChange} />
                 <Input name="message" placeholder="Reply Message" value={reply.message} onChange={handleChange} />
                 <Button onClick={handleSubmit} className="mt-2 bg-green-500">Submit</Button>
-                <Button onClick={onClose} className="mt-2 bg-gray-500">Cancel</Button>
+                <Button onClick={onCloseAction} className="mt-2 bg-gray-500">Cancel</Button>
             </div>
         </div>
     );
