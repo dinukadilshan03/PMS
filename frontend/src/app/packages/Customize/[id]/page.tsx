@@ -4,29 +4,30 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; // Correct import for dynamic routing
 import { jsPDF } from "jspdf";  // Import jsPDF
 import './page.css';
+import {Package} from "@/app/packages/types/Package";
 
-interface Package {
-    id: string;
-    name: string;
-    investment: number;
-    packageType: string;
-    servicesIncluded: string[]; // List of services that are initially included
-    additionalItems: {
-        editedImages: string;
-        uneditedImages: string;
-        albums: Array<{
-            size: string;
-            type: string;
-            spreadCount: number;
-        }> | null;
-        framedPortraits: Array<{
-            size: string;
-            quantity: number;
-        }> | null;
-        thankYouCards: number | null;
-    };
-    image: string | null; // Image URL or path
-}
+// interface Package {
+//     id: string;
+//     name: string;
+//     investment: number;
+//     packageType: string;
+//     servicesIncluded: string[]; // List of services that are initially included
+//     additionalItems: {
+//         editedImages: string;
+//         uneditedImages: string;
+//         albums: Array<{
+//             size: string;
+//             type: string;
+//             spreadCount: number;
+//         }> | null;
+//         framedPortraits: Array<{
+//             size: string;
+//             quantity: number;
+//         }> | null;
+//         thankYouCards: number | null;
+//     };
+//     image: string | null; // Image URL or path
+// }
 
 const CustomizePackage = () => {
     const { id } = useParams(); // useParams() to get the dynamic 'id'
