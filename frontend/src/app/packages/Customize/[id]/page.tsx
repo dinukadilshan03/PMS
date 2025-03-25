@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { jsPDF } from "jspdf";
 import './page.css';
 import {Package} from "@/app/packages/types/Package";
+import Link from "next/link";
 
 
 // interface Package {
@@ -28,6 +29,7 @@ import {Package} from "@/app/packages/types/Package";
 //     };
 //     image: string | null; // Image URL or path
 // }
+
 
 
 const CustomizePackage = () => {
@@ -158,6 +160,7 @@ const CustomizePackage = () => {
 
     return (
         <div className="container mx-auto p-6">
+
             <h1 className="text-4xl font-bold text-center mb-8">{packageData.name} - Customize</h1>
             <p className="text-2xl text-center mb-4">Price: {price} LKR</p>
 
@@ -261,7 +264,7 @@ const CustomizePackage = () => {
                 onClick={handleBooking}
                 className="mt-6 p-2 bg-green-500 text-white rounded"
             >
-                Book Now
+                Book Now!
             </button>
         </div>
     );
