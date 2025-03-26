@@ -47,7 +47,7 @@ h1 {
 
 /* Feature Sections (Additional Items) */
 .feature {
-    background-color: #f9f9f9;
+    background-color: #dcecf6;
     padding: 10px;
     border-radius: 8px;
     margin-top: 10px;
@@ -69,7 +69,7 @@ h1 {
 }
 
 /* Action Buttons */
-.btn-edit, .btn-delete, .btn-download {
+.btn-edit, .btn-delete, .btn-download, .btn-create {
     cursor: pointer;
     padding: 12px 20px;
     font-size: 1rem;
@@ -82,13 +82,13 @@ h1 {
 
 /* Edit Button */
 .btn-edit {
-    background-color: #3498db;
+    background-color: #42bd42;
     color: white;
     border: none;
 }
 
 .btn-edit:hover {
-    background-color: #2980b9;
+    background-color: darkgreen;
 }
 
 /* Delete Button */
@@ -104,13 +104,24 @@ h1 {
 
 /* Download PDF Button */
 .btn-download {
-    background-color: #9b59b6;
+    background-color: #b071ca;
     color: white;
     border: none;
 }
 
 .btn-download:hover {
     background-color: #8e44ad;
+}
+
+/* Create Button */
+.btn-download {
+    background-color: cornflowerblue;
+    color: #fdfcfc;
+    border: none;
+}
+
+.btn-download:hover {
+    background-color: darkblue;
 }
 
 /* Filter Section */
