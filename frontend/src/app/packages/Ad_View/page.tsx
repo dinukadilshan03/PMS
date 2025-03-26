@@ -120,7 +120,7 @@ const HomePage = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
-            <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <div className="container mx-auto p-6 bg-blue-100 shadow-lg rounded-lg">
                 <h1 className="text-3xl font-bold mb-6 text-center">Photography Packages</h1>
 
                 {/* Create Package Link */}
@@ -128,7 +128,7 @@ const HomePage = () => {
                     href="/packages/create"
                     className="bg-blue-500 text-white px-6 py-3 rounded mb-6 inline-block hover:bg-blue-700 transition duration-200"
                 >
-                    Create Package
+                    <button className="btn-download ">Create Package</button>
                 </Link>
 
                 {/* Show Loading Spinner while fetching */}
