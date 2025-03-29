@@ -2,11 +2,17 @@ package com.beni.backend.albumAndPorfilio.controller;
 
 import com.beni.backend.albumAndPorfilio.model.Album;
 import com.beni.backend.albumAndPorfilio.service.AlbumService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -62,4 +68,5 @@ public class AlbumController {
     public boolean deleteAlbum(@PathVariable String id){
         return albumService.deleteAlbums(id);
     }
+
 }
