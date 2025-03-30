@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import '../[id]/page.css'; // Ensure the path is correct for your project
 
 // Use React.use() to handle the Promise
 const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -9,8 +10,8 @@ const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [investment, setInvestment] = useState("");
     const [packageType, setPackageType] = useState("");
     const [servicesIncluded, setServicesIncluded] = useState<string[]>([]);
-    const [editedImages, setEditedImages] = useState("");  // Edited images as string
-    const [uneditedImages, setUneditedImages] = useState("");  // Unedited images as string
+    const [editedImages, setEditedImages] = useState("");
+    const [uneditedImages, setUneditedImages] = useState("");
     const [albums, setAlbums] = useState([{ size: "", type: "", spreadCount: "" }]);
     const [framedPortraits, setFramedPortraits] = useState([{ size: "", quantity: "" }]);
     const [thankYouCards, setThankYouCards] = useState("");
@@ -161,162 +162,204 @@ const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     return (
-        <div>
-            <h1>Edit Photography Package</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Package Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                </div>
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
+            <div className="max-w-5xl w-full bg-white p-10 rounded-lg shadow-lg"> {/* Changed to max-w-5xl to make it wider */}
+                <h1 className="text-3xl font-bold text-center mb-8">Edit Photography Package</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Package Name:</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter package name"
+                            required
+                        />
+                    </div>
 
-                <div>
-                    <label>Investment (in LKR):</label>
-                    <input
-                        type="number"
-                        value={investment}
-                        onChange={(e) => setInvestment(e.target.value)}
-                        required
-                    />
-                </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Investment (in LKR):</label>
+                        <input
+                            type="number"
+                            value={investment}
+                            onChange={(e) => setInvestment(e.target.value)}
+                            className="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter investment amount"
+                            required
+                        />
+                    </div>
 
-                <div>
-                    <label>Package Type:</label>
-                    <input
-                        type="text"
-                        value={packageType}
-                        onChange={(e) => setPackageType(e.target.value)}
-                        required
-                    />
-                </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Package Type:</label>
+                        <input
+                            type="text"
+                            value={packageType}
+                            onChange={(e) => setPackageType(e.target.value)}
+                            className="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter package type"
+                            required
+                        />
+                    </div>
 
-                <div>
-                    <label>Services Included:</label>
-                    {servicesIncluded.map((service, index) => (
-                        <div key={index}>
-                            <input
-                                type="text"
-                                value={service}
-                                onChange={(e) => handleServiceChange(e, index)}
-                                placeholder={`Service #${index + 1}`}
-                                required
-                            />
-                            <button type="button" onClick={() => removeService(index)}>
-                                Remove Service
-                            </button>
-                        </div>
-                    ))}
-                    <button type="button" onClick={addService}>Add Service</button>
-                </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Services Included:</label>
+                        {servicesIncluded.map((service, index) => (
+                            <div key={index} className="flex mb-4">
+                                <input
+                                    type="text"
+                                    value={service}
+                                    onChange={(e) => handleServiceChange(e, index)}
+                                    className="flex-1 p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                                    placeholder={`Service #${index + 1}`}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => removeService(index)}
+                                    className="ml-4 p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={addService}
+                            className="mt-2 text-blue-600 hover:text-blue-800"
+                        >
+                            Add Service
+                        </button>
+                    </div>
 
-                <div>
-                    <label>Edited Images:</label>
-                    <input
-                        type="text"
-                        value={editedImages}
-                        onChange={(e) => setEditedImages(e.target.value)}
-                        required
-                    />
-                </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Edited Images:</label>
+                        <input
+                            type="text"
+                            value={editedImages}
+                            onChange={(e) => setEditedImages(e.target.value)}
+                            className="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter edited images count"
+                            required
+                        />
+                    </div>
 
-                <div>
-                    <label>Unedited Images:</label>
-                    <input
-                        type="text"
-                        value={uneditedImages}
-                        onChange={(e) => setUneditedImages(e.target.value)}
-                        required
-                    />
-                </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Unedited Images:</label>
+                        <input
+                            type="text"
+                            value={uneditedImages}
+                            onChange={(e) => setUneditedImages(e.target.value)}
+                            className="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter unedited images count"
+                            required
+                        />
+                    </div>
 
-                <div>
-                    <label>Albums:</label>
-                    {albums.map((album, index) => (
-                        <div key={index}>
-                            <input
-                                type="text"
-                                placeholder="Size"
-                                value={album.size}
-                                onChange={(e) => {
-                                    const updatedAlbums = [...albums];
-                                    updatedAlbums[index].size = e.target.value;
-                                    setAlbums(updatedAlbums);
-                                }}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Type"
-                                value={album.type}
-                                onChange={(e) => {
-                                    const updatedAlbums = [...albums];
-                                    updatedAlbums[index].type = e.target.value;
-                                    setAlbums(updatedAlbums);
-                                }}
-                            />
-                            <input
-                                type="number"
-                                placeholder="Spread Count"
-                                value={album.spreadCount}
-                                onChange={(e) => {
-                                    const updatedAlbums = [...albums];
-                                    updatedAlbums[index].spreadCount = e.target.value;
-                                    setAlbums(updatedAlbums);
-                                }}
-                            />
-                        </div>
-                    ))}
-                    <button type="button" onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}>
-                        Add Album
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Albums:</label>
+                        {albums.map((album, index) => (
+                            <div key={index} className="flex mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="Size"
+                                    value={album.size}
+                                    onChange={(e) => {
+                                        const updatedAlbums = [...albums];
+                                        updatedAlbums[index].size = e.target.value;
+                                        setAlbums(updatedAlbums);
+                                    }}
+                                    className="w-1/3 p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Type"
+                                    value={album.type}
+                                    onChange={(e) => {
+                                        const updatedAlbums = [...albums];
+                                        updatedAlbums[index].type = e.target.value;
+                                        setAlbums(updatedAlbums);
+                                    }}
+                                    className="w-1/3 p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="Spread Count"
+                                    value={album.spreadCount}
+                                    onChange={(e) => {
+                                        const updatedAlbums = [...albums];
+                                        updatedAlbums[index].spreadCount = e.target.value;
+                                        setAlbums(updatedAlbums);
+                                    }}
+                                    className="w-1/3 p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}
+                            className="text-blue-600 hover:text-blue-800"
+                        >
+                            Add Album
+                        </button>
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Framed Portraits:</label>
+                        {framedPortraits.map((portrait, index) => (
+                            <div key={index} className="flex mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="Size"
+                                    value={portrait.size}
+                                    onChange={(e) => {
+                                        const updatedPortraits = [...framedPortraits];
+                                        updatedPortraits[index].size = e.target.value;
+                                        setFramedPortraits(updatedPortraits);
+                                    }}
+                                    className="w-1/3 p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="Quantity"
+                                    value={portrait.quantity}
+                                    onChange={(e) => {
+                                        const updatedPortraits = [...framedPortraits];
+                                        updatedPortraits[index].quantity = e.target.value;
+                                        setFramedPortraits(updatedPortraits);
+                                    }}
+                                    className="w-1/3 p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                                />
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}
+                            className="text-blue-600 hover:text-blue-800"
+                        >
+                            Add Framed Portrait
+                        </button>
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Thank You Cards:</label>
+                        <input
+                            type="number"
+                            value={thankYouCards}
+                            onChange={(e) => setThankYouCards(e.target.value)}
+                            className="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter Thank You Cards count"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full py-3 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none transition ease-in duration-200">
+                        Update Package
                     </button>
-                </div>
-
-                <div>
-                    <label>Framed Portraits:</label>
-                    {framedPortraits.map((portrait, index) => (
-                        <div key={index}>
-                            <input
-                                type="text"
-                                placeholder="Size"
-                                value={portrait.size}
-                                onChange={(e) => {
-                                    const updatedPortraits = [...framedPortraits];
-                                    updatedPortraits[index].size = e.target.value;
-                                    setFramedPortraits(updatedPortraits);
-                                }}
-                            />
-                            <input
-                                type="number"
-                                placeholder="Quantity"
-                                value={portrait.quantity}
-                                onChange={(e) => {
-                                    const updatedPortraits = [...framedPortraits];
-                                    updatedPortraits[index].quantity = e.target.value;
-                                    setFramedPortraits(updatedPortraits);
-                                }}
-                            />
-                        </div>
-                    ))}
-                    <button type="button" onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}>
-                        Add Framed Portrait
-                    </button>
-                </div>
-
-                <div>
-                    <label>Thank You Cards:</label>
-                    <input
-                        type="number"
-                        value={thankYouCards}
-                        onChange={(e) => setThankYouCards(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <button type="submit">Update Package</button>
-            </form>
+                </form>
+            </div>
         </div>
     );
 };

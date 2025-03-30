@@ -1,3 +1,4 @@
+
 package com.beni.backend;
 
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +12,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000") // Your Next.js frontend URL
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+
+
+                .allowedOrigins(frontendUrl,"http://localhost:3000","http://localhost:3002")  // Allow requests from frontend
+
+                .allowedMethods("GET", "POST", "PUT", "DELETE","PATCH")
+
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
@@ -25,3 +30,4 @@ public class WebConfig implements WebMvcConfigurer {
 
     }
 }
+

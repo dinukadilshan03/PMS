@@ -3,9 +3,10 @@ import CreateBookingForm from '@/app/bookings/components/BookingForm';
 
 const CreateBookingPage = () => {
     return (
-        <div>
-            <h1 className="text-2xl font-bold text-center mt-8">Create a Booking</h1>
-            <CreateBookingForm />
+        <div className="min-h-screen bg-emerald-200 flex items-center justify-center p-4">
+            <div className="w-full max-w-4xl">
+                <CreateBookingForm />
+            </div>
         </div>
     );
 };
