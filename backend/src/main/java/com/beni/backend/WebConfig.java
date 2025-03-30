@@ -1,23 +1,18 @@
 
 package com.beni.backend;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${frontend.port}")  // Fetch the value from environment variables or properties
-    private String frontendPort;
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Dynamically set the frontend URL with the port
-        String frontendUrl = "http://localhost:" + frontendPort;
-
         registry.addMapping("/**")
+
 
                 .allowedOrigins(frontendUrl,"http://localhost:3000","http://localhost:3002")  // Allow requests from frontend
 
@@ -25,6 +20,14 @@ public class WebConfig implements WebMvcConfigurer {
 
                 .allowedHeaders("*")
                 .allowCredentials(true);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:D:/Sliit/2nd Year 2nd Semester/ITP/PMS/backend/uploads/")
+                .setCachePeriod(3600);
+
     }
 }
 

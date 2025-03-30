@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import {router} from "next/client";
 
 export default function AlbumForm() {
     const [formData, setFormData] = useState({
@@ -45,11 +46,12 @@ export default function AlbumForm() {
                 body: formDataToSend,
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to create album');
+            if (!response.ok){
+                throw new Error('Failed to create portfolio')
+            }else{
+                alert('Album created successfully');
             }
 
-            alert('Album created successfully');
             // Reset form after successful submission
             setFormData({
                 name: '',
