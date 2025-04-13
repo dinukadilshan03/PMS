@@ -2,25 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-interface Album {
-    id: string;
-    name: string;
-    description: string;
-    category: string;
-    location: string;
-    status: string;
-    images: string[]; // Array of image filenames
-}
+import {Album} from "@/app/Album-Portfolio/types/types";
 
 export default function AlbumList() {
+
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    //Fetching all albums from backend
     useEffect(() => {
+
         const fetchAlbums = async () => {
+
             try {
+
+                //Default fetch() method is get.
                 const response = await fetch('http://localhost:8080/api/albums');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -28,9 +25,11 @@ export default function AlbumList() {
                 const data = await response.json();
                 setAlbums(data);
                 console.log(data);
+
             } catch (err) {
                 console.error('Error fetching albums:', err);
                 setError('Failed to load albums');
+
             } finally {
                 setLoading(false);
             }
@@ -39,7 +38,10 @@ export default function AlbumList() {
         fetchAlbums();
     }, []);
 
+
+    //Delete album from backend
     const handleDelete = async (id: string) => {
+
         try {
             const response = await fetch(`http://localhost:8080/api/albums/${id}`, {
                 method: 'DELETE',
@@ -50,6 +52,7 @@ export default function AlbumList() {
             }
 
             setAlbums(albums.filter(album => album.id !== id));
+
         } catch (err) {
             console.error('Error deleting album:', err);
             setError('Failed to delete album');

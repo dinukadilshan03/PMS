@@ -2,17 +2,11 @@ package com.beni.backend.albumAndPorfilio.controller;
 
 import com.beni.backend.albumAndPorfilio.model.Album;
 import com.beni.backend.albumAndPorfilio.service.AlbumService;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -36,11 +30,13 @@ public class AlbumController {
 
     @GetMapping
     public List<Album> getAllAlbums() {
+
         return albumService.getAllAlbums();
     }
 
     @GetMapping("/{id}")
     public Album getAlbum(@PathVariable String id) {
+
         return albumService.getAlbumById(id);
     }
 
@@ -57,8 +53,7 @@ public class AlbumController {
             @RequestParam(required = false) String status) {
 
         // Call the service method to update the album
-        Album updatedAlbum = albumService.updateAlbum(
-                id, name, description, images, coverImage, category, location, status);
+        Album updatedAlbum = albumService.updateAlbum(id, name, description, images, coverImage, category, location, status);
 
         // Return the updated album with HTTP 200 OK
         return ResponseEntity.ok(updatedAlbum);

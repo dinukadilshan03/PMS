@@ -12,12 +12,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-
-
-                .allowedOrigins(frontendUrl,"http://localhost:3000","http://localhost:3002")  // Allow requests from frontend
-
-                .allowedMethods("GET", "POST", "PUT", "DELETE","PATCH")
-
+                .allowedOrigins("http://localhost:3000", "http://192.168.137.1:3000") // Allow both origins
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
@@ -27,7 +23,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:D:/Sliit/2nd Year 2nd Semester/ITP/PMS/backend/uploads/")
                 .setCachePeriod(3600);
-
     }
 }
 
