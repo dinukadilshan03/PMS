@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
+import { useRouter } from 'next/navigation';  // Import from next/router
 import { useState } from 'react';
-import {router} from "next/client";
 
 export default function AlbumForm() {
     const [formData, setFormData] = useState({
@@ -14,6 +14,7 @@ export default function AlbumForm() {
 
     const [images, setImages] = useState<File[]>([]);
     const [coverImage, setCoverImage] = useState<File | null>(null);
+    const router = useRouter();  // Correct hook import for pages/ directory
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,6 +28,7 @@ export default function AlbumForm() {
         if (e.target.files) setCoverImage(e.target.files[0]);
     };
 
+    // Handle Submit Function
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const formDataToSend = new FormData();
@@ -46,10 +48,12 @@ export default function AlbumForm() {
                 body: formDataToSend,
             });
 
-            if (!response.ok){
-                throw new Error('Failed to create portfolio')
-            }else{
+            if (!response.ok) {
+                throw new Error('Failed to create album');
+            } else {
                 alert('Album created successfully');
+
+                router.push(`/Album-Portfolio/album/pages/`); // Redirect to the album detail page
             }
 
             // Reset form after successful submission
@@ -76,6 +80,7 @@ export default function AlbumForm() {
                         <p className="mt-2 text-sm text-gray-600">Fill in the details to create a new photo album</p>
                     </div>
 
+                    {/* Start form */}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Album Name */}
                         <div>
@@ -86,7 +91,7 @@ export default function AlbumForm() {
                                 type="text"
                                 id="name"
                                 name="name"
-                                placeholder="My Awesome Album"
+                                placeholder="Enter album name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
