@@ -1,4 +1,6 @@
-// types/portfolio.d.ts
+// Define the Portfolio interface
+// types/portfolio.ts
+
 export interface Portfolio {
     id: string;
     albumName: string;

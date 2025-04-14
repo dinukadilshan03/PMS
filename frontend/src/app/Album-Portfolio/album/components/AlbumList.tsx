@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {Album} from "@/app/Album-Portfolio/types/types";
+import {Album} from "@/app/Album-Portfolio/types/album";
 
 export default function AlbumList() {
 
@@ -72,7 +72,7 @@ export default function AlbumList() {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Albums</h2>
                 <Link
-                    href="albums/create/"
+                    href="/Album-Portfolio/album/pages/create/"
                     className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
                 >
                     Add a New Album
