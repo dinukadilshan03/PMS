@@ -82,47 +82,56 @@ export default function AlbumList() {
             {albums.length === 0 ? (
                 <p className="text-gray-500">No albums found</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {albums.map((album) => (
-                        <div key={album.id} className="bg-white shadow-md rounded-lg overflow-hidden">
-                            {/* Album Images Grid */}
-                            {album.images?.length > 0 && (
-                                <div className="grid grid-cols-2 gap-1 p-1">
-                                    {album.images.slice(0, 4).map((image, index) => (
-                                        <div key={index} className="aspect-square bg-gray-100 overflow-hidden">
-                                            <img
-                                                src={`http://localhost:8080/uploads/${image}`}
-                                                alt={`Album ${album.name} image ${index + 1}`}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).style.display = 'none';
-                                                    console.error('Error loading image:', image);
-                                                }}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
 
-                            {/* Album Info */}
-                            <div className="p-4">
-                                <h3 className="text-lg font-bold">{album.name}</h3>
-                                <p className="text-gray-600 text-sm line-clamp-2">{album.description}</p>
-                                <div className="flex justify-between items-center mt-3">
-                                    <span className="text-xs text-gray-500">
-                                        {album.category} • {album.location}
-                                    </span>
-                                    <button
-                                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors text-sm"
-                                        onClick={() => handleDelete(album.id)}
-                                    >
-                                        Delete
-                                    </button>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {albums.map((album) => (
+                            <div key={album.id} className="bg-white shadow-md rounded-lg overflow-hidden">
+
+                                <Link href={`/Album-Portfolio/album/pages/${album.id}`}>
+
+                                {/* Album Images Grid */}
+                                {album.images?.length > 0 && (
+                                    <div className="grid grid-cols-2 gap-1 p-1">
+                                        {album.images.slice(0, 4).map((image, index) => (
+                                            <div key={index} className="aspect-square bg-gray-100 overflow-hidden">
+                                                <img
+                                                    src={`http://localhost:8080/uploads/${image}`}
+                                                    alt={`Album ${album.name} image ${index + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                        console.error('Error loading image:', image);
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                </Link>
+
+                                {/* Album Info */}
+                                <div className="p-4">
+                                    <h3 className="text-lg font-bold">{album.name}</h3>
+                                    <p className="text-gray-600 text-sm line-clamp-2">{album.description}</p>
+                                    <div className="flex justify-between items-center mt-3">
+                                        <span className="text-xs text-gray-500">
+                                            {album.category} • {album.location}
+                                        </span>
+                                        <button
+                                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors text-sm"
+                                            onClick={() => handleDelete(album.id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+
+
             )}
         </div>
     );
