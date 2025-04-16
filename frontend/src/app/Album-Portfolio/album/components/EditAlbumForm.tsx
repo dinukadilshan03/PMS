@@ -22,6 +22,7 @@ export default function EditAlbumForm() {
                     }
                     const data = await response.json();
                     setAlbum(data);
+                    console.log(data);
                 } catch (error) {
                     console.error("Error fetching album:", error);
                     setError("Failed to load album");
