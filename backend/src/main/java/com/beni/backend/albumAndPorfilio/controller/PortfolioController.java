@@ -31,16 +31,19 @@ public class PortfolioController {
 
     @GetMapping
     public List<Portfolio> getAllPortfolios() {
+
         return portfolioService.getPortfolios();
     }
 
     @GetMapping("/{id}")
     public Optional<Portfolio> getPortfolioById(@PathVariable String id) {
+
         return portfolioService.getPortfolio(id);
     }
 
     @DeleteMapping("/{id}")
     public boolean deleteImage(@PathVariable String id) {
+
         return portfolioService.deleteImage(id);
     }
 

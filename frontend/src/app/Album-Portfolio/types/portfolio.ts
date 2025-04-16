@@ -8,6 +8,5 @@ export interface Portfolio {
     photographerName: string;
     category: string;
     imageUrl: string;
-    createdAt?: string;
-    updatedAt?: string;
+    dateUploaded: string;
 }

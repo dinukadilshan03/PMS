@@ -21,7 +21,7 @@ export default function Home() {
                         Browse Albums
                     </Link>
                     <Link
-                        href="/Album-Portfolio/portfolio/"
+                        href="/Album-Portfolio/portfolio/pages/"
                         className="bg-white text-blue-500 px-6 py-3 rounded-lg border border-blue-500 hover:bg-blue-50 transition-colors"
                     >
                         View Portfolio
