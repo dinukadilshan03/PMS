@@ -142,7 +142,7 @@ export default function PortfolioList() {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                                         <button
-                                            onClick={() => router.push(`/Album-Portfolio/portfolio/pages/edit/${portfolio.id}`)}
+                                            onClick={() => router.push(`/Album-Portfolio/portfolio/pages/${portfolio.id}`)}
                                             className="mr-2 px-4 py-2 bg-white/90 text-gray-800 rounded-lg hover:bg-white transition-colors"
                                         >
                                             Edit
