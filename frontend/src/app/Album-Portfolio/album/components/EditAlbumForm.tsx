@@ -6,11 +6,45 @@ import { useParams, useRouter } from "next/navigation";
 
 export default function EditAlbumForm() {
     const [album, setAlbum] = useState<any>(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        category: '',
+        location: '',
+        status: '',
+    })
+    const [images, setImages] = useState<File[]>([]);
+    const [coverImage, setCoverImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const { id } = useParams();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) setImages(Array.from(e.target.files));
+    };
+
+    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) setCoverImage(e.target.files[0]);
+    };
+
+    // Update the formData when portfolio data is fetched
+    useEffect(() => {
+        if (album) {
+            setFormData({
+                name: album.name || "",
+                description: album.description || "",
+                category: album.category || "",
+                location: album.location || "",
+                status: album.status || "",
+            });
+        }
+    }, [album]);
 
     useEffect(() => {
         if (id) {
@@ -23,9 +57,11 @@ export default function EditAlbumForm() {
                     const data = await response.json();
                     setAlbum(data);
                     console.log(data);
+
                 } catch (error) {
                     console.error("Error fetching album:", error);
                     setError("Failed to load album");
+
                 } finally {
                     setLoading(false);
                 }
@@ -38,17 +74,31 @@ export default function EditAlbumForm() {
         e.preventDefault();
         setIsSubmitting(true);
         try {
+
+            const formDataToSend = new FormData()
+
+            formDataToSend.append("name", formData.name)
+            formDataToSend.append("description", formData.description)
+            if (album.images && album.images.length > 0) {
+                album.images.forEach((image:File) => {
+                    formDataToSend.append("images", image);
+                });
+            }
+            if(coverImage) formDataToSend.append("coverImage", coverImage)
+            formDataToSend.append("category", formData.category)
+            formDataToSend.append("location", formData.location)
+            formDataToSend.append("status", formData.status)
+
             const response = await fetch(`http://localhost:8080/api/albums/${id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(album),
+                body: formDataToSend
             });
 
             if (!response.ok) {
                 throw new Error(`HTTP Error: ${response.status}`);
             }
+
+            console.log(response)
             router.push('/Album-Portfolio/album/pages');
         } catch (error) {
             console.error("Error updating album:", error);
@@ -104,9 +154,6 @@ export default function EditAlbumForm() {
                                     src={`http://localhost:8080/uploads/${image}`}
                                     alt={`Album image ${index + 1}`}
                                     className="w-full h-32 object-cover rounded-md shadow-sm border border-gray-200"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).style.display = 'none';
-                                    }}
                                 />
                                 <button
                                     type="button"
@@ -135,8 +182,8 @@ export default function EditAlbumForm() {
                         type="text"
                         id="name"
                         name="name"
-                        value={album?.name || ""}
-                        onChange={(e) => setAlbum({ ...album, name: e.target.value })}
+                        value={formData.name}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         required
                     />
@@ -150,9 +197,39 @@ export default function EditAlbumForm() {
                         id="description"
                         name="description"
                         rows={4}
-                        value={album?.description || ""}
-                        onChange={(e) => setAlbum({ ...album, description: e.target.value })}
+                        value={formData.description}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        Location
+                    </label>
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        Status
+                    </label>
+                    <input
+                        type="text"
+                        id="status"
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        required
                     />
                 </div>
 
@@ -161,7 +238,8 @@ export default function EditAlbumForm() {
                     <label className="block text-sm font-medium text-gray-700">
                         Add More Images
                     </label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div
+                        className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                         <div className="space-y-1 text-center">
                             <div className="flex text-sm text-gray-600">
                                 <label
@@ -206,7 +284,8 @@ export default function EditAlbumForm() {
                     >
                         {isSubmitting ? (
                             <span className="flex items-center">
-                                <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+                                <span
+                                    className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
                                 Saving...
                             </span>
                         ) : (
