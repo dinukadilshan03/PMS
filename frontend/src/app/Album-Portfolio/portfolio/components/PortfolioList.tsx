@@ -7,7 +7,24 @@ import {useRouter} from "next/navigation";
 export default function PortfolioList() {
     const router = useRouter();
     const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+    const [filteredPortfolios, setFilteredPortfolios] = useState<Portfolio[]>([]);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [search, setSearch] = useState("");
+
+    const handleSearch = (value: string) => {
+        setSearch(value);
+
+        if (value.trim() === "") {
+
+            setFilteredPortfolios(portfolios);
+        } else {
+
+            const filtered = portfolios.filter((portfolio: any) =>
+                portfolio.albumName.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredPortfolios(filtered);
+        }
+    }
 
     // Portfolios Fetching Function
     useEffect(() => {
@@ -19,6 +36,8 @@ export default function PortfolioList() {
                 }
                 const data = await response.json();
                 setPortfolios(data);
+                setFilteredPortfolios(data)
+                console.log(data)
             } catch (error) {
                 console.error("Fetch error:", error);
             }
@@ -84,6 +103,10 @@ export default function PortfolioList() {
                             type="text"
                             placeholder="Search portfolios..."
                             className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            id={"searchBar"}
+                            name={"searchBar"}
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
                         />
                         <svg
                             className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -111,7 +134,7 @@ export default function PortfolioList() {
                     </button>
                 </div>
 
-                {portfolios.length === 0 ? (
+                {filteredPortfolios.length === 0 ? (
                     <div className="text-center py-20">
                         <div className="mx-auto w-24 h-24 mb-4 text-gray-400">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +152,7 @@ export default function PortfolioList() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {portfolios.map((portfolio) => (
+                        {filteredPortfolios.map((portfolio) => (
                             <div
                                 key={portfolio.id}
                                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
