@@ -23,11 +23,13 @@ const CreateBookingForm = () => {
     const [packages, setPackages] = useState<{id: string, name: string}[]>([]);
     const [loading, setLoading] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Fetch packages from backend
     useEffect(() => {
         const fetchPackages = async () => {
             try {
+                setIsLoading(true);
                 const response = await fetch("http://localhost:8080/api/packages");
                 const data = await response.json();
                 setPackages(data);
@@ -37,6 +39,8 @@ const CreateBookingForm = () => {
                     ...prev,
                     form: "Failed to load packages. Please refresh the page."
                 }));
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchPackages();
@@ -141,8 +145,8 @@ const CreateBookingForm = () => {
             return;
         }
 
-        // Retrieve userId from localStorage
-        const userId = localStorage.getItem("userId");
+        // Retrieve userId from sessionStorage
+        const userId = sessionStorage.getItem("userId");
         if (!userId) {
             setErrors(prev => ({
                 ...prev,
@@ -159,14 +163,15 @@ const CreateBookingForm = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    userId: userId,
+                    "Userid": userId,
                 },
                 body: JSON.stringify({
                     email: formData.email,
                     phoneNumber: formData.phoneNumber,
                     location: formData.location,
                     packageName: formData.selectedPackage,
-                    dateTime: formData.dateTime,
+                    dateTime: new Date(formData.dateTime).toISOString(),
+                    clientId: userId,
                 }),
             });
 
@@ -193,143 +198,218 @@ const CreateBookingForm = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-white">
-            <div className="w-full max-w-2xl p-8 border-2 border-gray-300 rounded-lg shadow-md">
-                <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">Create a New Booking</h2>
-
-                {(errors.form || Object.values(errors).some(error => error)) && (
-                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg">
-                        {errors.form && <p className="font-bold mb-2">{errors.form}</p>}
-                        <ul className="list-disc pl-5 space-y-1">
-                            {errors.email && <li>{errors.email}</li>}
-                            {errors.phoneNumber && <li>{errors.phoneNumber}</li>}
-                            {errors.location && <li>{errors.location}</li>}
-                            {errors.selectedPackage && <li>{errors.selectedPackage}</li>}
-                            {errors.dateTime && <li>{errors.dateTime}</li>}
-                        </ul>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                    <div>
-                        <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-1">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className={`mt-1 p-3 w-full border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-indigo-500`}
-                            required
-                        />
-                        {errors.email && (
-                            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="phoneNumber" className="block text-lg font-medium text-gray-700 mb-1">Phone Number</label>
-                        <input
-                            type="tel"
-                            id="phoneNumber"
-                            value={formData.phoneNumber}
-                            onChange={handleChange}
-                            className={`mt-1 p-3 w-full border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-indigo-500`}
-                            required
-                            placeholder="e.g., 123-456-7890"
-                        />
-                        {errors.phoneNumber && (
-                            <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="location" className="block text-lg font-medium text-gray-700 mb-1">Location</label>
-                        <input
-                            type="text"
-                            id="location"
-                            value={formData.location}
-                            onChange={handleChange}
-                            className={`mt-1 p-3 w-full border ${errors.location ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-indigo-500`}
-                            required
-                        />
-                        {errors.location && (
-                            <p className="mt-1 text-sm text-red-600">{errors.location}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="selectedPackage" className="block text-lg font-medium text-gray-700 mb-1">Package</label>
-                        <select
-                            id="selectedPackage"
-                            value={formData.selectedPackage}
-                            onChange={handleChange}
-                            className={`mt-1 p-3 w-full border ${errors.selectedPackage ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-indigo-500`}
-                            required
-                        >
-                            <option value="">Select a package</option>
-                            {packages.map((pkg) => (
-                                <option key={pkg.id} value={pkg.name}>
-                                    {pkg.name}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.selectedPackage && (
-                            <p className="mt-1 text-sm text-red-600">{errors.selectedPackage}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="dateTime" className="block text-lg font-medium text-gray-700 mb-1">Date & Time</label>
-                        <input
-                            type="datetime-local"
-                            id="dateTime"
-                            value={formData.dateTime}
-                            onChange={handleChange}
-                            className={`mt-1 p-3 w-full border ${errors.dateTime ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-indigo-500`}
-                            required
-                            min={new Date().toISOString().slice(0, 16)}
-                        />
-                        {errors.dateTime && (
-                            <p className="mt-1 text-sm text-red-600">{errors.dateTime}</p>
-                        )}
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading || !isFormValid}
-                        className={`bg-amber-700 text-white px-4 py-3 rounded-md w-full text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
-                        ${loading ? 'opacity-70 cursor-not-allowed' : !isFormValid ? 'opacity-70 cursor-not-allowed' : 'hover:bg-green-600'}`}
-                    >
-                        {loading ? (
-                            <div className="flex items-center justify-center">
-                                <svg
-                                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    />
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    />
-                                </svg>
-                                Processing...
+        <div className="space-y-6">
+            {isLoading ? (
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                </div>
+            ) : (
+                <>
+                    {(errors.form || Object.values(errors).some(error => error)) && (
+                        <div className="rounded-md bg-red-50 p-4">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-red-800">Form Errors</h3>
+                                    <div className="mt-2 text-sm text-red-700">
+                                        {errors.form && <p className="font-medium">{errors.form}</p>}
+                                        <ul className="list-disc pl-5 space-y-1 mt-1">
+                                            {errors.email && <li>{errors.email}</li>}
+                                            {errors.phoneNumber && <li>{errors.phoneNumber}</li>}
+                                            {errors.location && <li>{errors.location}</li>}
+                                            {errors.selectedPackage && <li>{errors.selectedPackage}</li>}
+                                            {errors.dateTime && <li>{errors.dateTime}</li>}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                        ) : (
-                            "Create Booking"
-                        )}
-                    </button>
-                </form>
-            </div>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
+                                        placeholder="you@example.com"
+                                        required
+                                    />
+                                </div>
+                                {errors.email && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="tel"
+                                        id="phoneNumber"
+                                        value={formData.phoneNumber}
+                                        onChange={handleChange}
+                                        className={`block w-full pl-10 pr-3 py-2 border ${errors.phoneNumber ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
+                                        placeholder="123-456-7890"
+                                        required
+                                    />
+                                </div>
+                                {errors.phoneNumber && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.phoneNumber}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        id="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        className={`block w-full pl-10 pr-3 py-2 border ${errors.location ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
+                                        placeholder="Enter location"
+                                        required
+                                    />
+                                </div>
+                                {errors.location && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.location}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label htmlFor="selectedPackage" className="block text-sm font-medium text-gray-700">Package</label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
+                                    <select
+                                        id="selectedPackage"
+                                        value={formData.selectedPackage}
+                                        onChange={handleChange}
+                                        className={`block w-full pl-10 pr-10 py-2 border ${errors.selectedPackage ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
+                                        required
+                                    >
+                                        <option value="">Select a package</option>
+                                        {packages.map((pkg) => (
+                                            <option key={pkg.id} value={pkg.name}>
+                                                {pkg.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                {errors.selectedPackage && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.selectedPackage}</p>
+                                )}
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">Date & Time</label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="datetime-local"
+                                        id="dateTime"
+                                        value={formData.dateTime}
+                                        onChange={handleChange}
+                                        className={`block w-full pl-10 pr-3 py-2 border ${errors.dateTime ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
+                                        required
+                                        min={new Date().toISOString().slice(0, 16)}
+                                    />
+                                </div>
+                                {errors.dateTime && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.dateTime}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="pt-5">
+                            <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => router.push('/bookings')}
+                                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading || !isFormValid}
+                                    className={`ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
+                                        loading || !isFormValid
+                                            ? 'bg-indigo-400 cursor-not-allowed'
+                                            : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                                    }`}
+                                >
+                                    {loading ? (
+                                        <div className="flex items-center">
+                                            <svg
+                                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                />
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                />
+                                            </svg>
+                                            Processing...
+                                        </div>
+                                    ) : (
+                                        "Create Booking"
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </>
+            )}
         </div>
     );
 };
