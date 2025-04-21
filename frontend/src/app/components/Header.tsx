@@ -17,8 +17,8 @@ const Header = () => {
     const navigation = [
         { name: 'Home', href: '/' },
         { name: 'Bookings', href: '/bookings' },
-        { name: 'Portfolio', href: '/portfolio' },
-        { name: 'Albums', href: '/albums' },
+        { name: 'Portfolio', href: '/Album-Portfolio/portfolio/pages/user/' },
+        { name: 'Albums', href: '/Album-Portfolio/album/pages/user/' },
         { name: 'Packages', href: '/packages' },
         { name: 'Testimonials', href: '/testimonials' },
     ];
