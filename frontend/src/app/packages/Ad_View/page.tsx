@@ -5,19 +5,21 @@ import { Package } from '@/app/packages/types/Package';
 import { getPackages, deletePackage } from '@/app/packages/utils/api';
 import Link from 'next/link';
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
-import '../Ad_View/page.css'
 
 const HomePage = () => {
     const [packages, setPackages] = useState<Package[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPackages = async () => {
             try {
                 const data = await getPackages();
                 setPackages(data);
+                setError(null);
             } catch (error) {
                 console.error('Error fetching packages:', error);
+                setError('Unable to load packages. Please make sure the backend server is running.');
             } finally {
                 setLoading(false);
             }
@@ -36,16 +38,18 @@ const HomePage = () => {
 
     const renderAdditionalItems = (pkg: Package) => {
         return (
-            <div className="mt-4">
-                <div className="feature">
-                    <strong>Edited Images:</strong> {pkg.additionalItems.editedImages}
+            <div className="space-y-4">
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-700">Edited Images:</span>
+                    <span className="text-gray-600">{pkg.additionalItems.editedImages}</span>
                 </div>
-                <div className="feature">
-                    <strong>Unedited Images:</strong> {pkg.additionalItems.uneditedImages}
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-700">Unedited Images:</span>
+                    <span className="text-gray-600">{pkg.additionalItems.uneditedImages}</span>
                 </div>
-                <div className="feature">
-                    <strong>Albums:</strong>
-                    <ul className="list-disc pl-6">
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-700">Albums:</span>
+                    <ul className="list-disc pl-6 text-gray-600">
                         {pkg.additionalItems.albums?.map((album, index) => (
                             <li key={index}>
                                 {album.size} {album.type} (Spread Count: {album.spreadCount})
@@ -53,9 +57,9 @@ const HomePage = () => {
                         ))}
                     </ul>
                 </div>
-                <div className="feature">
-                    <strong>Framed Portraits:</strong>
-                    <ul className="list-disc pl-6">
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-700">Framed Portraits:</span>
+                    <ul className="list-disc pl-6 text-gray-600">
                         {pkg.additionalItems.framedPortraits?.map((portrait, index) => (
                             <li key={index}>
                                 {portrait.size} (Quantity: {portrait.quantity})
@@ -63,8 +67,9 @@ const HomePage = () => {
                         ))}
                     </ul>
                 </div>
-                <div className="feature">
-                    <strong>Thank You Cards:</strong> {pkg.additionalItems.thankYouCards}
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-700">Thank You Cards:</span>
+                    <span className="text-gray-600">{pkg.additionalItems.thankYouCards}</span>
                 </div>
             </div>
         );
@@ -119,78 +124,104 @@ const HomePage = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
-            <div className="container mx-auto p-6 bg-blue-100 shadow-lg rounded-lg">
-                <h1 className="text-3xl font-bold mb-6 text-center">Photography Packages</h1>
+        <div className="min-h-screen bg-background">
+            <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+                <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                        Photography Packages
+                    </h1>
+                    <Link
+                        href="/packages/create"
+                        className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    >
+                        Create Package
+                    </Link>
+                </div>
 
-                {/* Create Package Link */}
-                <Link
-                    href="/packages/create"
-                    className="bg-blue-500 text-white px-6 py-3 rounded mb-6 inline-block hover:bg-blue-700 transition duration-200"
-                >
-                    <button className="btn-download ">Create Package</button>
-                </Link>
-
-                {/* Show Loading Spinner while fetching */}
                 {loading ? (
-                    <p className="text-center">Loading packages...</p>
+                    <div className="mt-8 flex justify-center">
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    </div>
+                ) : error ? (
+                    <div className="mt-8 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center">
+                        <p className="text-destructive">{error}</p>
+                        <p className="mt-2 text-sm text-destructive/80">
+                            Please ensure that:
+                            <br />1. The backend server is running on port 8080
+                            <br />2. The API endpoint is accessible
+                            <br />3. Your network connection is stable
+                        </p>
+                    </div>
                 ) : (
-                    <ul className="space-y-6">
+                    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {packages.length === 0 ? (
-                            <li className="text-center">No packages available.</li>
+                            <div className="col-span-full rounded-lg border bg-card p-8 text-center text-card-foreground">
+                                <p className="text-muted-foreground">No packages available.</p>
+                            </div>
                         ) : (
                             packages.map((pkg) => (
-                                <li
+                                <div
                                     key={pkg.id}
-                                    className="package-card p-6 bg-white rounded-lg shadow-lg transition-transform transform hover:scale-105"
+                                    className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md"
                                 >
-                                    <div className="package-header mb-4">
-                                        <h2 className="text-2xl font-semibold text-gray-800">{pkg.name}</h2>
-                                        <p className="text-xl text-gray-600">Price: {pkg.investment} LKR</p>
-                                        <p className="text-lg text-gray-600">{pkg.packageType}</p>
-                                    </div>
+                                    <div className="p-6">
+                                        <div className="mb-6">
+                                            <h2 className="text-xl font-semibold text-card-foreground">
+                                                {pkg.name}
+                                            </h2>
+                                            <p className="mt-1 text-lg font-medium text-primary">
+                                                {pkg.investment} LKR
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">{pkg.packageType}</p>
+                                        </div>
 
-                                    {/* Render Services Included */}
-                                    <div className="feature mt-4">
-                                        <strong>Services Included:</strong>
-                                        <ul className="list-disc pl-6">
-                                            {pkg.servicesIncluded?.map((service, index) => (
-                                                <li key={index}>{service}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="font-medium text-card-foreground">
+                                                    Services Included:
+                                                </h3>
+                                                <ul className="mt-2 list-disc space-y-1 pl-6 text-muted-foreground">
+                                                    {pkg.servicesIncluded?.map((service, index) => (
+                                                        <li key={index}>{service}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            {renderAdditionalItems(pkg)}
+                                        </div>
 
-                                    {renderAdditionalItems(pkg)}
-
-                                    {/* Action Buttons */}
-                                    <div className="package-actions mt-6 flex justify-between space-x-6">
-                                        <Link
-                                            href={`/packages/edit/${pkg.id}`}
-                                            className="btn-edit text-blue-500 hover:text-blue-700 transition duration-200"
-                                        >
-                                            Edit
-                                        </Link>
-
-                                        <div className="flex space-x-4">
-                                            <button
-                                                onClick={() => handleDelete(pkg.id)}
-                                                className="btn-delete text-red-500 hover:text-red-700 transition duration-200"
+                                        <div className="mt-6 flex items-center justify-between border-t pt-4">
+                                            <Link
+                                                href={`/packages/edit/${pkg.id}`}
+                                                className="text-sm font-medium text-primary hover:text-primary/90"
                                             >
-                                                Delete
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleDownloadPDF(pkg)}
-                                                className="btn-download text-purple-500 hover:text-purple-700 transition duration-200"
-                                            >
-                                                Download PDF
-                                            </button>
+                                                Edit
+                                            </Link>
+                                            <div className="flex items-center gap-4">
+                                                <Link
+                                                    href={`/packages/customize/${pkg.id}`}
+                                                    className="text-sm font-medium text-primary hover:text-primary/90"
+                                                >
+                                                    Customize
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(pkg.id)}
+                                                    className="text-sm font-medium text-destructive hover:text-destructive/90"
+                                                >
+                                                    Delete
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDownloadPDF(pkg)}
+                                                    className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                                                >
+                                                    Download PDF
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </li>
+                                </div>
                             ))
                         )}
-                    </ul>
+                    </div>
                 )}
             </div>
         </div>
