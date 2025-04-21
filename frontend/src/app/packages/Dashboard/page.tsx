@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
-import '../Dashboard/page.css'; // Ensure this path is correct
+import styles from './page.module.css'; // Ensure this path is correct
 import { Package } from "@/app/packages/types/Package";
 
 const CustomerDashboard = () => {
@@ -110,106 +110,104 @@ const CustomerDashboard = () => {
     }
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-4xl font-bold text-center mb-8">Photography Packages</h1>
+        <div className={styles.dashboardContainer}>
+            <h1 className={styles.dashboardTitle}>Photography Packages</h1>
 
             {/* Filter Input Fields */}
-            <div className="mb-6 flex gap-4">
+            <div className={`${styles.filterSection} flex gap-4`}>
                 <input
                     type="text"
                     placeholder="Search by name"
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-md"
+                    className={styles.dashboardInput}
                 />
                 <input
                     type="number"
                     placeholder="Min Price"
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-md"
+                    className={styles.dashboardInput}
                 />
                 <input
                     type="number"
                     placeholder="Max Price"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-md"
+                    className={styles.dashboardInput}
                 />
             </div>
 
             {/* List Available Packages */}
-            <div className="package-list">
+            <div className={styles.packageList}>
                 {filteredPackages.length === 0 ? (
-                    <div>No packages found</div>
+                    <div className={styles.noPackages}>No packages found</div>
                 ) : (
                     filteredPackages.map((pkg) => (
-                        <div key={pkg.id} className="package-card p-4 bg-white rounded-lg shadow-lg mb-4">
-                            <h3 className="text-xl font-semibold">{pkg.name}</h3>
-                            <p><strong>Type:</strong> {pkg.packageType}</p>
-                            <p><strong>Price:</strong> {pkg.investment} LKR</p>
+                        <div key={pkg.id} className={styles.packageCard}>
+                            <h3 className={styles.dashboardSubtitle}>{pkg.name}</h3>
+                            <p className={styles.dashboardText}><strong>Type:</strong> {pkg.packageType}</p>
+                            <p className={styles.dashboardText}><strong>Price:</strong> {pkg.investment} LKR</p>
 
                             {/* Package Details */}
-                            <div className="package-details mt-4">
-                                <h3 className="text-lg font-semibold mb-2">Services Included</h3>
+                            <div className={styles.packageDetails}>
+                                <h3 className={styles.dashboardSubtitle}>Services Included</h3>
                                 <ul className="list-disc pl-6 mb-4">
                                     {pkg.servicesIncluded?.map((service, index) => (
-                                        <li key={index}>{service}</li>
-                                    )) || <li>No services included</li>}
+                                        <li key={index} className={styles.dashboardText}>{service}</li>
+                                    )) || <li className={styles.dashboardText}>No services included</li>}
                                 </ul>
 
-                                <h3 className="text-lg font-semibold mb-2">Additional Items</h3>
-                                <p><strong>Edited Images:</strong> {pkg.additionalItems?.editedImages || 'N/A'}</p>
-                                <p><strong>Unedited Images:</strong> {pkg.additionalItems?.uneditedImages || 'N/A'}</p>
+                                <h3 className={styles.dashboardSubtitle}>Additional Items</h3>
+                                <p className={styles.dashboardText}><strong>Edited Images:</strong> {pkg.additionalItems?.editedImages || 'N/A'}</p>
+                                <p className={styles.dashboardText}><strong>Unedited Images:</strong> {pkg.additionalItems?.uneditedImages || 'N/A'}</p>
 
-                                <h4 className="text-md font-semibold">Albums</h4>
+                                <h4 className={styles.dashboardSubtitleSmall}>Albums</h4>
                                 <ul className="list-disc pl-6 mb-4">
                                     {pkg.additionalItems?.albums?.map((album, index) => (
-                                        <li key={index}>
+                                        <li key={index} className={styles.dashboardText}>
                                             {album.size} {album.type} (Spread Count: {album.spreadCount})
                                         </li>
-                                    )) || <li>No albums available</li>}
+                                    )) || <li className={styles.dashboardText}>No albums available</li>}
                                 </ul>
 
-                                <h4 className="text-md font-semibold">Framed Portraits</h4>
+                                <h4 className={styles.dashboardSubtitleSmall}>Framed Portraits</h4>
                                 <ul className="list-disc pl-6 mb-4">
                                     {pkg.additionalItems?.framedPortraits?.map((portrait, index) => (
-                                        <li key={index}>
+                                        <li key={index} className={styles.dashboardText}>
                                             {portrait.size} (Quantity: {portrait.quantity})
                                         </li>
-                                    )) || <li>No framed portraits available</li>}
+                                    )) || <li className={styles.dashboardText}>No framed portraits available</li>}
                                 </ul>
 
-                                <p><strong>Thank You Cards:</strong> {pkg.additionalItems?.thankYouCards || 'N/A'}</p>
+                                <p className={styles.dashboardText}><strong>Thank You Cards:</strong> {pkg.additionalItems?.thankYouCards || 'N/A'}</p>
 
                                 {/* Buttons with layouts */}
-                                <div className="mt-4 flex flex-col gap-4">
+                                <div className={styles.packageActions}>
                                     {/* Download PDF Button spanning full width */}
                                     <button
                                         onClick={() => handleDownloadPDF(pkg)}
-                                        className="w-full bg-purple-500 text-white font-semibold py-3 rounded-md shadow hover:bg-purple-600 transition duration-200 ease-in-out flex items-center justify-center"
+                                        className={`${styles.dashboardButton} w-full bg-purple-500 text-white font-semibold py-3 rounded-md shadow hover:bg-purple-600 transition duration-200 ease-in-out flex items-center justify-center`}
                                     >
                                         Download PDF
                                     </button>
 
                                     {/* Book Now and Customize Buttons below */}
-                                    <div className="flex gap-4">
+                                    <div className={styles.buttonContainer}>
                                         <button
                                             onClick={() => handleBooking(pkg)}
-                                            className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-600 transition duration-200 ease-in-out flex-1"
+                                            className={`${styles.dashboardButton} ${styles.buttonBlue} flex-1`}
                                         >
                                             Book Now!
                                         </button>
 
-
                                         <Link
                                             href={`/packages/Customize/${pkg.id}`}
                                             onClick={() => handleCustomizePackage(pkg)}
-                                            className="bg-green-500 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-green-600 transition duration-200 ease-in-out flex-1"
+                                            className={`${styles.dashboardButton} ${styles.buttonGreen} flex-1`}
                                         >
-                                            <button> Customize Package</button>
+                                            <button>Customize Package</button>
                                         </Link>
-
                                     </div>
                                 </div>
                             </div>
