@@ -22,11 +22,11 @@ const CustomerDashboard = () => {
     const [filteredPackages, setFilteredPackages] = useState<Package[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchName, setSearchName] = useState("");
-    const [minPrice, setMinPrice] = useState<number | string>("");
-    const [maxPrice, setMaxPrice] = useState<number | string>("");
+    const [minPrice, setMinPrice] = useState<string>("");
+    const [maxPrice, setMaxPrice] = useState<string>("");
     const router = useRouter();
 
-    // Fetch packages from the backend (MongoDB)
+    // Fetch packages from the backend
     useEffect(() => {
         const fetchPackages = async () => {
             try {
@@ -44,8 +44,8 @@ const CustomerDashboard = () => {
         fetchPackages();
     }, []);
 
-    // Filter packages based on the name and price range
-    const handleFilter = () => {
+    // Filter packages based on search and price range
+    useEffect(() => {
         let filtered = packages.filter((pkg) => {
             const matchesName = pkg.name.toLowerCase().includes(searchName.toLowerCase());
             const matchesMinPrice = minPrice ? pkg.investment >= +minPrice : true;
@@ -53,18 +53,13 @@ const CustomerDashboard = () => {
             return matchesName && matchesMinPrice && matchesMaxPrice;
         });
         setFilteredPackages(filtered);
-    };
-
-    useEffect(() => {
-        handleFilter();
-    }, [searchName, minPrice, maxPrice]);
+    }, [searchName, minPrice, maxPrice, packages]);
 
     const handleBooking = (pkg: Package) => {
-        const query = new URLSearchParams({ packageName: pkg.name }).toString();
-        router.push(`/bookings/create?${query}`);
+        router.push(`/bookings/create?packageName=${encodeURIComponent(pkg.name)}`);
     };
 
-    const handleCustomizePackage = (pkg: Package) => {
+    const handleCustomize = (pkg: Package) => {
         router.push(`/packages/Customize/${pkg.id}`);
     };
 
@@ -119,8 +114,7 @@ const CustomerDashboard = () => {
         <div className={styles.dashboardContainer}>
             <h1 className={styles.dashboardTitle}>Photography Packages</h1>
 
-            {/* Filter Input Fields */}
-            <div className={`${styles.filterSection} flex gap-4`}>
+            <div className={styles.filterSection}>
                 <input
                     type="text"
                     placeholder="Search by name"
@@ -144,82 +138,44 @@ const CustomerDashboard = () => {
                 />
             </div>
 
-            {/* List Available Packages */}
             <div className={styles.packageList}>
-                {filteredPackages.length === 0 ? (
-                    <div className={styles.noPackages}>No packages found</div>
-                ) : (
-                    filteredPackages.map((pkg) => (
-                        <div key={pkg.id} className={styles.packageCard}>
-                            <h3 className={styles.dashboardSubtitle}>{pkg.name}</h3>
-                            <p className={styles.dashboardText}><strong>Type:</strong> {pkg.packageType}</p>
-                            <p className={styles.dashboardText}><strong>Price:</strong> {pkg.investment} LKR</p>
+                {filteredPackages.map((pkg) => (
+                    <div key={pkg.id} className={styles.packageCard}>
+                        <h2 className={styles.packageTitle}>{pkg.name}</h2>
+                        <div className={styles.packagePrice}>{pkg.investment} LKR</div>
+                        <div className={styles.packageType}>{pkg.packageType}</div>
 
-                            {/* Package Details */}
-                            <div className={styles.packageDetails}>
-                                <h3 className={styles.dashboardSubtitle}>Services Included</h3>
-                                <ul className="list-disc pl-6 mb-4">
-                                    {pkg.servicesIncluded?.map((service, index) => (
-                                        <li key={index} className={styles.dashboardText}>{service}</li>
-                                    )) || <li className={styles.dashboardText}>No services included</li>}
-                                </ul>
+                        <div className={styles.sectionTitle}>Services Included:</div>
+                        <ul className={styles.servicesList}>
+                            {pkg.servicesIncluded?.map((service, index) => (
+                                <li key={index} className={styles.serviceItem}>
+                                    {service}
+                                </li>
+                            ))}
+                        </ul>
 
-                                <h3 className={styles.dashboardSubtitle}>Additional Items</h3>
-                                <p className={styles.dashboardText}><strong>Edited Images:</strong> {pkg.additionalItems?.editedImages || 'N/A'}</p>
-                                <p className={styles.dashboardText}><strong>Unedited Images:</strong> {pkg.additionalItems?.uneditedImages || 'N/A'}</p>
+                        <div className={styles.sectionTitle}>Edited Images:</div>
+                        <div>{pkg.additionalItems?.editedImages || 'Edited Images On Pen Drive'}</div>
 
-                                <h4 className={styles.dashboardSubtitleSmall}>Albums</h4>
-                                <ul className="list-disc pl-6 mb-4">
-                                    {pkg.additionalItems?.albums?.map((album, index) => (
-                                        <li key={index} className={styles.dashboardText}>
-                                            {album.size} {album.type} (Spread Count: {album.spreadCount})
-                                        </li>
-                                    )) || <li className={styles.dashboardText}>No albums available</li>}
-                                </ul>
+                        <div className={styles.sectionTitle}>Unedited Images:</div>
+                        <div>{pkg.additionalItems?.uneditedImages || 'All Unedited Images'}</div>
 
-                                <h4 className={styles.dashboardSubtitleSmall}>Framed Portraits</h4>
-                                <ul className="list-disc pl-6 mb-4">
-                                    {pkg.additionalItems?.framedPortraits?.map((portrait, index) => (
-                                        <li key={index} className={styles.dashboardText}>
-                                            {portrait.size} (Quantity: {portrait.quantity})
-                                        </li>
-                                    )) || <li className={styles.dashboardText}>No framed portraits available</li>}
-                                </ul>
-
-                                <p className={styles.dashboardText}><strong>Thank You Cards:</strong> {pkg.additionalItems?.thankYouCards || 'N/A'}</p>
-
-                                {/* Buttons with layouts */}
-                                <div className={styles.packageActions}>
-                                    {/* Download PDF Button spanning full width */}
-                                    <button
-                                        onClick={() => handleDownloadPDF(pkg)}
-                                        className={`${styles.dashboardButton} w-full bg-purple-500 text-white font-semibold py-3 rounded-md shadow hover:bg-purple-600 transition duration-200 ease-in-out flex items-center justify-center`}
-                                    >
-                                        Download PDF
-                                    </button>
-
-                                    {/* Book Now and Customize Buttons below */}
-                                    <div className={styles.buttonContainer}>
-                                        <button
-                                            onClick={() => handleBooking(pkg)}
-                                            className={`${styles.dashboardButton} ${styles.buttonBlue} flex-1`}
-                                        >
-                                            Book Now!
-                                        </button>
-
-                                        <Link
-                                            href={`/packages/Customize/${pkg.id}`}
-                                            onClick={() => handleCustomizePackage(pkg)}
-                                            className={`${styles.dashboardButton} ${styles.buttonGreen} flex-1`}
-                                        >
-                                            <button>Customize Package</button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className={styles.buttonContainer}>
+                            <button
+                                onClick={() => handleBooking(pkg)}
+                                className={styles.bookButton}
+                            >
+                                Book Now
+                            </button>
+                            <button
+                                onClick={() => handleCustomize(pkg)}
+                                className={styles.customizeButton}
+                            >
+                                Customize
+                            </button>
                         </div>
-                    ))
-                )}
+                    </div>
+                ))}
             </div>
         </div>
     );
