@@ -16,6 +16,7 @@ import {
     PhotoIcon,
     CheckIcon
 } from "@heroicons/react/20/solid";
+import Chatbot from '@/app/components/Chatbot';
 
 const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
@@ -110,6 +111,20 @@ const CustomerDashboard = () => {
         doc.save(`${pkg.name || 'custom-package'}.pdf`);
     };
 
+    const handleChatbotPackageSelect = (packageId: string) => {
+        const selectedPackage = packages.find(pkg => pkg.id === packageId);
+        if (selectedPackage) {
+            handleBooking(selectedPackage);
+        }
+    };
+
+    const handleChatbotCustomize = (packageId: string) => {
+        const selectedPackage = packages.find(pkg => pkg.id === packageId);
+        if (selectedPackage) {
+            handleCustomize(selectedPackage);
+        }
+    };
+
     return (
         <div className={styles.dashboardContainer}>
             <h1 className={styles.dashboardTitle}>Photography Packages</h1>
@@ -177,6 +192,12 @@ const CustomerDashboard = () => {
                     </div>
                 ))}
             </div>
+
+            <Chatbot 
+                onPackageSelect={handleChatbotPackageSelect}
+                onCustomize={handleChatbotCustomize}
+                packages={packages}
+            />
         </div>
     );
 };
