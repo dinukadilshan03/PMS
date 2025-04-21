@@ -10,9 +10,25 @@ const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
-        const userId = sessionStorage.getItem('userId');
-        setIsLoggedIn(!!userId);
+        // Check login status on mount and when storage changes
+        const checkLoginStatus = () => {
+            const userId = sessionStorage.getItem('userId');
+            setIsLoggedIn(!!userId);
+        };
+
+        checkLoginStatus();
+        window.addEventListener('storage', checkLoginStatus);
+        
+        return () => {
+            window.removeEventListener('storage', checkLoginStatus);
+        };
     }, []);
+
+    const handleLogout = () => {
+        sessionStorage.clear();
+        setIsLoggedIn(false);
+        router.push('/');
+    };
 
     const navigation = [
         { name: 'Home', href: '/' },
@@ -54,14 +70,10 @@ const Header = () => {
                             ))}
                             {isLoggedIn ? (
                                 <button
-                                    onClick={() => {
-                                        sessionStorage.clear();
-                                        setIsLoggedIn(false);
-                                        router.push('/login');
-                                    }}
-                                    className="text-sm font-medium text-gray-500 hover:text-gray-900"
+                                    onClick={handleLogout}
+                                    className="inline-flex items-center justify-center px-4 py-2 border border-red-500 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition duration-150"
                                 >
-                                    Logout
+                                    Sign Out
                                 </button>
                             ) : (
                                 <button
@@ -115,14 +127,12 @@ const Header = () => {
                                 {isLoggedIn ? (
                                     <button
                                         onClick={() => {
-                                            sessionStorage.clear();
-                                            setIsLoggedIn(false);
-                                            router.push('/login');
+                                            handleLogout();
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className="block w-full text-left px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                                        className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
                                     >
-                                        Logout
+                                        Sign Out
                                     </button>
                                 ) : (
                                     <button
