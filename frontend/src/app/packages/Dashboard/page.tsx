@@ -6,6 +6,16 @@ import Link from "next/link";
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
 import styles from './page.module.css'; // Ensure this path is correct
 import { Package } from "@/app/packages/types/Package";
+import {
+    CameraIcon,
+    MagnifyingGlassIcon,
+    CurrencyDollarIcon,
+    DocumentArrowDownIcon,
+    WrenchScrewdriverIcon,
+    CalendarDaysIcon,
+    PhotoIcon,
+    CheckIcon
+} from "@heroicons/react/20/solid";
 
 const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
@@ -55,7 +65,7 @@ const CustomerDashboard = () => {
     };
 
     const handleCustomizePackage = (pkg: Package) => {
-        alert(`Customizing package: ${pkg.name}`);
+        router.push(`/packages/Customize/${pkg.id}`);
     };
 
     // Generate PDF for each package
@@ -104,10 +114,6 @@ const CustomerDashboard = () => {
         // Save PDF
         doc.save(`${pkg.name || 'custom-package'}.pdf`);
     };
-
-    if (loading) {
-        return <div>Loading packages...</div>;
-    }
 
     return (
         <div className={styles.dashboardContainer}>
