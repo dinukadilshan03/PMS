@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
+import styles from './page.module.css'; // Ensure this path is correct
 import { Package } from "@/app/packages/types/Package";
 import {
     CameraIcon,
@@ -115,152 +116,109 @@ const CustomerDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex items-center gap-3 mb-8">
-                    <CameraIcon className="h-8 w-8 text-blue-500" />
-                    <h1 className="text-3xl font-bold text-foreground">
-                        Photography Packages
-                    </h1>
-                </div>
+        <div className={styles.dashboardContainer}>
+            <h1 className={styles.dashboardTitle}>Photography Packages</h1>
 
-                {/* Search and Filter Section */}
-                <div className="mb-8 space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <input
-                                type="text"
-                                placeholder="Search by name"
-                                value={searchName}
-                                onChange={(e) => setSearchName(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="relative">
-                                <CurrencyDollarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <input
-                                    type="number"
-                                    placeholder="Min Price"
-                                    value={minPrice}
-                                    onChange={(e) => setMinPrice(e.target.value)}
-                                    className="w-32 pl-10 pr-4 py-2 rounded-md border border-input bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                            <div className="relative">
-                                <CurrencyDollarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <input
-                                    type="number"
-                                    placeholder="Max Price"
-                                    value={maxPrice}
-                                    onChange={(e) => setMaxPrice(e.target.value)}
-                                    className="w-32 pl-10 pr-4 py-2 rounded-md border border-input bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Filter Input Fields */}
+            <div className={`${styles.filterSection} flex gap-4`}>
+                <input
+                    type="text"
+                    placeholder="Search by name"
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    className={styles.dashboardInput}
+                />
+                <input
+                    type="number"
+                    placeholder="Min Price"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    className={styles.dashboardInput}
+                />
+                <input
+                    type="number"
+                    placeholder="Max Price"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    className={styles.dashboardInput}
+                />
+            </div>
 
-                {loading ? (
-                    <div className="flex justify-center">
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-                    </div>
+            {/* List Available Packages */}
+            <div className={styles.packageList}>
+                {filteredPackages.length === 0 ? (
+                    <div className={styles.noPackages}>No packages found</div>
                 ) : (
-                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {filteredPackages.length === 0 ? (
-                            <div className="col-span-full text-center text-muted-foreground">
-                                No packages found
-                            </div>
-                        ) : (
-                            filteredPackages.map((pkg) => (
-                                <div
-                                    key={pkg.id}
-                                    className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-input overflow-hidden"
-                                >
-                                    <div className="p-6">
-                                        <div className="mb-6">
-                                            <h2 className="text-2xl font-semibold text-card-foreground mb-2">
-                                                {pkg.name}
-                                            </h2>
-                                            <p className="text-xl font-medium text-blue-600 mb-1">
-                                                {pkg.investment} LKR
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">{pkg.packageType}</p>
-                                        </div>
+                    filteredPackages.map((pkg) => (
+                        <div key={pkg.id} className={styles.packageCard}>
+                            <h3 className={styles.dashboardSubtitle}>{pkg.name}</h3>
+                            <p className={styles.dashboardText}><strong>Type:</strong> {pkg.packageType}</p>
+                            <p className={styles.dashboardText}><strong>Price:</strong> {pkg.investment} LKR</p>
 
-                                        <div className="space-y-6">
-                                            <div>
-                                                <h3 className="font-medium text-card-foreground mb-2 flex items-center gap-2">
-                                                    <CheckIcon className="h-5 w-5 text-green-500" />
-                                                    Services Included:
-                                                </h3>
-                                                <ul className="list-none space-y-1 pl-7">
-                                                    {pkg.servicesIncluded?.map((service, index) => (
-                                                        <li key={index} className="text-muted-foreground flex items-center gap-2">
-                                                            <div className="w-1 h-1 rounded-full bg-blue-500"></div>
-                                                            {service}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
+                            {/* Package Details */}
+                            <div className={styles.packageDetails}>
+                                <h3 className={styles.dashboardSubtitle}>Services Included</h3>
+                                <ul className="list-disc pl-6 mb-4">
+                                    {pkg.servicesIncluded?.map((service, index) => (
+                                        <li key={index} className={styles.dashboardText}>{service}</li>
+                                    )) || <li className={styles.dashboardText}>No services included</li>}
+                                </ul>
 
-                                            <div className="space-y-4">
-                                                <div className="flex items-center gap-2">
-                                                    <PhotoIcon className="h-5 w-5 text-amber-500" />
-                                                    <div>
-                                                        <span className="font-medium text-card-foreground">
-                                                            Edited Images:
-                                                        </span>
-                                                        <span className="ml-2 text-muted-foreground">
-                                                            {pkg.additionalItems?.editedImages || 'N/A'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <PhotoIcon className="h-5 w-5 text-amber-500" />
-                                                    <div>
-                                                        <span className="font-medium text-card-foreground">
-                                                            Unedited Images:
-                                                        </span>
-                                                        <span className="ml-2 text-muted-foreground">
-                                                            {pkg.additionalItems?.uneditedImages || 'N/A'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <h3 className={styles.dashboardSubtitle}>Additional Items</h3>
+                                <p className={styles.dashboardText}><strong>Edited Images:</strong> {pkg.additionalItems?.editedImages || 'N/A'}</p>
+                                <p className={styles.dashboardText}><strong>Unedited Images:</strong> {pkg.additionalItems?.uneditedImages || 'N/A'}</p>
 
-                                        <div className="flex items-center justify-between mt-6 pt-4 border-t border-input">
-                                            <button
-                                                onClick={() => handleBooking(pkg)}
-                                                className="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-                                            >
-                                                <CalendarDaysIcon className="h-4 w-4" />
-                                                Book Now
-                                            </button>
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    onClick={() => handleCustomizePackage(pkg)}
-                                                    className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                                                >
-                                                    <WrenchScrewdriverIcon className="h-4 w-4" />
-                                                    Customize
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDownloadPDF(pkg)}
-                                                    className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                                                >
-                                                    <DocumentArrowDownIcon className="h-4 w-4" />
-                                                    PDF
-                                                </button>
-                                            </div>
-                                        </div>
+                                <h4 className={styles.dashboardSubtitleSmall}>Albums</h4>
+                                <ul className="list-disc pl-6 mb-4">
+                                    {pkg.additionalItems?.albums?.map((album, index) => (
+                                        <li key={index} className={styles.dashboardText}>
+                                            {album.size} {album.type} (Spread Count: {album.spreadCount})
+                                        </li>
+                                    )) || <li className={styles.dashboardText}>No albums available</li>}
+                                </ul>
+
+                                <h4 className={styles.dashboardSubtitleSmall}>Framed Portraits</h4>
+                                <ul className="list-disc pl-6 mb-4">
+                                    {pkg.additionalItems?.framedPortraits?.map((portrait, index) => (
+                                        <li key={index} className={styles.dashboardText}>
+                                            {portrait.size} (Quantity: {portrait.quantity})
+                                        </li>
+                                    )) || <li className={styles.dashboardText}>No framed portraits available</li>}
+                                </ul>
+
+                                <p className={styles.dashboardText}><strong>Thank You Cards:</strong> {pkg.additionalItems?.thankYouCards || 'N/A'}</p>
+
+                                {/* Buttons with layouts */}
+                                <div className={styles.packageActions}>
+                                    {/* Download PDF Button spanning full width */}
+                                    <button
+                                        onClick={() => handleDownloadPDF(pkg)}
+                                        className={`${styles.dashboardButton} w-full bg-purple-500 text-white font-semibold py-3 rounded-md shadow hover:bg-purple-600 transition duration-200 ease-in-out flex items-center justify-center`}
+                                    >
+                                        Download PDF
+                                    </button>
+
+                                    {/* Book Now and Customize Buttons below */}
+                                    <div className={styles.buttonContainer}>
+                                        <button
+                                            onClick={() => handleBooking(pkg)}
+                                            className={`${styles.dashboardButton} ${styles.buttonBlue} flex-1`}
+                                        >
+                                            Book Now!
+                                        </button>
+
+                                        <Link
+                                            href={`/packages/Customize/${pkg.id}`}
+                                            onClick={() => handleCustomizePackage(pkg)}
+                                            className={`${styles.dashboardButton} ${styles.buttonGreen} flex-1`}
+                                        >
+                                            <button>Customize Package</button>
+                                        </Link>
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            </div>
+                        </div>
+                    ))
                 )}
             </div>
         </div>
