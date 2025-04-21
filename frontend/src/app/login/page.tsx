@@ -41,7 +41,7 @@ export default function LoginPage() {
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('role', data.role);
 
-            router.push('/bookings'); // Navigate to /bookings after login
+            router.push('/'); // Navigate to home page after login
 
         } catch (err) {
             setError('Something went wrong');

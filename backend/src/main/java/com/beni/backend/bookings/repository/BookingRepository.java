@@ -3,7 +3,7 @@ package com.beni.backend.bookings.repository;
 import com.beni.backend.bookings.model.Booking;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
