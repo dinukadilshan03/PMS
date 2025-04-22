@@ -19,6 +19,7 @@ public class Feedback {
     private String clientEmail;
     private String content;
     private int rating;
+    private String packageName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isActive;

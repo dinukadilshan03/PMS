@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface FeedbackRepository extends MongoRepository<Feedback, String> {
     List<Feedback> findByIsActive(boolean isActive);
+    List<Feedback> findByIsActiveAndPackageName(boolean isActive, String packageName);
 }
