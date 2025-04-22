@@ -10,12 +10,13 @@ interface Feedback {
     clientEmail: string;
     content: string;
     rating: number;
+    packageName: string;
     createdAt: string;
     updatedAt: string;
     isActive: boolean;
 }
 
-const API_BASE_URL = 'http://localhost:8080'; // Update with your backend URL
+const API_BASE_URL = 'http://localhost:8080';
 
 export default function FeedbackPage() {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -25,16 +26,21 @@ export default function FeedbackPage() {
         clientName: '',
         clientEmail: '',
         content: '',
-        rating: 5
+        rating: 5,
+        packageName: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [selectedPackage, setSelectedPackage] = useState('');
 
     // Fetch all active feedbacks
     const fetchFeedbacks = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${API_BASE_URL}/api/feedbacks/active`);
+            const url = selectedPackage
+                ? `${API_BASE_URL}/api/feedbacks/active?packageName=${selectedPackage}`
+                : `${API_BASE_URL}/api/feedbacks/active`;
+            const response = await fetch(url); // Use the constructed URL here
             if (!response.ok) throw new Error('Failed to fetch feedbacks');
             const data = await response.json();
             setFeedbacks(data);
@@ -47,19 +53,50 @@ export default function FeedbackPage() {
 
     useEffect(() => {
         fetchFeedbacks();
-    }, []);
+    }, [selectedPackage]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'rating' ? parseInt(value) : value
-        }));
+
+        setFormData(prev => {
+            if (name === "rating") {
+                // ✅ Ensure rating stays between 1 and 5
+                return { ...prev, [name]: Math.max(1, Math.min(5, parseInt(value))) };
+            }
+            if (name === "clientName" && /\d/.test(value)) {
+                // ✅ Prevent numbers in client name
+                return prev;
+            }
+
+            if (name === "content" && value.length > 500) {
+                // ✅ Limit feedback content length
+                return prev;
+            }
+            return { ...prev, [name]: value };
+        });
+    };
+
+    const handlePackageFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedPackage(e.target.value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // ✅ Add: Email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // ✅ Add: Client-side validation before submission
+        if (!formData.clientName.trim()) {
+            setError('Client name is required.');
+            return;
+        }
+        if (!formData.clientEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+            setError('Invalid email format.');
+            return;
+        }
+
 
         try {
             setLoading(true);
@@ -95,7 +132,8 @@ export default function FeedbackPage() {
             clientName: feedback.clientName,
             clientEmail: feedback.clientEmail,
             content: feedback.content,
-            rating: feedback.rating
+            rating: feedback.rating,
+            packageName: feedback.packageName
         });
     };
 
@@ -125,7 +163,8 @@ export default function FeedbackPage() {
             clientName: '',
             clientEmail: '',
             content: '',
-            rating: 5
+            rating: 5,
+            packageName: ''
         });
     };
 
@@ -168,6 +207,23 @@ export default function FeedbackPage() {
                                 required
                             />
                         </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">Package</label>
+                        <select
+                            name="packageName"
+                            value={formData.packageName}
+                            onChange={handleInputChange}
+                            className="w-full p-2 border rounded"
+                            required
+                        >
+                            <option value="">Select a package</option>
+                            <option value="basic">Basic Package</option>
+                            <option value="standard">Standard Package</option>
+                            <option value="premium">Premium Package</option>
+                            <option value="enterprise">Enterprise Package</option>
+                        </select>
                     </div>
 
                     <div className="mb-4">
@@ -230,8 +286,20 @@ export default function FeedbackPage() {
 
             {/* Feedback List */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">All Feedbacks</h2>
-
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">All Feedbacks</h2>
+                    <select
+                        value={selectedPackage}
+                        onChange={handlePackageFilterChange}
+                        className="p-2 border rounded"
+                    >
+                        <option value="">All Packages</option>
+                        <option value="basic">Basic Package</option>
+                        <option value="standard">Standard Package</option>
+                        <option value="premium">Premium Package</option>
+                        <option value="enterprise">Enterprise Package</option>
+                    </select>
+                </div>
                 {loading && feedbacks.length === 0 ? (
                     <p className="text-center py-4">Loading feedbacks...</p>
                 ) : feedbacks.length === 0 ? (
@@ -244,6 +312,7 @@ export default function FeedbackPage() {
                                     <div>
                                         <h3 className="font-medium">{feedback.clientName}</h3>
                                         <p className="text-sm text-gray-600">{feedback.clientEmail}</p>
+                                        <p className="text-sm text-gray-600">Package: {feedback.packageName}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button

@@ -27,6 +27,10 @@ public class FeedbackService {
         return feedbackRepository.findByIsActive(true);
     }
 
+    public List<Feedback> getActiveFeedbacksByPackage(String packageName) {
+        return feedbackRepository.findByIsActiveAndPackageName(true, packageName);
+    }
+
     public Feedback updateFeedback(String id, Feedback feedbackDetails) {
         Feedback feedback = feedbackRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
@@ -35,6 +39,7 @@ public class FeedbackService {
         feedback.setClientEmail(feedbackDetails.getClientEmail());
         feedback.setContent(feedbackDetails.getContent());
         feedback.setRating(feedbackDetails.getRating());
+        feedback.setPackageName(feedbackDetails.getPackageName());
         feedback.setUpdatedAt(LocalDateTime.now());
 
         return feedbackRepository.save(feedback);
