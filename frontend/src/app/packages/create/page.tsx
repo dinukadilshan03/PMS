@@ -1,20 +1,29 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import "../create/page.css";
+import {
+    CameraIcon,
+    PlusIcon,
+    XMarkIcon,
+    PhotoIcon,
+    BookOpenIcon,
+    GiftIcon,
+    CheckIcon,
+    ArrowLeftIcon
+} from "@heroicons/react/20/solid";
+
 const CreatePackage = () => {
     const [name, setName] = useState("");
     const [investment, setInvestment] = useState("");
     const [packageType, setPackageType] = useState("");
     const [servicesIncluded, setServicesIncluded] = useState<string[]>([]);
-    const [editedImages, setEditedImages] = useState("");  // Edited images as string
-    const [uneditedImages, setUneditedImages] = useState("");  // Unedited images as string
+    const [editedImages, setEditedImages] = useState("");
+    const [uneditedImages, setUneditedImages] = useState("");
     const [albums, setAlbums] = useState([{ size: "", type: "", spreadCount: "" }]);
     const [framedPortraits, setFramedPortraits] = useState([{ size: "", quantity: "" }]);
     const [thankYouCards, setThankYouCards] = useState("");
     const router = useRouter();
 
-    // Validate form fields
     const validateForm = () => {
         if (!name.trim()) {
             alert("Package name is required.");
@@ -55,7 +64,6 @@ const CreatePackage = () => {
         return true;
     };
 
-    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -86,7 +94,7 @@ const CreatePackage = () => {
 
             if (res.ok) {
                 alert("Package created successfully!");
-                router.push("/");
+                router.push("/packages/Ad_View");
             } else {
                 alert("Failed to create package.");
             }
@@ -110,195 +118,304 @@ const CreatePackage = () => {
         setServicesIncluded(updatedServices);
     };
 
+    const handleAlbumChange = (index: number, field: string, value: string) => {
+        const newAlbums = [...albums];
+        newAlbums[index] = { ...albums[index], [field]: value };
+        setAlbums(newAlbums);
+    };
+
+    const handleRemoveAlbum = (index: number) => {
+        const newAlbums = albums.filter((_, i) => i !== index);
+        setAlbums(newAlbums);
+    };
+
+    const handleAddAlbum = () => setAlbums([...albums, { size: "", type: "", spreadCount: "" }]);
+
+    const handlePortraitChange = (index: number, field: string, value: string) => {
+        const newPortraits = [...framedPortraits];
+        newPortraits[index] = { ...framedPortraits[index], [field]: value };
+        setFramedPortraits(newPortraits);
+    };
+
+    const handleRemovePortrait = (index: number) => {
+        const newPortraits = framedPortraits.filter((_, i) => i !== index);
+        setFramedPortraits(newPortraits);
+    };
+
+    const handleAddPortrait = () => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }]);
+
     return (
-        <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
-            <h1 className="text-3xl font-bold text-center mb-8">Create a New Photography Package</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Package Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
+        <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto">
+                <div className="flex items-center gap-3 mb-8">
+                    <CameraIcon className="h-8 w-8 text-blue-500" />
+                    <h1 className="text-3xl font-bold text-foreground">
+                        Create New Package
+                    </h1>
                 </div>
 
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Investment (in LKR):</label>
-                    <input
-                        type="number"
-                        value={investment}
-                        onChange={(e) => setInvestment(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Package Type:</label>
-                    <input
-                        type="text"
-                        value={packageType}
-                        onChange={(e) => setPackageType(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Services Included:</label>
-                    {servicesIncluded.map((service, index) => (
-                        <div key={index} className="flex items-center mb-4">
-                            <input
-                                type="text"
-                                value={service}
-                                onChange={(e) => handleServiceChange(e, index)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder={`Service #${index + 1}`}
-                                required
-                            />
-                            <button
-                                type="button"
-                                onClick={() => removeService(index)}
-                                className="ml-4 text-red-500 hover:text-red-700"
-                            >
-                                Remove Service
-                            </button>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="space-y-6">
+                        {/* Basic Information */}
+                        <div className="bg-card rounded-lg border shadow-sm p-6">
+                            <h2 className="text-xl font-semibold text-card-foreground mb-4">Basic Information</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
+                                        Package Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="investment" className="block text-sm font-medium text-foreground mb-1">
+                                        Investment (LKR)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="investment"
+                                        value={investment}
+                                        onChange={(e) => setInvestment(e.target.value)}
+                                        className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="packageType" className="block text-sm font-medium text-foreground mb-1">
+                                        Package Type
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="packageType"
+                                        value={packageType}
+                                        onChange={(e) => setPackageType(e.target.value)}
+                                        className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={addService}
-                        className="text-blue-500 hover:text-blue-700"
-                    >
-                        Add Service
-                    </button>
-                </div>
 
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Edited Images:</label>
-                    <input
-                        type="text"
-                        value={editedImages}
-                        onChange={(e) => setEditedImages(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Unedited Images:</label>
-                    <input
-                        type="text"
-                        value={uneditedImages}
-                        onChange={(e) => setUneditedImages(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Albums:</label>
-                    {albums.map((album, index) => (
-                        <div key={index} className="flex mb-4">
-                            <input
-                                type="text"
-                                placeholder="Size"
-                                value={album.size}
-                                onChange={(e) => {
-                                    const updatedAlbums = [...albums];
-                                    updatedAlbums[index].size = e.target.value;
-                                    setAlbums(updatedAlbums);
-                                }}
-                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Type"
-                                value={album.type}
-                                onChange={(e) => {
-                                    const updatedAlbums = [...albums];
-                                    updatedAlbums[index].type = e.target.value;
-                                    setAlbums(updatedAlbums);
-                                }}
-                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Spread Count"
-                                value={album.spreadCount}
-                                onChange={(e) => {
-                                    const updatedAlbums = [...albums];
-                                    updatedAlbums[index].spreadCount = e.target.value;
-                                    setAlbums(updatedAlbums);
-                                }}
-                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                        {/* Services */}
+                        <div className="bg-card rounded-lg border shadow-sm p-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <CheckIcon className="h-5 w-5 text-blue-500" />
+                                <h2 className="text-xl font-semibold text-card-foreground">Services Included</h2>
+                            </div>
+                            <div className="space-y-4">
+                                {servicesIncluded.map((service, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={service}
+                                            onChange={(e) => {
+                                                const newServices = [...servicesIncluded];
+                                                newServices[index] = e.target.value;
+                                                setServicesIncluded(newServices);
+                                            }}
+                                            className="flex-1 rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Enter service"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newServices = servicesIncluded.filter((_, i) => i !== index);
+                                                setServicesIncluded(newServices);
+                                            }}
+                                            className="p-2 text-destructive hover:text-destructive/90 transition-colors"
+                                        >
+                                            <XMarkIcon className="h-5 w-5" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setServicesIncluded([...servicesIncluded, ""])}
+                                    className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                >
+                                    <PlusIcon className="h-4 w-4" />
+                                    Add Service
+                                </button>
+                            </div>
                         </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}
-                        className="text-blue-500 hover:text-blue-700"
-                    >
-                        Add Album
-                    </button>
-                </div>
 
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Framed Portraits:</label>
-                    {framedPortraits.map((portrait, index) => (
-                        <div key={index} className="flex mb-4">
-                            <input
-                                type="text"
-                                placeholder="Size"
-                                value={portrait.size}
-                                onChange={(e) => {
-                                    const updatedPortraits = [...framedPortraits];
-                                    updatedPortraits[index].size = e.target.value;
-                                    setFramedPortraits(updatedPortraits);
-                                }}
-                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Quantity"
-                                value={portrait.quantity}
-                                onChange={(e) => {
-                                    const updatedPortraits = [...framedPortraits];
-                                    updatedPortraits[index].quantity = e.target.value;
-                                    setFramedPortraits(updatedPortraits);
-                                }}
-                                className="w-1/3 px-4 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                        {/* Additional Items */}
+                        <div className="bg-card rounded-lg border shadow-sm p-6">
+                            <h2 className="text-xl font-semibold text-card-foreground mb-6">Additional Items</h2>
+                            
+                            {/* Images */}
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <PhotoIcon className="h-5 w-5 text-amber-500" />
+                                        <h3 className="font-medium text-foreground">Images</h3>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="editedImages" className="block text-sm font-medium text-foreground mb-1">
+                                            Edited Images
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="editedImages"
+                                            value={editedImages}
+                                            onChange={(e) => setEditedImages(e.target.value)}
+                                            className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="uneditedImages" className="block text-sm font-medium text-foreground mb-1">
+                                            Unedited Images
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="uneditedImages"
+                                            value={uneditedImages}
+                                            onChange={(e) => setUneditedImages(e.target.value)}
+                                            className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Albums */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <BookOpenIcon className="h-5 w-5 text-indigo-500" />
+                                        <h3 className="font-medium text-foreground">Albums</h3>
+                                    </div>
+                                    {albums.map((album, index) => (
+                                        <div key={index} className="grid gap-4 sm:grid-cols-3">
+                                            <input
+                                                type="text"
+                                                value={album.size}
+                                                onChange={(e) => handleAlbumChange(index, "size", e.target.value)}
+                                                placeholder="Size"
+                                                className="rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={album.type}
+                                                onChange={(e) => handleAlbumChange(index, "type", e.target.value)}
+                                                placeholder="Type"
+                                                className="rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={album.spreadCount}
+                                                    onChange={(e) => handleAlbumChange(index, "spreadCount", e.target.value)}
+                                                    placeholder="Spread Count"
+                                                    className="flex-1 rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveAlbum(index)}
+                                                    className="p-2 text-destructive hover:text-destructive/90 transition-colors"
+                                                >
+                                                    <XMarkIcon className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={handleAddAlbum}
+                                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                    >
+                                        <PlusIcon className="h-4 w-4" />
+                                        Add Album
+                                    </button>
+                                </div>
+
+                                {/* Framed Portraits */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <PhotoIcon className="h-5 w-5 text-amber-500" />
+                                        <h3 className="font-medium text-foreground">Framed Portraits</h3>
+                                    </div>
+                                    {framedPortraits.map((portrait, index) => (
+                                        <div key={index} className="grid gap-4 sm:grid-cols-2">
+                                            <input
+                                                type="text"
+                                                value={portrait.size}
+                                                onChange={(e) => handlePortraitChange(index, "size", e.target.value)}
+                                                placeholder="Size"
+                                                className="rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={portrait.quantity}
+                                                    onChange={(e) => handlePortraitChange(index, "quantity", e.target.value)}
+                                                    placeholder="Quantity"
+                                                    className="flex-1 rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemovePortrait(index)}
+                                                    className="p-2 text-destructive hover:text-destructive/90 transition-colors"
+                                                >
+                                                    <XMarkIcon className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={handleAddPortrait}
+                                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                    >
+                                        <PlusIcon className="h-4 w-4" />
+                                        Add Portrait
+                                    </button>
+                                </div>
+
+                                {/* Thank You Cards */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <GiftIcon className="h-5 w-5 text-purple-500" />
+                                        <h3 className="font-medium text-foreground">Thank You Cards</h3>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={thankYouCards}
+                                        onChange={(e) => setThankYouCards(e.target.value)}
+                                        className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter quantity"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}
-                        className="text-blue-500 hover:text-blue-700"
-                    >
-                        Add Framed Portrait
-                    </button>
-                </div>
+                    </div>
 
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-medium">Thank You Cards:</label>
-                    <input
-                        type="number"
-                        value={thankYouCards}
-                        onChange={(e) => setThankYouCards(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <button type="submit" className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-                    Create Package
-                </button>
-            </form>
+                    {/* Actions */}
+                    <div className="flex justify-end gap-4">
+                        <button
+                            type="button"
+                            onClick={() => router.back()}
+                            className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                            <ArrowLeftIcon className="h-4 w-4" />
+                            Back
+                        </button>
+                        <button
+                            type="submit"
+                            className="inline-flex items-center justify-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-600"
+                        >
+                            <PlusIcon className="h-4 w-4" />
+                            Create Package
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

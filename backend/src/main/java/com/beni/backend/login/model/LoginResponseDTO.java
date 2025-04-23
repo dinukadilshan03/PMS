@@ -2,7 +2,7 @@ package com.beni.backend.login.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.*;
+
 @Setter
 @Getter
 public class LoginResponseDTO {

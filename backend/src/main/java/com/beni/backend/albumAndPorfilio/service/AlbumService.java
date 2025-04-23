@@ -11,9 +11,11 @@ import java.util.List;
 @Service
 public class AlbumService {
 
+    //Create album repository object
     @Autowired
     private AlbumRepository albumRepository;
 
+    //Create file storage object
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -46,6 +48,7 @@ public class AlbumService {
 
     // Get All Albums Method
     public List<Album> getAllAlbums() {
+
         return albumRepository.findAll();
     }
 
@@ -89,17 +92,15 @@ public class AlbumService {
 
         // Handle image updates only if new images are provided
         if (images != null && !images.isEmpty()) {
-            // Delete old images
-            if (existingAlbum.getImages() != null && !existingAlbum.getImages().isEmpty()) {
-                for (String oldImagePath : existingAlbum.getImages()) {
-                    if (oldImagePath != null && !oldImagePath.isEmpty()) {
-                        fileStorageService.deleteFile(oldImagePath);
-                    }
-                }
-            }
             // Save new images
-            List<String> imagePaths = fileStorageService.saveFiles(images);
-            existingAlbum.setImages(imagePaths);
+            List<String> newImagePaths = fileStorageService.saveFiles(images);
+
+            // Append new images to the existing images (don't delete old ones)
+            if (existingAlbum.getImages() != null) {
+                existingAlbum.getImages().addAll(newImagePaths); // Add new images to the list of existing images
+            } else {
+                existingAlbum.setImages(newImagePaths); // If no existing images, set new images directly
+            }
         }
 
         // Handle cover image update only if a new cover image is provided
@@ -122,7 +123,6 @@ public class AlbumService {
         // Fetch the album to get the image paths
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Album not found with ID: " + id));
-
         // Delete the cover image
         if (album.getCoverImage() != null && !album.getCoverImage().isEmpty()) {
             fileStorageService.deleteFile(album.getCoverImage());
@@ -140,4 +140,6 @@ public class AlbumService {
 
         return true;
     }
+
+
 }
