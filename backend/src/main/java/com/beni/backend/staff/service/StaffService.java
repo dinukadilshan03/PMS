@@ -27,7 +27,7 @@ public class StaffService {
     // Add new staff member (Admin can add staff)
     public Staff addStaff(Staff staff) {
         try {
-            return staffRepository.save(staff); // Save the staff object with the updated availability field (boolean)
+            return staffRepository.save(staff); // Save the staff object with the updated availabilityDate field
         } catch (Exception e) {
             throw new RuntimeException("Error adding staff", e);
         }
@@ -44,6 +44,7 @@ public class StaffService {
             staff.setHourlyRate(updatedStaff.getHourlyRate());
             staff.setSpecialization(updatedStaff.getSpecialization());
             staff.setAvailability(updatedStaff.isAvailability()); // Update availability (boolean)
+            staff.setAvailabilityDate(updatedStaff.getAvailabilityDate()); // Update availabilityDate
             return staffRepository.save(staff);
         }).orElse(null);
     }

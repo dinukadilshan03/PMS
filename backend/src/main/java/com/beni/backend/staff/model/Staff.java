@@ -24,6 +24,7 @@ public class Staff {
     private String checkOutTime;
     private Earnings earnings;
     private List<Rating> ratings;
+    private String availabilityDate;  // New field for storing the availability date (ISO 8601 format)
 
     // Subclasses for Earnings and Ratings
     @Data

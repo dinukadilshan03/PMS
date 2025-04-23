@@ -23,11 +23,44 @@ const UpdateStaffPage: React.FC = () => {
         fetchStaffData();
     }, [id]);
 
+    // Validate form fields
+    const validateForm = () => {
+        if (!staffData.name.trim()) {
+            alert("Name is required.");
+            return false;
+        }
+        if (!staffData.email.trim() || !/\S+@\S+\.\S+/.test(staffData.email)) {
+            alert("Please enter a valid email.");
+            return false;
+        }
+        if (!/^\d{10}$/.test(staffData.phone)) {
+            alert("Phone number must be exactly 10 digits and contain only numbers.");
+            return false;
+        }
+        if (!staffData.address.trim()) {
+            alert("Address is required.");
+            return false;
+        }
+        if (!staffData.experience.trim()) {
+            alert("Experience is required.");
+            return false;
+        }
+        if (isNaN(Number(staffData.hourlyRate)) || Number(staffData.hourlyRate) <= 0) {
+            alert("Hourly rate must be a valid positive number.");
+            return false;
+        }
+        if (!staffData.specialization.trim()) {
+            alert("Specialization is required.");
+            return false;
+        }
+        return true;
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!staffData) return; // Don't submit if data is null
+        if (!staffData || !validateForm()) return; // Don't submit if data is null or invalid
 
         try {
             const res = await axios.put(`http://localhost:8080/api/staff/${id}`, staffData);
@@ -51,7 +84,7 @@ const UpdateStaffPage: React.FC = () => {
     };
 
     if (!staffData) {
-        // Loading state while fetching staff data
+        // Loading state
         return <div className="text-center text-xl mt-10">Loading...</div>;
     }
 

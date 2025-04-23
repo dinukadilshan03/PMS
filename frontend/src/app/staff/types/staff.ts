@@ -7,5 +7,6 @@ export interface Staff {
     experience: string;
     hourlyRate: number;
     specialization: string;
-    availability: boolean;  // This should match the backend field
+    availability: boolean;
+    availabilityDate: string;// This should match the backend field
 }

@@ -11,6 +11,7 @@ const AddStaffForm = () => {
     const [hourlyRate, setHourlyRate] = useState("");
     const [specialization, setSpecialization] = useState("");
     const [availability, setAvailability] = useState(true);
+    const [availabilityDate, setAvailabilityDate] = useState<string>(new Date().toISOString().split("T")[0]); // Default to today's date (in YYYY-MM-DD format)
     const router = useRouter();
 
     // Validate form fields
@@ -61,6 +62,7 @@ const AddStaffForm = () => {
             hourlyRate: parseFloat(hourlyRate),
             specialization,
             availability,
+            availabilityDate, // Add the availability date here
         };
 
         try {
@@ -149,7 +151,7 @@ const AddStaffForm = () => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-700">Hourly Rate (in LKR):</label>
+                    <label className="block text-xs font-medium text-gray-700">Hourly Rate:</label>
                     <input
                         type="number"
                         value={hourlyRate}
@@ -185,6 +187,16 @@ const AddStaffForm = () => {
                         <option value="true">Available</option>
                         <option value="false">Busy</option>
                     </select>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-medium text-gray-700">Availability Date:</label>
+                    <input
+                        type="date"
+                        value={availabilityDate}
+                        onChange={(e) => setAvailabilityDate(e.target.value)} // Now the user can edit the date
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                    />
                 </div>
 
                 <button

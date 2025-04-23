@@ -42,7 +42,7 @@ const AdminStaffList: React.FC = () => {
         router.push(`/staff/update/${id}`);
     };
 
-    // Toggle availability status
+    // Handle the availability toggle for staff
     const updateAvailability = async (id: string, availability: boolean) => {
         try {
             await axios.put(`http://localhost:8080/api/staff/availability/${id}`, {
@@ -61,22 +61,24 @@ const AdminStaffList: React.FC = () => {
     // Handle Delete functionality
     const handleDelete = async (id: string) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this staff member?");
-
         if (confirmDelete) {
             try {
                 // Delete the staff member from the database
                 await axios.delete(`http://localhost:8080/api/staff/${id}`);
-
                 // Remove the staff member from the list
                 setStaffList(staffList.filter(staff => staff.id !== id));
                 setFilteredStaff(filteredStaff.filter(staff => staff.id !== id)); // Update filtered list
-
                 alert("Staff deleted successfully!");
             } catch (err) {
                 setError("Failed to delete staff.");
                 console.log(err);
             }
         }
+    };
+
+    // Handle Assign to Photographer functionality
+    const handleAssignToPhotographer = (id: string) => {
+        router.push(`/bookings/assign/${id}`); // Redirect to the booking list page with photographer ID
     };
 
     return (
@@ -104,13 +106,14 @@ const AdminStaffList: React.FC = () => {
                     <th className="px-2 py-1 border border-gray-300 text-sm">Hourly Rate</th>
                     <th className="px-2 py-1 border border-gray-300 text-sm">Specialization</th>
                     <th className="px-2 py-1 border border-gray-300 text-sm">Availability</th>
+                    <th className="px-2 py-1 border border-gray-300 text-sm">Availability Date</th> {/* New column for date */}
                     <th className="px-2 py-1 border border-gray-300 text-sm">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {filteredStaff.length === 0 ? (
                     <tr>
-                        <td colSpan={8} className="text-center px-4 py-2 border border-gray-300 text-sm">
+                        <td colSpan={9} className="text-center px-4 py-2 border border-gray-300 text-sm">
                             No staff members found.
                         </td>
                     </tr>
@@ -126,17 +129,19 @@ const AdminStaffList: React.FC = () => {
                             <td className="px-2 py-1 border border-gray-300">
                                 <div className="flex justify-between items-center">
                                     <span>{staff.availability ? "Available" : "Busy"}</span>
-                                    {staff.availability && (
-                                        <button
-                                            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                                            onClick={() => updateAvailability(staff.id, !staff.availability)}
-                                        >
-                                            Assign to Booking
-                                        </button>
-                                    )}
                                 </div>
                             </td>
+                            <td className="px-2 py-1 border border-gray-300">{staff.availabilityDate}</td> {/* Display availability date */}
                             <td className="px-2 py-1 border border-gray-300 flex space-x-2">
+                                <button
+                                    className={`px-2 py-1 text-sm rounded ${
+                                        staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                                    }`}
+                                    onClick={() => staff.availability && handleAssignToPhotographer(staff.id)} // Only call function if available
+                                    disabled={!staff.availability} // Disable button if not available
+                                >
+                                    Assign
+                                </button>
                                 <button
                                     className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                                     onClick={() => goToUpdatePage(staff.id)}

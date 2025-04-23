@@ -23,11 +23,32 @@ const StaffProfilePage: React.FC = () => {
         fetchStaffData();
     }, [id]);
 
+    // Validate form fields
+    const validateForm = () => {
+        if (!staffData.name.trim()) {
+            alert("Name is required.");
+            return false;
+        }
+        if (!staffData.email.trim() || !/\S+@\S+\.\S+/.test(staffData.email)) {
+            alert("Please enter a valid email.");
+            return false;
+        }
+        if (!/^[0-9]{10}$/.test(staffData.phone)) {
+            alert("Phone number must be exactly 10 digits and contain only numbers.");
+            return false;
+        }
+        if (!staffData.address.trim()) {
+            alert("Address is required.");
+            return false;
+        }
+        return true;
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!staffData) return; // Don't submit if data is null
+        if (!staffData || !validateForm()) return; // Don't submit if data is null or invalid
 
         try {
             const res = await axios.put(`http://localhost:8080/api/staff/${id}`, staffData);
