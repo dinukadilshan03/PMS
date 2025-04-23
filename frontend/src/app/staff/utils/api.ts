@@ -8,7 +8,7 @@ const api = axios.create({
     },
 });
 
-// Fetch all staff
+// fetch all staff
 export const getAllStaff = async () => {
     try {
         const response = await api.get("/staff");
@@ -60,7 +60,7 @@ export const addStaff = async (staffData: any) => {
     }
 };
 
-// Update staff details
+//Update staff details
 export const updateStaff = async (id: string, updatedData: any) => {
     try {
         const response = await api.put(`/staff/${id}`, updatedData);

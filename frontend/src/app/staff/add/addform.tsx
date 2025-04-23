@@ -1,8 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Use correct import for router in Next.js
-
-
+import { useRouter } from "next/navigation";
 
 const AddStaffForm = () => {
     const [name, setName] = useState("");
@@ -12,7 +10,8 @@ const AddStaffForm = () => {
     const [experience, setExperience] = useState("");
     const [hourlyRate, setHourlyRate] = useState("");
     const [specialization, setSpecialization] = useState("");
-    const [availability, setAvailability] = useState(true); // Availability is a boolean
+    const [availability, setAvailability] = useState(true);
+    const [availabilityDate, setAvailabilityDate] = useState<string>(new Date().toISOString().split("T")[0]); // Default to today's date (in YYYY-MM-DD format)
     const router = useRouter();
 
     // Validate form fields
@@ -60,9 +59,10 @@ const AddStaffForm = () => {
             phone,
             address,
             experience,
-            hourlyRate: parseFloat(hourlyRate), // Convert hourly rate to a number
+            hourlyRate: parseFloat(hourlyRate),
             specialization,
-            availability, // Availability is already a boolean
+            availability,
+            availabilityDate, // Add the availability date here
         };
 
         try {
@@ -87,91 +87,124 @@ const AddStaffForm = () => {
     };
 
     return (
-        <div>
-            <h1>Add New Staff Member</h1>
-            <form onSubmit={handleSubmit}>
+        <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg mt-10">
+            <h1 className="text-xl font-bold mb-4 text-center text-blue-600">Add New Staff Member</h1>
+            <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                    <label>Name:</label>
+                    <label className="block text-xs font-medium text-gray-700">Your Name:</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter your name"
                         required
                     />
                 </div>
 
                 <div>
-                    <label>Email:</label>
+                    <label className="block text-xs font-medium text-gray-700">Email Address:</label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter your email"
                         required
                     />
                 </div>
 
                 <div>
-                    <label>Phone:</label>
+                    <label className="block text-xs font-medium text-gray-700">Phone:</label>
                     <input
                         type="text"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter phone number"
                         required
                     />
                 </div>
 
                 <div>
-                    <label>Address:</label>
+                    <label className="block text-xs font-medium text-gray-700">Address:</label>
                     <input
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter address"
                         required
                     />
                 </div>
 
                 <div>
-                    <label>Experience:</label>
+                    <label className="block text-xs font-medium text-gray-700">Experience:</label>
                     <input
                         type="text"
                         value={experience}
                         onChange={(e) => setExperience(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter experience"
                         required
                     />
                 </div>
 
                 <div>
-                    <label>Hourly Rate (in LKR):</label>
+                    <label className="block text-xs font-medium text-gray-700">Hourly Rate:</label>
                     <input
                         type="number"
                         value={hourlyRate}
                         onChange={(e) => setHourlyRate(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter hourly rate"
                         required
                     />
                 </div>
 
                 <div>
-                    <label>Specialization:</label>
-                    <input
-                        type="text"
+                    <label className="block text-xs font-medium text-gray-700">Specialization:</label>
+                    <select
                         value={specialization}
                         onChange={(e) => setSpecialization(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                         required
-                    />
+                    >
+                        <option value="">Select Specialization</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Portraits">Portraits</option>
+                        <option value="Events">Events</option>
+                    </select>
                 </div>
 
                 <div>
-                    <label>Availability:</label>
+                    <label className="block text-xs font-medium text-gray-700">Availability:</label>
                     <select
                         value={availability.toString()}
                         onChange={(e) => setAvailability(e.target.value === "true")}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
                     >
                         <option value="true">Available</option>
                         <option value="false">Busy</option>
                     </select>
                 </div>
 
-                <button type="submit">Add Staff</button>
+                <div>
+                    <label className="block text-xs font-medium text-gray-700">Availability Date:</label>
+                    <input
+                        type="date"
+                        value={availabilityDate}
+                        onChange={(e) => setAvailabilityDate(e.target.value)} // Now the user can edit the date
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-700 transition"
+                >
+                    Add Staff
+                </button>
             </form>
         </div>
     );
