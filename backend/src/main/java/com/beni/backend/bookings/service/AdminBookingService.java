@@ -1,13 +1,15 @@
 package com.beni.backend.bookings.service;
 
-
 import com.beni.backend.bookings.model.Booking;
 import com.beni.backend.bookings.repository.BookingRepository;
+import com.beni.backend.staff.model.Staff;
+import com.beni.backend.staff.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminBookingService {
@@ -15,9 +17,19 @@ public class AdminBookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    // Get all bookings
+    @Autowired
+    private StaffRepository staffRepository;
+
+    // Get all bookings with staff information
     public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+        List<Booking> bookings = bookingRepository.findAll();
+        return bookings.stream().map(booking -> {
+            if (booking.getAssignedStaffId() != null) {
+                Optional<Staff> staff = staffRepository.findById(booking.getAssignedStaffId());
+                staff.ifPresent(s -> booking.setAssignedStaffName(s.getName()));
+            }
+            return booking;
+        }).collect(Collectors.toList());
     }
 
     // Get a booking by ID

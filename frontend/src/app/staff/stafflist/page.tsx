@@ -78,7 +78,7 @@ const AdminStaffList: React.FC = () => {
 
     // Handle Assign to Photographer functionality
     const handleAssignToPhotographer = (id: string) => {
-        router.push(`/bookings/assign/${id}`); // Redirect to the booking list page with photographer ID
+        router.push(`/staff/assign/${id}`); // Updated to point to the new assign page
     };
 
     return (

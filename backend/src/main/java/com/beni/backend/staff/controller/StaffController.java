@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -55,7 +56,20 @@ public class StaffController {
 
     // Staff: Update own availability (staff can change their availability)
     @PutMapping("/availability/{id}")
-    public Staff updateAvailability(@PathVariable String id, @RequestBody boolean availability) {
-        return staffService.updateAvailability(id, availability);
+    public Staff updateStaffAvailability(@PathVariable String id, @RequestBody Map<String, Boolean> request) {
+        return staffService.updateAvailability(id, request.get("availability"));
+    }
+
+    // Assign staff to a booking
+    @PutMapping("/{id}/assign")
+    public Staff assignToBooking(@PathVariable String id, @RequestBody Map<String, String> request) {
+        String bookingId = request.get("bookingId");
+        return staffService.assignToBooking(id, bookingId);
+    }
+
+    // Unassign staff from a booking
+    @PutMapping("/{id}/unassign")
+    public Staff unassignFromBooking(@PathVariable String id) {
+        return staffService.unassignFromBooking(id);
     }
 }

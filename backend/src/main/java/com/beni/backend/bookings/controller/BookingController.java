@@ -155,4 +155,34 @@ public class BookingController {
             return ResponseEntity.status(500).body("Error cancelling booking: " + e.getMessage());
         }
     }
+
+    // Assign staff to a booking
+    @PutMapping("/{bookingId}/assign")
+    public ResponseEntity<?> assignStaff(@PathVariable String bookingId, @RequestBody Map<String, String> request) {
+        logger.info("Received staff assignment request for booking: {}", bookingId);
+        try {
+            String staffId = request.get("staffId");
+            if (staffId == null || staffId.isEmpty()) {
+                return ResponseEntity.badRequest().body("Staff ID is required");
+            }
+            Booking updatedBooking = bookingService.assignStaff(bookingId, staffId);
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            logger.error("Error assigning staff: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error assigning staff: " + e.getMessage());
+        }
+    }
+
+    // Unassign staff from a booking
+    @PutMapping("/{bookingId}/unassign")
+    public ResponseEntity<?> unassignStaff(@PathVariable String bookingId) {
+        logger.info("Received staff unassignment request for booking: {}", bookingId);
+        try {
+            Booking updatedBooking = bookingService.unassignStaff(bookingId);
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            logger.error("Error unassigning staff: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error unassigning staff: " + e.getMessage());
+        }
+    }
 }

@@ -70,4 +70,28 @@ public class StaffService {
         }
         return null;
     }
+
+    // Assign staff to a booking
+    public Staff assignToBooking(String id, String bookingId) {
+        Optional<Staff> staffOptional = staffRepository.findById(id);
+        if (staffOptional.isPresent()) {
+            Staff staff = staffOptional.get();
+            staff.setAssignedBookingId(bookingId);
+            staff.setAvailability(false); // Set availability to false when assigned
+            return staffRepository.save(staff);
+        }
+        throw new RuntimeException("Staff not found");
+    }
+
+    // Unassign staff from a booking
+    public Staff unassignFromBooking(String id) {
+        Optional<Staff> staffOptional = staffRepository.findById(id);
+        if (staffOptional.isPresent()) {
+            Staff staff = staffOptional.get();
+            staff.setAssignedBookingId(null);
+            staff.setAvailability(true); // Set availability to true when unassigned
+            return staffRepository.save(staff);
+        }
+        throw new RuntimeException("Staff not found");
+    }
 }

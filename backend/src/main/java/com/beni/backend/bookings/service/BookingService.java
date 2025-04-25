@@ -101,4 +101,26 @@ public class BookingService {
         logger.info("Saving updated booking: {}", booking.getId());
         return bookingRepository.save(booking);
     }
+
+    // Assign staff to a booking
+    public Booking assignStaff(String bookingId, String staffId) {
+        logger.info("Assigning staff {} to booking {}", staffId, bookingId);
+        Booking booking = getBookingById(bookingId);
+        if (booking == null) {
+            throw new RuntimeException("Booking not found");
+        }
+        booking.setAssignedStaffId(staffId);
+        return saveBooking(booking);
+    }
+
+    // Unassign staff from a booking
+    public Booking unassignStaff(String bookingId) {
+        logger.info("Unassigning staff from booking {}", bookingId);
+        Booking booking = getBookingById(bookingId);
+        if (booking == null) {
+            throw new RuntimeException("Booking not found");
+        }
+        booking.setAssignedStaffId(null);
+        return saveBooking(booking);
+    }
 }

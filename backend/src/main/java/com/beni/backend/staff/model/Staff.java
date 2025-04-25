@@ -25,6 +25,7 @@ public class Staff {
     private Earnings earnings;
     private List<Rating> ratings;
     private String availabilityDate;  // New field for storing the availability date (ISO 8601 format)
+    private String assignedBookingId; // ID of the booking this staff is assigned to
 
     // Subclasses for Earnings and Ratings
     @Data
