@@ -10,6 +10,8 @@ interface Booking {
     packageName: string;
     bookingStatus: string;
     paymentStatus: string;
+    assignedStaffId?: string;
+    assignedStaffName?: string;
 }
 
 const BookingTable = () => {
@@ -153,6 +155,7 @@ const BookingTable = () => {
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date & Time</th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Package</th>
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Assigned Staff</th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Payment</th>
                                 <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -176,6 +179,9 @@ const BookingTable = () => {
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                             {booking.packageName || '-'}
                                         </span>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {booking.assignedStaffName || 'Not assigned'}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(booking.bookingStatus)}`}>

@@ -49,6 +49,9 @@ public class Booking {
     @NotBlank(message = "Package name is required")
     private String packageName;
 
+    private String assignedStaffId; // ID of the staff member assigned to this booking
+    private String assignedStaffName; // Name of the staff member assigned to this booking
+
     // Custom validation method
     public boolean isValid() {
         if (dateTime == null || dateTime.isBefore(LocalDateTime.now())) {
