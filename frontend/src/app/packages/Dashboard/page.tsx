@@ -14,7 +14,9 @@ import {
     WrenchScrewdriverIcon,
     CalendarDaysIcon,
     PhotoIcon,
-    CheckIcon
+    CheckIcon,
+    PencilIcon,
+    ShoppingCartIcon
 } from "@heroicons/react/20/solid";
 import Chatbot from '@/app/components/Chatbot';
 
@@ -22,9 +24,9 @@ const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
     const [filteredPackages, setFilteredPackages] = useState<Package[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchName, setSearchName] = useState("");
-    const [minPrice, setMinPrice] = useState<string>("");
-    const [maxPrice, setMaxPrice] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
     const router = useRouter();
 
     // Fetch packages from the backend
@@ -47,14 +49,15 @@ const CustomerDashboard = () => {
 
     // Filter packages based on search and price range
     useEffect(() => {
-        let filtered = packages.filter((pkg) => {
-            const matchesName = pkg.name.toLowerCase().includes(searchName.toLowerCase());
-            const matchesMinPrice = minPrice ? pkg.investment >= +minPrice : true;
-            const matchesMaxPrice = maxPrice ? pkg.investment <= +maxPrice : true;
-            return matchesName && matchesMinPrice && matchesMaxPrice;
+        const filtered = packages.filter((pkg) => {
+            const matchesSearch = pkg.name.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesPrice =
+                (!minPrice || pkg.investment >= parseFloat(minPrice)) &&
+                (!maxPrice || pkg.investment <= parseFloat(maxPrice));
+            return matchesSearch && matchesPrice;
         });
         setFilteredPackages(filtered);
-    }, [searchName, minPrice, maxPrice, packages]);
+    }, [searchQuery, minPrice, maxPrice, packages]);
 
     const handleBooking = (pkg: Package) => {
         router.push(`/bookings/create?packageName=${encodeURIComponent(pkg.name)}`);
@@ -127,77 +130,124 @@ const CustomerDashboard = () => {
 
     return (
         <div className={styles.dashboardContainer}>
-            <h1 className={styles.dashboardTitle}>Photography Packages</h1>
+            {/* <div className={styles.header}>
+                <h1 className={styles.packageTitle}>Photography Packages</h1>
+            </div> */}
 
-            <div className={styles.filterSection}>
+            <div className={styles.searchContainer}>
                 <input
                     type="text"
-                    placeholder="Search by name"
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    className={styles.dashboardInput}
+                    placeholder="Search packages..."
+                    className={styles.searchInput}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <input
-                    type="number"
-                    placeholder="Min Price"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                    className={styles.dashboardInput}
-                />
-                <input
-                    type="number"
-                    placeholder="Max Price"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                    className={styles.dashboardInput}
-                />
+                <div className={styles.priceFilter}>
+                    <input
+                        type="number"
+                        placeholder="Min price"
+                        className={styles.priceInput}
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                    />
+                    <span>to</span>
+                    <input
+                        type="number"
+                        placeholder="Max price"
+                        className={styles.priceInput}
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                    />
+                </div>
             </div>
 
             <div className={styles.packageList}>
                 {filteredPackages.map((pkg) => (
                     <div key={pkg.id} className={styles.packageCard}>
-                        <h2 className={styles.packageTitle}>{pkg.name}</h2>
-                        <div className={styles.packagePrice}>{pkg.investment} LKR</div>
-                        <div className={styles.packageType}>{pkg.packageType}</div>
+                        <div className={styles.packageCardContent}>
+                            <CameraIcon className={styles.packageIcon} />
+                            <h2 className={styles.packageTitle}>{pkg.name}</h2>
+                            <div className={styles.packageType}>{pkg.packageType}</div>
+                            <div className={styles.packagePrice}>{pkg.investment.toLocaleString()} LKR</div>
+                            
+                            <div className={styles.packageDetails}>
+                                <div className={styles.additionalItems}>
+                                    <div className={styles.additionalItemTitle}>Services Included:</div>
+                                    <ul className={styles.servicesList}>
+                                        {pkg.servicesIncluded?.map((service, index) => (
+                                            <li key={index} className={styles.serviceItem}>
+                                                <CheckIcon className="w-5 h-5" />
+                                                <span>{service}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
 
-                        <div className={styles.sectionTitle}>Services Included:</div>
-                        <ul className={styles.servicesList}>
-                            {pkg.servicesIncluded?.map((service, index) => (
-                                <li key={index} className={styles.serviceItem}>
-                                    {service}
-                                </li>
-                            ))}
-                        </ul>
+                                <div className={styles.additionalItems}>
+                                    <div className={styles.additionalItemTitle}>Additional Items:</div>
+                                    <div className={styles.servicesList}>
+                                        {pkg.additionalItems?.editedImages && (
+                                            <div className={styles.serviceItem}>
+                                                <PhotoIcon className="w-5 h-5" />
+                                                <span>Edited Images: {pkg.additionalItems.editedImages}</span>
+                                            </div>
+                                        )}
+                                        {pkg.additionalItems?.uneditedImages && (
+                                            <div className={styles.serviceItem}>
+                                                <CameraIcon className="w-5 h-5" />
+                                                <span>Unedited Images: {pkg.additionalItems.uneditedImages}</span>
+                                            </div>
+                                        )}
+                                        {pkg.additionalItems?.thankYouCards && (
+                                            <div className={styles.serviceItem}>
+                                                <DocumentArrowDownIcon className="w-5 h-5" />
+                                                <span>Thank You Cards: {pkg.additionalItems.thankYouCards}</span>
+                                            </div>
+                                        )}
+                                        {pkg.additionalItems?.albums?.map((album, index) => (
+                                            <div key={index} className={styles.serviceItem}>
+                                                <PhotoIcon className="w-5 h-5" />
+                                                <span>Album: {album.size}, {album.type}, {album.spreadCount} spreads</span>
+                                            </div>
+                                        ))}
+                                        {pkg.additionalItems?.framedPortraits?.map((portrait, index) => (
+                                            <div key={index} className={styles.serviceItem}>
+                                                <PhotoIcon className="w-5 h-5" />
+                                                <span>Framed Portrait: {portrait.size}, Quantity: {portrait.quantity}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div className={styles.sectionTitle}>Edited Images:</div>
-                        <div>{pkg.additionalItems?.editedImages || 'Edited Images On Pen Drive'}</div>
-
-                        <div className={styles.sectionTitle}>Unedited Images:</div>
-                        <div>{pkg.additionalItems?.uneditedImages || 'All Unedited Images'}</div>
-
-                        <div className={styles.buttonContainer}>
-                            <button
-                                onClick={() => handleBooking(pkg)}
-                                className={styles.bookButton}
-                            >
-                                Book Now
-                            </button>
-                            <button
-                                onClick={() => handleCustomize(pkg)}
-                                className={styles.customizeButton}
-                            >
-                                Customize
-                            </button>
+                            <div className={styles.buttonContainer}>
+                                <button
+                                    onClick={() => handleBooking(pkg)}
+                                    className={`${styles.button} ${styles.bookButton}`}
+                                >
+                                    <ShoppingCartIcon className="w-5 h-5" />
+                                    Book Now
+                                </button>
+                                <button
+                                    onClick={() => handleCustomize(pkg)}
+                                    className={`${styles.button} ${styles.customizeButton}`}
+                                >
+                                    <PencilIcon className="w-5 h-5" />
+                                    Customize
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <Chatbot 
-                onPackageSelect={handleChatbotPackageSelect}
-                onCustomize={handleChatbotCustomize}
-                packages={packages}
-            />
+            <div className={styles.chatbotContainer}>
+                <Chatbot 
+                    onPackageSelect={handleChatbotPackageSelect}
+                    onCustomize={handleChatbotCustomize}
+                    packages={packages}
+                />
+            </div>
         </div>
     );
 };
