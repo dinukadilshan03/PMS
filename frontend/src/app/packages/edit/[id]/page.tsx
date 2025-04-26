@@ -183,313 +183,243 @@ const EditPackage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     return (
-        <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto">
-                {loading ? (
-                    <div className="flex justify-center">
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-                    </div>
-                ) : (
-                    <>
-                        <div className="flex items-center gap-3 mb-8">
-                            <CameraIcon className="h-8 w-8 text-blue-500" />
-                            <h1 className="text-3xl font-bold text-foreground">
-                                Edit Package
-                            </h1>
+        <div className="min-h-screen bg-[#e9e5dc] py-16 px-4 font-sans">
+            <div className="max-w-3xl mx-auto bg-white rounded-[2.5rem_1rem_2.5rem_1rem] shadow-lg p-0" style={{ boxShadow: '0 8px 32px rgba(45,41,38,0.07)' }}>
+                {/* Section Heading */}
+                <div className="px-10 pt-10 pb-2">
+                    <h1 className="text-3xl font-serif font-light text-[#222] mb-2 tracking-wide">edit package</h1>
+                    <div className="w-16 h-1 bg-black mb-6" />
+                    <p className="text-center text-base text-[#444] mb-8 font-light">Update the details of your package below.</p>
+                </div>
+                <form onSubmit={handleSubmit} className="px-10 pb-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 mb-8">
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="name" className="text-xs font-medium text-[#222] tracking-widest uppercase">Package Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                placeholder="Enter package name"
+                                required
+                            />
                         </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-8">
-                            <div className="space-y-6">
-                                {/* Basic Information */}
-                                <div className="bg-card rounded-lg border shadow-sm p-6">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <PencilSquareIcon className="h-5 w-5 text-blue-500" />
-                                        <h2 className="text-xl font-semibold text-card-foreground">Basic Information</h2>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
-                                                Package Name
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="investment" className="block text-sm font-medium text-foreground mb-1">
-                                                Investment (LKR)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                id="investment"
-                                                value={investment}
-                                                onChange={(e) => setInvestment(e.target.value)}
-                                                className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="packageType" className="block text-sm font-medium text-foreground mb-1">
-                                                Package Type
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="packageType"
-                                                value={packageType}
-                                                onChange={(e) => setPackageType(e.target.value)}
-                                                className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="investment" className="text-xs font-medium text-[#222] tracking-widest uppercase">Investment (LKR)</label>
+                            <input
+                                type="number"
+                                id="investment"
+                                value={investment}
+                                onChange={(e) => setInvestment(e.target.value)}
+                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                placeholder="Enter investment"
+                                required
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="packageType" className="text-xs font-medium text-[#222] tracking-widest uppercase">Package Type</label>
+                            <input
+                                type="text"
+                                id="packageType"
+                                value={packageType}
+                                onChange={(e) => setPackageType(e.target.value)}
+                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                placeholder="Enter package type"
+                                required
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-medium text-[#222] tracking-widest uppercase">Thank You Cards</label>
+                            <input
+                                type="text"
+                                value={thankYouCards}
+                                onChange={(e) => setThankYouCards(e.target.value)}
+                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                placeholder="Enter quantity"
+                            />
+                        </div>
+                    </div>
+                    {/* Services Included */}
+                    <div className="mb-8">
+                        <label className="block text-xs font-medium text-[#222] tracking-widest uppercase mb-2">Services Included</label>
+                        <div className="flex flex-col gap-2">
+                            {servicesIncluded.map((service, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        value={service}
+                                        onChange={(e) => handleServiceChange(e, index)}
+                                        className="flex-1 border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        placeholder="Enter service"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeService(index)}
+                                        className="p-1 text-[#bbb] hover:text-red-500 transition"
+                                    >
+                                        <XMarkIcon className="h-5 w-5" />
+                                    </button>
                                 </div>
-
-                                {/* Services */}
-                                <div className="bg-card rounded-lg border shadow-sm p-6">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <CheckIcon className="h-5 w-5 text-blue-500" />
-                                        <h2 className="text-xl font-semibold text-card-foreground">Services Included</h2>
-                                    </div>
-                                    <div className="space-y-4">
-                                        {servicesIncluded.map((service, index) => (
-                                            <div key={index} className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={service}
-                                                    onChange={(e) => {
-                                                        const newServices = [...servicesIncluded];
-                                                        newServices[index] = e.target.value;
-                                                        setServicesIncluded(newServices);
-                                                    }}
-                                                    className="flex-1 rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="Enter service"
-                                                    required
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const newServices = servicesIncluded.filter((_, i) => i !== index);
-                                                        setServicesIncluded(newServices);
-                                                    }}
-                                                    className="p-2 text-destructive hover:text-destructive/90 transition-colors"
-                                                >
-                                                    <XMarkIcon className="h-5 w-5" />
-                                                </button>
-                                            </div>
-                                        ))}
+                            ))}
+                            <button
+                                type="button"
+                                onClick={addService}
+                                className="inline-flex items-center gap-2 text-xs font-medium text-[#b6a489] hover:text-[#222] transition mt-2"
+                            >
+                                <PlusIcon className="h-4 w-4" /> Add Service
+                            </button>
+                        </div>
+                    </div>
+                    {/* Additional Items */}
+                    <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-medium text-[#222] tracking-widest uppercase">Edited Images</label>
+                            <input
+                                type="text"
+                                value={editedImages}
+                                onChange={(e) => setEditedImages(e.target.value)}
+                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                placeholder="Enter edited images"
+                                required
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-medium text-[#222] tracking-widest uppercase">Unedited Images</label>
+                            <input
+                                type="text"
+                                value={uneditedImages}
+                                onChange={(e) => setUneditedImages(e.target.value)}
+                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                placeholder="Enter unedited images"
+                                required
+                            />
+                        </div>
+                    </div>
+                    {/* Albums */}
+                    <div className="mb-8">
+                        <label className="block text-xs font-medium text-[#222] tracking-widest uppercase mb-2">Albums</label>
+                        <div className="flex flex-col gap-2">
+                            {albums.map((album, index) => (
+                                <div key={index} className="grid grid-cols-3 gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        value={album.size}
+                                        onChange={(e) => {
+                                            const newAlbums = [...albums];
+                                            newAlbums[index] = { ...album, size: e.target.value };
+                                            setAlbums(newAlbums);
+                                        }}
+                                        placeholder="Size"
+                                        className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={album.type}
+                                        onChange={(e) => {
+                                            const newAlbums = [...albums];
+                                            newAlbums[index] = { ...album, type: e.target.value };
+                                            setAlbums(newAlbums);
+                                        }}
+                                        placeholder="Type"
+                                        className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                    />
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="text"
+                                            value={album.spreadCount}
+                                            onChange={(e) => {
+                                                const newAlbums = [...albums];
+                                                newAlbums[index] = { ...album, spreadCount: e.target.value };
+                                                setAlbums(newAlbums);
+                                            }}
+                                            placeholder="Spread Count"
+                                            className="flex-1 border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        />
                                         <button
                                             type="button"
-                                            onClick={() => setServicesIncluded([...servicesIncluded, ""])}
-                                            className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                            onClick={() => {
+                                                const newAlbums = albums.filter((_, i) => i !== index);
+                                                setAlbums(newAlbums);
+                                            }}
+                                            className="p-1 text-[#bbb] hover:text-red-500 transition"
                                         >
-                                            <PlusIcon className="h-4 w-4" />
-                                            Add Service
+                                            <XMarkIcon className="h-5 w-5" />
                                         </button>
                                     </div>
                                 </div>
-
-                                {/* Additional Items */}
-                                <div className="bg-card rounded-lg border shadow-sm p-6">
-                                    <h2 className="text-xl font-semibold text-card-foreground mb-6">Additional Items</h2>
-                                    
-                                    {/* Images */}
-                                    <div className="space-y-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <PhotoIcon className="h-5 w-5 text-amber-500" />
-                                                <h3 className="font-medium text-foreground">Images</h3>
-                                            </div>
-                                            <div>
-                                                <label htmlFor="editedImages" className="block text-sm font-medium text-foreground mb-1">
-                                                    Edited Images
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    id="editedImages"
-                                                    value={editedImages}
-                                                    onChange={(e) => setEditedImages(e.target.value)}
-                                                    className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="uneditedImages" className="block text-sm font-medium text-foreground mb-1">
-                                                    Unedited Images
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    id="uneditedImages"
-                                                    value={uneditedImages}
-                                                    onChange={(e) => setUneditedImages(e.target.value)}
-                                                    className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Albums */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <BookOpenIcon className="h-5 w-5 text-indigo-500" />
-                                                <h3 className="font-medium text-foreground">Albums</h3>
-                                            </div>
-                                            {albums.map((album, index) => (
-                                                <div key={index} className="grid gap-4 sm:grid-cols-3">
-                                                    <input
-                                                        type="text"
-                                                        value={album.size}
-                                                        onChange={(e) => {
-                                                            const newAlbums = [...albums];
-                                                            newAlbums[index] = { ...album, size: e.target.value };
-                                                            setAlbums(newAlbums);
-                                                        }}
-                                                        placeholder="Size"
-                                                        className="rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    />
-                                                    <input
-                                                        type="text"
-                                                        value={album.type}
-                                                        onChange={(e) => {
-                                                            const newAlbums = [...albums];
-                                                            newAlbums[index] = { ...album, type: e.target.value };
-                                                            setAlbums(newAlbums);
-                                                        }}
-                                                        placeholder="Type"
-                                                        className="rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    />
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="text"
-                                                            value={album.spreadCount}
-                                                            onChange={(e) => {
-                                                                const newAlbums = [...albums];
-                                                                newAlbums[index] = { ...album, spreadCount: e.target.value };
-                                                                setAlbums(newAlbums);
-                                                            }}
-                                                            placeholder="Spread Count"
-                                                            className="flex-1 rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newAlbums = albums.filter((_, i) => i !== index);
-                                                                setAlbums(newAlbums);
-                                                            }}
-                                                            className="p-2 text-destructive hover:text-destructive/90 transition-colors"
-                                                        >
-                                                            <XMarkIcon className="h-5 w-5" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            <button
-                                                type="button"
-                                                onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}
-                                                className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                                            >
-                                                <PlusIcon className="h-4 w-4" />
-                                                Add Album
-                                            </button>
-                                        </div>
-
-                                        {/* Framed Portraits */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <PhotoIcon className="h-5 w-5 text-amber-500" />
-                                                <h3 className="font-medium text-foreground">Framed Portraits</h3>
-                                            </div>
-                                            {framedPortraits.map((portrait, index) => (
-                                                <div key={index} className="grid gap-4 sm:grid-cols-2">
-                                                    <input
-                                                        type="text"
-                                                        value={portrait.size}
-                                                        onChange={(e) => {
-                                                            const newPortraits = [...framedPortraits];
-                                                            newPortraits[index] = { ...portrait, size: e.target.value };
-                                                            setFramedPortraits(newPortraits);
-                                                        }}
-                                                        placeholder="Size"
-                                                        className="rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    />
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="text"
-                                                            value={portrait.quantity}
-                                                            onChange={(e) => {
-                                                                const newPortraits = [...framedPortraits];
-                                                                newPortraits[index] = { ...portrait, quantity: e.target.value };
-                                                                setFramedPortraits(newPortraits);
-                                                            }}
-                                                            placeholder="Quantity"
-                                                            className="flex-1 rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newPortraits = framedPortraits.filter((_, i) => i !== index);
-                                                                setFramedPortraits(newPortraits);
-                                                            }}
-                                                            className="p-2 text-destructive hover:text-destructive/90 transition-colors"
-                                                        >
-                                                            <XMarkIcon className="h-5 w-5" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            <button
-                                                type="button"
-                                                onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}
-                                                className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                                            >
-                                                <PlusIcon className="h-4 w-4" />
-                                                Add Portrait
-                                            </button>
-                                        </div>
-
-                                        {/* Thank You Cards */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <GiftIcon className="h-5 w-5 text-purple-500" />
-                                                <h3 className="font-medium text-foreground">Thank You Cards</h3>
-                                            </div>
-                                            <input
-                                                type="text"
-                                                value={thankYouCards}
-                                                onChange={(e) => setThankYouCards(e.target.value)}
-                                                className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                placeholder="Enter quantity"
-                                            />
-                                        </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => setAlbums([...albums, { size: "", type: "", spreadCount: "" }])}
+                                className="inline-flex items-center gap-2 text-xs font-medium text-[#b6a489] hover:text-[#222] transition mt-2"
+                            >
+                                <PlusIcon className="h-4 w-4" /> Add Album
+                            </button>
+                        </div>
+                    </div>
+                    {/* Framed Portraits */}
+                    <div className="mb-8">
+                        <label className="block text-xs font-medium text-[#222] tracking-widest uppercase mb-2">Framed Portraits</label>
+                        <div className="flex flex-col gap-2">
+                            {framedPortraits.map((portrait, index) => (
+                                <div key={index} className="grid grid-cols-2 gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        value={portrait.size}
+                                        onChange={(e) => {
+                                            const newPortraits = [...framedPortraits];
+                                            newPortraits[index] = { ...portrait, size: e.target.value };
+                                            setFramedPortraits(newPortraits);
+                                        }}
+                                        placeholder="Size"
+                                        className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                    />
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="text"
+                                            value={portrait.quantity}
+                                            onChange={(e) => {
+                                                const newPortraits = [...framedPortraits];
+                                                newPortraits[index] = { ...portrait, quantity: e.target.value };
+                                                setFramedPortraits(newPortraits);
+                                            }}
+                                            placeholder="Quantity"
+                                            className="flex-1 border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newPortraits = framedPortraits.filter((_, i) => i !== index);
+                                                setFramedPortraits(newPortraits);
+                                            }}
+                                            className="p-1 text-[#bbb] hover:text-red-500 transition"
+                                        >
+                                            <XMarkIcon className="h-5 w-5" />
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex justify-end gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => router.back()}
-                                    className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors"
-                                >
-                                    <ArrowLeftIcon className="h-4 w-4" />
-                                    Back
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="inline-flex items-center justify-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-600"
-                                >
-                                    <PencilSquareIcon className="h-4 w-4" />
-                                    Update Package
-                                </button>
-                            </div>
-                        </form>
-                    </>
-                )}
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => setFramedPortraits([...framedPortraits, { size: "", quantity: "" }])}
+                                className="inline-flex items-center gap-2 text-xs font-medium text-[#b6a489] hover:text-[#222] transition mt-2"
+                            >
+                                <PlusIcon className="h-4 w-4" /> Add Portrait
+                            </button>
+                        </div>
+                    </div>
+                    {/* Submit Button */}
+                    <div className="flex justify-center mt-10">
+                        <button
+                            type="submit"
+                            className="w-64 py-3 rounded-full bg-[#a08c6b] text-white text-base font-serif tracking-widest uppercase shadow hover:bg-[#7c6a53] transition"
+                        >
+                            Update
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );
