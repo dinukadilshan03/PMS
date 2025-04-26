@@ -86,7 +86,7 @@ export default function AlbumListUser(){
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredAlbums.map((album) => (
                         <div key={album.id} className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl">
-                            <Link href={`/Album-Portfolio/album/pages/${album.id}`}>
+                            <Link href={`/Album-Portfolio/album/pages/user/${album.id}`}>
                                 {/* Album Images Grid */}
                                 {album.images?.length > 0 && (
                                     <div className="grid grid-cols-2 gap-1 p-1">
