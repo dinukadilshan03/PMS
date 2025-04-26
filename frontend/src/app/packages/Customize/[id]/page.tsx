@@ -200,179 +200,131 @@ const CustomizePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-            <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-                <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center gap-3 mb-2">
-                        <CameraIcon className="h-8 w-8 text-blue-500" />
-                        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                            {package_?.name} - Customize
-                        </h1>
+        <div className="min-h-screen bg-gradient-to-br from-[#e9e5dc] via-[#e0ecec] to-[#cfd8dc] flex items-center justify-center p-4">
+            <div className="w-full max-w-3xl bg-white rounded-[3rem_1rem_3rem_1rem] shadow-2xl p-10 flex flex-col gap-10">
+                {/* Header */}
+                <div className="flex flex-col items-center gap-2 mb-2">
+                    <CameraIcon className="h-10 w-10 text-[#b6a489] mb-2" />
+                    <h1 className="text-3xl font-serif font-bold text-[#2d2926] tracking-wide">{package_?.name} - Customize</h1>
+                    <div className="flex items-center gap-2 mt-2">
+                        <CurrencyDollarIcon className="h-5 w-5 text-[#b6a489]" />
+                        <span className="text-lg font-medium text-[#2d2926]">Base Price: {package_?.investment} LKR</span>
                     </div>
-                    <div className="flex items-center gap-2 mb-8">
-                        <CurrencyDollarIcon className="h-5 w-5 text-green-500" />
-                        <p className="text-xl font-medium text-green-600">
-                            Base Price: {package_?.investment} LKR
-                        </p>
+                </div>
+                <hr className="my-2 border-[#ede7df]" />
+                {/* Base Services */}
+                <section>
+                    <h3 className="text-lg font-serif font-medium text-[#2d2926] mb-3">Base Services Included</h3>
+                    <ul className="list-none pl-0 space-y-2 text-[#4b4b4b]">
+                        {package_?.servicesIncluded.map((service, index) => (
+                            <li key={index} className="flex items-center gap-2">
+                                <CheckIcon className="h-4 w-4 text-emerald-500" />
+                                {service}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+                <hr className="my-2 border-[#ede7df]" />
+                {/* Additional Services */}
+                <section>
+                    <h3 className="text-lg font-serif font-medium text-[#2d2926] mb-3">Additional Services</h3>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        {package_?.additionalServices.map((service, index) => {
+                            const Icon = additionalServicesOptions[index].icon;
+                            return (
+                                <label
+                                    key={index}
+                                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${service.selected ? 'bg-[#e0ecec] border-[#b6a489]' : 'bg-white border-[#e5e1da] hover:bg-[#f7f6f2]'}`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={service.selected}
+                                        onChange={() => handleServiceToggle(index)}
+                                        className="accent-[#b6a489] w-4 h-4 rounded-full border border-[#b6a489]"
+                                    />
+                                    <Icon className="h-5 w-5 text-[#b6a489]" />
+                                    <span className="flex-1 text-sm text-[#2d2926]">{service.name}</span>
+                                    <span className="text-xs text-[#6b6b6b]">{service.price} LKR</span>
+                                </label>
+                            );
+                        })}
                     </div>
-
-                    <div className="space-y-8">
-                        {/* Base Services */}
-                        <div className="bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <CheckIcon className="h-6 w-6 text-blue-500" />
-                                <h2 className="text-xl font-semibold text-card-foreground">
-                                    Base Services Included
-                                </h2>
-                            </div>
-                            <ul className="list-none pl-6 space-y-2 text-muted-foreground">
-                                {package_?.servicesIncluded.map((service, index) => (
-                                    <li key={index} className="flex items-center gap-2">
-                                        <CheckIcon className="h-4 w-4 text-emerald-500" />
-                                        {service}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Additional Services */}
-                        <div className="bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <GiftIcon className="h-6 w-6 text-purple-500" />
-                                <h2 className="text-xl font-semibold text-card-foreground">
-                                    Additional Services
-                                </h2>
-                            </div>
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                {package_?.additionalServices.map((service, index) => {
-                                    const Icon = additionalServicesOptions[index].icon;
-                                    return (
-                                        <div
-                                            key={index}
-                                            className={`flex items-center space-x-3 p-4 rounded-lg border ${
-                                                service.selected 
-                                                    ? 'bg-blue-50 border-blue-500' 
-                                                    : 'bg-background hover:bg-accent/50'
-                                            } transition-colors cursor-pointer`}
-                                            onClick={() => handleServiceToggle(index)}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={service.selected}
-                                                onChange={() => handleServiceToggle(index)}
-                                                className="h-4 w-4 rounded border-blue-500 text-blue-600 focus:ring-blue-500"
-                                            />
-                                            <div className="flex-1 flex items-center gap-2">
-                                                <Icon className="h-5 w-5 text-blue-500" />
-                                                <div>
-                                                    <p className="font-medium text-foreground">{service.name}</p>
-                                                    <p className="text-sm text-blue-600">{service.price} LKR</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Package Items */}
-                        <div className="bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <BookOpenIcon className="h-6 w-6 text-indigo-500" />
-                                <h2 className="text-xl font-semibold text-card-foreground">
-                                    Package Items
-                                </h2>
-                            </div>
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-2">
-                                    <PhotoIcon className="h-5 w-5 text-amber-500" />
-                                    <div>
-                                        <p className="font-medium text-foreground">Edited Images:</p>
-                                        <p className="text-muted-foreground">{package_?.additionalItems.editedImages}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <PhotoIcon className="h-5 w-5 text-amber-500" />
-                                    <div>
-                                        <p className="font-medium text-foreground">Unedited Images:</p>
-                                        <p className="text-muted-foreground">{package_?.additionalItems.uneditedImages}</p>
-                                    </div>
-                                </div>
-                                {package_?.additionalItems.albums && (
-                                    <div className="flex items-start gap-2">
-                                        <BookOpenIcon className="h-5 w-5 text-indigo-500 mt-1" />
-                                        <div>
-                                            <p className="font-medium text-foreground">Albums:</p>
-                                            <ul className="list-none space-y-1 text-muted-foreground">
+                </section>
+                <hr className="my-2 border-[#ede7df]" />
+                {/* Package Items */}
+                <section>
+                    <h3 className="text-lg font-serif font-medium text-[#2d2926] mb-3">Package Items</h3>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full border-separate border-spacing-y-2">
+                            <thead>
+                                <tr>
+                                    <th className="text-left text-xs font-semibold text-[#b6a489] uppercase tracking-wider pb-2">Item</th>
+                                    <th className="text-left text-xs font-semibold text-[#b6a489] uppercase tracking-wider pb-2">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="bg-[#f7f6f2]">
+                                    <td className="py-2 pr-4 font-medium text-[#2d2926]">Edited Images</td>
+                                    <td className="py-2 text-[#6b6b6b]">{package_?.additionalItems.editedImages}</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 pr-4 font-medium text-[#2d2926]">Unedited Images</td>
+                                    <td className="py-2 text-[#6b6b6b]">{package_?.additionalItems.uneditedImages}</td>
+                                </tr>
+                                {package_?.additionalItems.albums && package_.additionalItems.albums.length > 0 && (
+                                    <tr className="bg-[#f7f6f2]">
+                                        <td className="py-2 pr-4 font-medium text-[#2d2926] align-top">Albums</td>
+                                        <td className="py-2 text-[#6b6b6b]">
+                                            <ul className="list-disc pl-4">
                                                 {package_.additionalItems.albums.map((album, index) => (
-                                                    <li key={index} className="flex items-center gap-2">
-                                                        <div className="w-1 h-1 rounded-full bg-indigo-500"></div>
-                                                        {album.size} {album.type} ({album.spreadCount} spreads)
-                                                    </li>
+                                                    <li key={index}>{album.size} {album.type} ({album.spreadCount} spreads)</li>
                                                 ))}
                                             </ul>
-                                        </div>
-                                    </div>
+                                        </td>
+                                    </tr>
                                 )}
-                                {package_?.additionalItems.framedPortraits && (
-                                    <div className="flex items-start gap-2">
-                                        <PhotoIcon className="h-5 w-5 text-amber-500 mt-1" />
-                                        <div>
-                                            <p className="font-medium text-foreground">Framed Portraits:</p>
-                                            <ul className="list-none space-y-1 text-muted-foreground">
+                                {package_?.additionalItems.framedPortraits && package_.additionalItems.framedPortraits.length > 0 && (
+                                    <tr>
+                                        <td className="py-2 pr-4 font-medium text-[#2d2926] align-top">Framed Portraits</td>
+                                        <td className="py-2 text-[#6b6b6b]">
+                                            <ul className="list-disc pl-4">
                                                 {package_.additionalItems.framedPortraits.map((portrait, index) => (
-                                                    <li key={index} className="flex items-center gap-2">
-                                                        <div className="w-1 h-1 rounded-full bg-amber-500"></div>
-                                                        {portrait.size} (Quantity: {portrait.quantity})
-                                                    </li>
+                                                    <li key={index}>{portrait.size} (Quantity: {portrait.quantity})</li>
                                                 ))}
                                             </ul>
-                                        </div>
-                                    </div>
+                                        </td>
+                                    </tr>
                                 )}
-                                <div className="flex items-center gap-2">
-                                    <GiftIcon className="h-5 w-5 text-purple-500" />
-                                    <div>
-                                        <p className="font-medium text-foreground">Thank You Cards:</p>
-                                        <p className="text-muted-foreground">{package_?.additionalItems.thankYouCards}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Total Price */}
-                        <div className="bg-primary/5 rounded-lg border shadow-sm p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <CurrencyDollarIcon className="h-6 w-6 text-green-500" />
-                                    <h2 className="text-xl font-semibold text-foreground">
-                                        Total Investment
-                                    </h2>
-                                </div>
-                                <p className="text-2xl font-bold text-green-600">
-                                    {totalPrice} LKR
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex justify-end gap-4">
-                            <button
-                                onClick={() => router.back()}
-                                className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors"
-                            >
-                                <ArrowLeftIcon className="h-4 w-4 text-gray-500" />
-                                Back
-                            </button>
-                            <button
-                                onClick={handleDownloadPDF}
-                                className="inline-flex items-center justify-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-600"
-                            >
-                                <ArrowDownOnSquareIcon className="h-4 w-4" />
-                                Download PDF
-                            </button>
-                        </div>
+                                <tr className="bg-[#f7f6f2]">
+                                    <td className="py-2 pr-4 font-medium text-[#2d2926]">Thank You Cards</td>
+                                    <td className="py-2 text-[#6b6b6b]">{package_?.additionalItems.thankYouCards}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                </section>
+                <hr className="my-2 border-[#ede7df]" />
+                {/* Total Price */}
+                <section className="flex items-center justify-between mt-2">
+                    <span className="text-base font-serif font-medium text-[#2d2926]">Total Investment</span>
+                    <span className="text-xl font-bold text-[#b6a489]">{totalPrice} LKR</span>
+                </section>
+                {/* Actions */}
+                <div className="flex justify-end gap-4 mt-4">
+                    <button
+                        onClick={() => router.back()}
+                        className="py-3 px-8 rounded-full bg-[#ede7df] text-[#2d2926] font-medium text-sm shadow hover:bg-[#e9e5dc] transition"
+                        type="button"
+                    >
+                        Back
+                    </button>
+                    <button
+                        onClick={handleDownloadPDF}
+                        className="py-3 px-8 rounded-full bg-[#a08c6b] text-white font-medium text-sm shadow hover:bg-[#7c6a53] transition"
+                        type="button"
+                    >
+                        Download PDF
+                    </button>
                 </div>
             </div>
         </div>
