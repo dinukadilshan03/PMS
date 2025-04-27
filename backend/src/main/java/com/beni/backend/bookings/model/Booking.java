@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -49,6 +50,9 @@ public class Booking {
     @NotBlank(message = "Package name is required")
     private String packageName;
 
+    @NotNull(message = "Price is required")
+    private double price;
+
     private String assignedStaffId; // ID of the staff member assigned to this booking
     private String assignedStaffName; // Name of the staff member assigned to this booking
 
@@ -76,6 +80,9 @@ public class Booking {
             return false;
         }
         if (packageName == null || packageName.trim().isEmpty()) {
+            return false;
+        }
+        if (price <= 0) {
             return false;
         }
         return true;

@@ -2,6 +2,36 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { 
+    Dialog, 
+    DialogTitle, 
+    DialogContent, 
+    DialogActions, 
+    Button,
+    Typography,
+    Box,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    InputAdornment,
+    IconButton,
+    Chip,
+    Stack,
+    Container,
+    Checkbox,
+    CircularProgress
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import EventIcon from '@mui/icons-material/Event';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PersonIcon from '@mui/icons-material/Person';
 
 interface Booking {
     id: string;
@@ -19,6 +49,17 @@ const BookingTable = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
+    const [deleteDialog, setDeleteDialog] = useState<{
+        open: boolean;
+        bookingIds: string[];
+        bookingDetails: string;
+    }>({
+        open: false,
+        bookingIds: [],
+        bookingDetails: ''
+    });
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -55,162 +96,385 @@ const BookingTable = () => {
     const getStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
             case 'confirmed':
-                return 'bg-green-100 text-green-800';
+                return 'success';
             case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'warning';
             case 'cancelled':
-                return 'bg-red-100 text-red-800';
+                return 'error';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'default';
         }
     };
 
     const getPaymentStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
             case 'paid':
-                return 'bg-green-100 text-green-800';
+                return 'success';
             case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'warning';
             case 'failed':
-                return 'bg-red-100 text-red-800';
+                return 'error';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'default';
         }
     };
 
-    return (
-        <div className="space-y-6">
-            {error && (
-                <div className="rounded-md bg-red-50 p-4">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800">Error</h3>
-                            <div className="mt-2 text-sm text-red-700">
-                                <p>{error}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+    const handleDelete = async (bookingIds: string[]) => {
+        setIsDeleting(true);
+        setError(null);
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex items-center">
-                    <h2 className="text-xl font-semibold text-gray-800">All Bookings</h2>
-                    <span className="ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                        {bookings.length} {bookings.length === 1 ? 'booking' : 'bookings'}
-                    </span>
-                </div>
-                <div className="relative w-full sm:w-64">
-                    <input
-                        type="text"
+        try {
+            const successfulDeletions: string[] = [];
+            const failedDeletions: string[] = [];
+
+            for (const id of bookingIds) {
+                try {
+                    const response = await axios.delete(`http://localhost:8080/admin/bookings/${id}`);
+                    if (response.data === "Booking deleted successfully") {
+                        successfulDeletions.push(id);
+                    } else {
+                        console.error(`Unexpected response for booking ${id}:`, response.data);
+                        failedDeletions.push(id);
+                    }
+                } catch (error) {
+                    if (axios.isAxiosError(error)) {
+                        console.error(`Failed to delete booking ${id}:`, {
+                            status: error.response?.status,
+                            data: error.response?.data,
+                            message: error.message
+                        });
+                    } else {
+                        console.error(`Failed to delete booking ${id}:`, error);
+                    }
+                    failedDeletions.push(id);
+                }
+            }
+
+            // Update the bookings list with successful deletions
+            if (successfulDeletions.length > 0) {
+                setBookings(prevBookings => 
+                    prevBookings.filter(booking => !successfulDeletions.includes(booking.id))
+                );
+            }
+
+            setSelectedBookings([]);
+            setDeleteDialog({
+                open: false,
+                bookingIds: [],
+                bookingDetails: ''
+            });
+
+            // Show error message if any deletions failed
+            if (failedDeletions.length > 0) {
+                setError(`Failed to delete ${failedDeletions.length} ${failedDeletions.length === 1 ? 'booking' : 'bookings'}. Please try again later.`);
+            }
+        } catch (error) {
+            console.error("Error in delete operation:", error);
+            setError("An unexpected error occurred while deleting bookings. Please try again later.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleSelectBooking = (bookingId: string) => {
+        setSelectedBookings(prev => 
+            prev.includes(bookingId) 
+                ? prev.filter(id => id !== bookingId)
+                : [...prev, bookingId]
+        );
+    };
+
+    const handleSelectAll = () => {
+        setSelectedBookings(prev => 
+            prev.length === filteredBookings.length 
+                ? [] 
+                : filteredBookings.map(booking => booking.id)
+        );
+    };
+
+    return (
+        <Container maxWidth={false} sx={{ py: 4, px: { xs: 2, sm: 4 } }}>
+            <Stack spacing={4}>
+            {error && (
+                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'error.light' }}>
+                        <Typography color="error">{error}</Typography>
+                    </Paper>
+                )}
+
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', sm: 'row' }, 
+                    justifyContent: 'space-between', 
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    gap: 2
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+                            All Bookings
+                        </Typography>
+                        <Chip 
+                            label={`${bookings.length} ${bookings.length === 1 ? 'booking' : 'bookings'}`}
+                            color="primary"
+                            size="small"
+                        />
+                    </Box>
+                    <TextField
                         placeholder="Search bookings..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        size="small"
+                        sx={{ width: { xs: '100%', sm: 300 } }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        }}
                     />
-                    <div className="absolute left-3 top-2.5">
-                        <svg
-                            className="h-5 w-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+                </Box>
 
             {isLoading ? (
-                <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-                </div>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                        <Typography>Loading...</Typography>
+                    </Box>
             ) : filteredBookings.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings found</h3>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <Paper elevation={0} sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
+                        <EventIcon sx={{ fontSize: 48, color: 'grey.400', mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No bookings found
+                        </Typography>
+                        <Typography color="text.secondary">
                         {bookings.length === 0 ? 'There are no bookings in the system yet.' : 'No bookings match your search criteria.'}
-                    </p>
-                </div>
-            ) : (
-                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-300">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ID</th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date & Time</th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Package</th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Assigned Staff</th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Payment</th>
-                                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                    <span className="sr-only">Actions</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 bg-white">
+                        </Typography>
+                    </Paper>
+                ) : (
+                    <TableContainer 
+                        component={Paper} 
+                        elevation={0} 
+                        sx={{ 
+                            border: 1, 
+                            borderColor: 'divider',
+                            maxWidth: '100%',
+                            overflowX: 'auto',
+                            '&::-webkit-scrollbar': {
+                                height: '8px',
+                            },
+                            '&::-webkit-scrollbar-track': {
+                                background: '#f1f1f1',
+                                borderRadius: '4px',
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                                background: '#888',
+                                borderRadius: '4px',
+                                '&:hover': {
+                                    background: '#555',
+                                },
+                            },
+                        }}
+                    >
+                        <Table sx={{ minWidth: 1000 }}>
+                            <TableHead>
+                                <TableRow sx={{ bgcolor: 'grey.50' }}>
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            checked={selectedBookings.length === filteredBookings.length}
+                                            indeterminate={selectedBookings.length > 0 && selectedBookings.length < filteredBookings.length}
+                                            onChange={handleSelectAll}
+                                        />
+                                    </TableCell>
+                                    <TableCell>ID</TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <EventIcon fontSize="small" />
+                                            Date & Time
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <LocationOnIcon fontSize="small" />
+                                            Location
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>Package</TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <PersonIcon fontSize="small" />
+                                            Assigned Staff
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell>Payment</TableCell>
+                                    <TableCell align="right">Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
                             {filteredBookings.map((booking) => (
-                                <tr key={booking.id} className="hover:bg-gray-50">
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                        {booking.id || '-'}
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {booking.dateTime ? new Date(booking.dateTime).toLocaleString() : '-'}
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    <TableRow 
+                                        key={booking.id} 
+                                        hover 
+                                        selected={selectedBookings.includes(booking.id)}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                checked={selectedBookings.includes(booking.id)}
+                                                onChange={() => handleSelectBooking(booking.id)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>{booking.id || '-'}</TableCell>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                <Typography variant="body2" fontWeight="medium">
+                                                    {booking.dateTime ? new Date(booking.dateTime).toLocaleDateString() : '-'}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {booking.dateTime ? new Date(booking.dateTime).toLocaleTimeString() : '-'}
+                                                </Typography>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" fontWeight="medium">
                                         {booking.location || '-'}
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                            {booking.packageName || '-'}
-                                        </span>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip 
+                                                label={booking.packageName || '-'}
+                                                size="small"
+                                                sx={{ bgcolor: 'purple.50', color: 'purple.700' }}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" color="text.secondary">
                                         {booking.assignedStaffName || 'Not assigned'}
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(booking.bookingStatus)}`}>
-                                            {booking.bookingStatus || '-'}
-                                        </span>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(booking.paymentStatus)}`}>
-                                            {booking.paymentStatus || '-'}
-                                        </span>
-                                    </td>
-                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        <Link
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip 
+                                                label={booking.bookingStatus || '-'}
+                                                size="small"
+                                                color={getStatusColor(booking.bookingStatus)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip 
+                                                label={booking.paymentStatus || '-'}
+                                                size="small"
+                                                color={getPaymentStatusColor(booking.paymentStatus)}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                                <IconButton
+                                                    component={Link}
                                             href={`/bookings/admin/${booking.id}`}
-                                            className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            Edit
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
+                                                    size="small"
+                                                    color="primary"
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    onClick={() => setDeleteDialog({
+                                                        open: true,
+                                                        bookingIds: [booking.id],
+                                                        bookingDetails: `Booking #${booking.id} for ${booking.packageName} on ${new Date(booking.dateTime).toLocaleString()}`
+                                                    })}
+                                                    size="small"
+                                                    color="error"
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Stack>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
+
+                {selectedBookings.length > 0 && (
+                    <Box sx={{ 
+                        position: 'fixed', 
+                        bottom: 0, 
+                        left: 0, 
+                        right: 0, 
+                        bgcolor: 'background.paper',
+                        p: 2,
+                        boxShadow: 1,
+                        zIndex: 1000
+                    }}>
+                        <Container maxWidth={false}>
+                            <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                                <Typography>
+                                    {selectedBookings.length} {selectedBookings.length === 1 ? 'booking' : 'bookings'} selected
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    startIcon={<DeleteIcon />}
+                                    onClick={() => setDeleteDialog({
+                                        open: true,
+                                        bookingIds: selectedBookings,
+                                        bookingDetails: `${selectedBookings.length} ${selectedBookings.length === 1 ? 'booking' : 'bookings'}`
+                                    })}
+                                >
+                                    Delete Selected
+                                </Button>
+                            </Stack>
+                        </Container>
+                    </Box>
+                )}
+            </Stack>
+
+            <Dialog
+                open={deleteDialog.open}
+                onClose={() => setDeleteDialog(prev => ({ ...prev, open: false }))}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        maxWidth: 400,
+                        width: '100%'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ 
+                    fontWeight: 600,
+                    color: 'error.main',
+                    textAlign: 'center',
+                    py: 2
+                }}>
+                    Delete {deleteDialog.bookingIds.length === 1 ? 'Booking' : 'Bookings'}
+                </DialogTitle>
+                <DialogContent sx={{ py: 2, px: 3 }}>
+                    <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+                        Are you sure you want to delete {deleteDialog.bookingDetails}?
+                        This action cannot be undone.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, py: 2, justifyContent: 'center', gap: 2 }}>
+                    <Button 
+                        onClick={() => setDeleteDialog(prev => ({ ...prev, open: false }))}
+                        variant="outlined"
+                        sx={{ borderRadius: 2 }}
+                        disabled={isDeleting}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={() => handleDelete(deleteDialog.bookingIds)}
+                        variant="contained"
+                        color="error"
+                        sx={{ borderRadius: 2 }}
+                        disabled={isDeleting}
+                        startIcon={isDeleting ? <CircularProgress size={20} color="inherit" /> : null}
+                    >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
     );
 };
 
