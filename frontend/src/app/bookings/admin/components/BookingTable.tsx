@@ -94,10 +94,11 @@ const BookingTable = () => {
     }, [bookings, searchTerm]);
 
     const getStatusColor = (status: string) => {
-        switch (status?.toLowerCase()) {
-            case 'confirmed':
+        const lowerStatus = status?.toLowerCase() || '';
+        switch (lowerStatus) {
+            case 'upcoming':
                 return 'success';
-            case 'pending':
+            case 'completed':
                 return 'warning';
             case 'cancelled':
                 return 'error';
@@ -107,12 +108,13 @@ const BookingTable = () => {
     };
 
     const getPaymentStatusColor = (status: string) => {
-        switch (status?.toLowerCase()) {
+        const lowerStatus = status?.toLowerCase() || '';
+        switch (lowerStatus) {
             case 'paid':
                 return 'success';
             case 'pending':
                 return 'warning';
-            case 'failed':
+            case 'refunded':
                 return 'error';
             default:
                 return 'default';

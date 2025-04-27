@@ -20,6 +20,9 @@ public class AdminBookingService {
     @Autowired
     private StaffRepository staffRepository;
 
+    @Autowired
+    private BookingValidationService validationService;
+
     // Get all bookings with staff information
     public List<Booking> getAllBookings() {
         List<Booking> bookings = bookingRepository.findAll();
@@ -41,9 +44,37 @@ public class AdminBookingService {
     // Update booking details
     public Booking updateBooking(String id, Booking updatedBooking) {
         Booking existingBooking = getBookingById(id);
-        existingBooking.setDateTime(updatedBooking.getDateTime());
-        existingBooking.setBookingStatus(updatedBooking.getBookingStatus());
-        existingBooking.setPaymentStatus(updatedBooking.getPaymentStatus());
+        
+        // Validate the updated booking data
+        if (updatedBooking.getDateTime() != null) {
+            validationService.validateBookingLimit(updatedBooking.getDateTime());
+            validationService.validateAdvanceBooking(updatedBooking.getDateTime());
+            validationService.validateNotInPast(updatedBooking.getDateTime());
+        }
+        
+        // Validate booking status
+        if (updatedBooking.getBookingStatus() != null && 
+            !updatedBooking.getBookingStatus().matches("^(upcoming|completed|cancelled)$")) {
+            throw new IllegalArgumentException("Invalid booking status");
+        }
+        
+        // Validate payment status
+        if (updatedBooking.getPaymentStatus() != null && 
+            !updatedBooking.getPaymentStatus().matches("^(pending|paid|refunded)$")) {
+            throw new IllegalArgumentException("Invalid payment status");
+        }
+
+        // Update only the fields that were provided
+        if (updatedBooking.getDateTime() != null) {
+            existingBooking.setDateTime(updatedBooking.getDateTime());
+        }
+        if (updatedBooking.getBookingStatus() != null) {
+            existingBooking.setBookingStatus(updatedBooking.getBookingStatus());
+        }
+        if (updatedBooking.getPaymentStatus() != null) {
+            existingBooking.setPaymentStatus(updatedBooking.getPaymentStatus());
+        }
+        
         return bookingRepository.save(existingBooking);
     }
 
