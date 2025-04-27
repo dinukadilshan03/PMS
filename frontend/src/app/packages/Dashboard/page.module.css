@@ -1,9 +1,9 @@
 /* Editorial Photography Website Styling */
 :root {
-    --color-background: #e2dacf; /* taupe/greige */
+    --color-background: #b09f88; /* taupe/greige */
     --color-surface: #f7f6f2;    /* off-white/ivory */
     --color-text: #2d2926;       /* deep brown/charcoal */
-    --color-accent: #b6a489;     /* sand/beige accent */
+    --color-accent: #937d5e;     /* sand/beige accent */
     --color-border: #e5e1da;     /* light border */
     --color-shadow: rgba(45, 41, 38, 0.06);
 }

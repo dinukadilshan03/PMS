@@ -77,50 +77,116 @@ const HomePage = () => {
     };
 
     const handleDownloadPDF = (pkg: Package) => {
-        const doc = new jsPDF();
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
 
-        doc.setFontSize(22);
-        doc.text(pkg.name, 10, 10);
+        // Colors
+        const colorHeader = '#b6a489'; // darker taupe/greige for header
+        const colorMain = '#f7f6f2';   // very light for content
+        const colorFooter = '#f7f6f2';
+        const colorText = '#2d2926';
+        const colorAccent = '#b6a489';
+        const colorBorder = '#e5e1da';
+
+        // HEADER (darker)
+        doc.setFillColor(colorHeader);
+        doc.rect(0, 0, pageWidth, 90, 'F');
+        doc.setFontSize(26);
+        doc.setTextColor('#fff');
+        doc.setFont('helvetica', 'bold');
+        doc.text('PhotoStudio', 48, 55);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor('#ede7df');
+        doc.text('Package Details', 48, 78);
+        doc.setDrawColor(colorBorder);
+        doc.setLineWidth(1.2);
+        doc.line(48, 92, pageWidth - 48, 92);
+
+        // MAIN CONTENT BACKGROUND (light)
+        const contentTop = 110;
+        const contentHeight = pageHeight - 210;
+        doc.setFillColor(colorMain);
+        doc.roundedRect(38, contentTop, pageWidth - 76, contentHeight, 18, 18, 'F');
+
+        // BODY
+        let y = contentTop + 38;
+        const left = 70;
+        doc.setFontSize(20);
+        doc.setTextColor(colorText);
+        doc.setFont('helvetica', 'bold');
+        doc.text(pkg.name, left, y);
+        y += 32;
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(colorAccent);
+        doc.text(`Package Type: ${pkg.packageType}`, left, y);
+        doc.setTextColor(colorText);
+        doc.text(`${pkg.investment} LKR`, pageWidth - left, y, { align: 'right' });
+        y += 22;
+        doc.setDrawColor(colorBorder);
+        doc.setLineWidth(0.7);
+        doc.line(left, y, pageWidth - left, y);
+        y += 28;
+
+        // Services Included
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
-
-        doc.text(`Package Type: ${pkg.packageType}`, 10, 20);
-        doc.text(`Price: ${pkg.investment} LKR`, 10, 30);
-        doc.text('Services Included:', 10, 40);
-        pkg.servicesIncluded.forEach((service, index) => {
-            doc.text(`${index + 1}. ${service}`, 10, 50 + (index * 10));
+        doc.setTextColor(colorAccent);
+        doc.text('Services Included', left, y);
+        y += 22;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(colorText);
+        pkg.servicesIncluded.forEach((service, idx) => {
+            doc.text(`• ${service}`, left + 18, y);
+            y += 18;
         });
+        y += 22;
 
-        // Additional items
-        let yOffset = 50 + (pkg.servicesIncluded.length || 0) * 10;
-        doc.text('Additional Items:', 10, yOffset);
-        yOffset += 10;
-
-        doc.text(`Edited Images: ${pkg.additionalItems.editedImages || 'N/A'}`, 10, yOffset);
-        yOffset += 10;
-        doc.text(`Unedited Images: ${pkg.additionalItems.uneditedImages || 'N/A'}`, 10, yOffset);
-        yOffset += 10;
-
-        // Albums
-        if (pkg.additionalItems.albums) {
-            doc.text('Albums:', 10, yOffset);
-            yOffset += 10;
-            pkg.additionalItems.albums.forEach((album, index) => {
-                doc.text(`${index + 1}. Size: ${album.size}, Type: ${album.type}, Spread Count: ${album.spreadCount}`, 10, yOffset);
-                yOffset += 10;
+        // Additional Items
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(colorAccent);
+        doc.text('Additional Items', left, y);
+        y += 22;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(colorText);
+        doc.text(`Edited Images: ${pkg.additionalItems.editedImages}`, left + 18, y);
+        y += 18;
+        doc.text(`Unedited Images: ${pkg.additionalItems.uneditedImages}`, left + 18, y);
+        y += 18;
+        if (pkg.additionalItems.albums?.length) {
+            doc.text('Albums:', left + 18, y);
+            y += 18;
+            pkg.additionalItems.albums.forEach((album) => {
+                doc.text(`- ${album.size} ${album.type} (Spread Count: ${album.spreadCount})`, left + 36, y);
+                y += 16;
             });
         }
-
-        // Framed Portraits
-        if (pkg.additionalItems.framedPortraits) {
-            doc.text('Framed Portraits:', 10, yOffset);
-            yOffset += 10;
-            pkg.additionalItems.framedPortraits.forEach((portrait, index) => {
-                doc.text(`${index + 1}. Size: ${portrait.size}, Quantity: ${portrait.quantity}`, 10, yOffset);
-                yOffset += 10;
+        if (pkg.additionalItems.framedPortraits?.length) {
+            doc.text('Framed Portraits:', left + 18, y);
+            y += 18;
+            pkg.additionalItems.framedPortraits.forEach((portrait) => {
+                doc.text(`- ${portrait.size} (Quantity: ${portrait.quantity})`, left + 36, y);
+                y += 16;
             });
         }
+        doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards}`, left + 18, y);
+        y += 28;
 
-        doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards || 'N/A'}`, 10, yOffset);
+        // FOOTER
+        doc.setFillColor(colorFooter);
+        doc.rect(0, pageHeight - 60, pageWidth, 60, 'F');
+        doc.setFontSize(11);
+        doc.setTextColor(colorText);
+        doc.text('Contact: info@photostudio.com | +94 77 123 4567 | www.photostudio.com', 48, pageHeight - 30);
+        doc.setFontSize(10);
+        doc.setTextColor(colorAccent);
+        doc.text('Capturing Moments, Creating Memories', 48, pageHeight - 12);
+
         doc.save(`${pkg.name || 'custom-package'}.pdf`);
     };
 
