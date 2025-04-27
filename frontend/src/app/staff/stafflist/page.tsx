@@ -36,15 +36,23 @@ const AdminStaffList: React.FC = () => {
         setFilteredStaff(filtered);
     }, [searchTerm, staffList]);
 
+    const calculateSummary = () => {
+        const totalStaff = filteredStaff.length;
+        const availableStaff = filteredStaff.filter(staff => staff.availability).length;
+        const totalHourlyRate = filteredStaff.reduce((sum, staff) => sum + (Number(staff.hourlyRate) || 0), 0);
+        const averageHourlyRate = totalStaff ? (totalHourlyRate / totalStaff).toFixed(2) : "0.00";
+        return { totalStaff, availableStaff, averageHourlyRate };
+    };
+
+    const summary = calculateSummary();
+
     const goToUpdatePage = (id: string) => {
         router.push(`/staff/update/${id}`);
     };
 
     const updateAvailability = async (id: string, availability: boolean) => {
         try {
-            await axios.put(`http://localhost:8080/api/staff/availability/${id}`, {
-                availability,
-            });
+            await axios.put(`http://localhost:8080/api/staff/availability/${id}`, { availability });
             const response = await axios.get<Staff[]>("http://localhost:8080/api/staff");
             setStaffList(response.data);
             setFilteredStaff(response.data);
@@ -74,7 +82,7 @@ const AdminStaffList: React.FC = () => {
     };
 
     const getStatusDot = (availability: boolean) => {
-        return availability ? "▪ Active" : "▪ InActive";
+        return availability ? "\u25AA Active" : "\u25AA InActive";
     };
 
     return (
@@ -82,11 +90,11 @@ const AdminStaffList: React.FC = () => {
             <h1 className="text-2xl font-semibold mb-2">Employee</h1>
             <p className="text-gray-600 mb-6">Manage your staff members and their availability.</p>
 
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-4">Employee List</h2>
-                <div className="flex space-x-4 mb-6">
-                    <span className="text-gray-600">All Staff</span>
-                    <span className="text-gray-600">Availability</span>
+            <div className="bg-blue-100 p-4 rounded-lg mb-6">
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                    <div><span className="font-bold">Available Photographer:</span> {summary.availableStaff}</div>
+                    <div><span className="font-bold">Total Staff:</span> {summary.totalStaff}</div>
+                    <div><span className="font-bold">Average Base Rate:</span> ${summary.averageHourlyRate}/hr</div>
                 </div>
             </div>
 
@@ -148,49 +156,16 @@ const AdminStaffList: React.FC = () => {
                         ) : (
                             filteredStaff.map((staff) => (
                                 <tr key={staff.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                        {staff.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {staff.email}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {staff.phone}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {staff.experience} {staff.experience ? "years" : "N/A"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        ${staff.hourlyRate}/hr
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {getStatusDot(staff.availability)}
-                                        {staff.availabilityDate && (
-                                            <span className="block text-xs text-gray-400">
-                                                    {new Date(staff.availabilityDate).toLocaleDateString()}
-                                                </span>
-                                        )}
-                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{staff.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.email}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.phone}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.experience} {staff.experience ? "years" : "N/A"}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${staff.hourlyRate}/hr</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getStatusDot(staff.availability)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex space-x-2">
-                                        <button
-                                            className={`px-3 py-1 text-xs rounded ${staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
-                                            onClick={() => staff.availability && handleAssignToPhotographer(staff.id)}
-                                            disabled={!staff.availability}
-                                        >
-                                            Assign
-                                        </button>
-                                        <button
-                                            className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-                                            onClick={() => goToUpdatePage(staff.id)}
-                                        >
-                                            Update
-                                        </button>
-                                        <button
-                                            className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
-                                            onClick={() => handleDelete(staff.id)}
-                                        >
-                                            Delete
-                                        </button>
+                                        <button className={`px-3 py-1 text-xs rounded ${staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`} onClick={() => staff.availability && handleAssignToPhotographer(staff.id)} disabled={!staff.availability}>Assign</button>
+                                        <button className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" onClick={() => goToUpdatePage(staff.id)}>Update</button>
+                                        <button className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" onClick={() => handleDelete(staff.id)}>Delete</button>
                                     </td>
                                 </tr>
                             ))
@@ -207,59 +182,16 @@ const AdminStaffList: React.FC = () => {
                     ) : (
                         filteredStaff.map((staff) => (
                             <div key={staff.id} className="bg-white p-4 rounded-lg shadow border border-gray-200">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="font-semibold text-lg">{staff.name}</h3>
-                                        <p className="text-gray-600 text-sm">{staff.email}</p>
-                                    </div>
-                                    <span className={`text-xs ${staff.availability ? "text-green-500" : "text-gray-500"}`}>
-                                        {getStatusDot(staff.availability)}
-                                    </span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2 mb-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500">Phone</p>
-                                        <p className="text-sm">{staff.phone}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Specialization</p>
-                                        <p className="text-sm">{staff.specialization || "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Experience</p>
-                                        <p className="text-sm">{staff.experience} {staff.experience ? "years" : ""}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Hourly Rate</p>
-                                        <p className="text-sm">${staff.hourlyRate}/hr</p>
-                                    </div>
-                                </div>
-                                {staff.availabilityDate && (
-                                    <div className="mb-3">
-                                        <p className="text-xs text-gray-500">Available Date</p>
-                                        <p className="text-sm">{new Date(staff.availabilityDate).toLocaleDateString()}</p>
-                                    </div>
-                                )}
+                                <h3 className="text-lg font-semibold mb-2">{staff.name}</h3>
+                                <p className="text-sm text-gray-500 mb-1">Email: {staff.email}</p>
+                                <p className="text-sm text-gray-500 mb-1">Phone: {staff.phone}</p>
+                                <p className="text-sm text-gray-500 mb-1">Experience: {staff.experience} {staff.experience ? "years" : "N/A"}</p>
+                                <p className="text-sm text-gray-500 mb-3">Hourly Rate: ${staff.hourlyRate}/hr</p>
+                                <p className="text-sm font-semibold mb-3">{getStatusDot(staff.availability)}</p>
                                 <div className="flex space-x-2">
-                                    <button
-                                        className={`flex-1 px-3 py-1 text-xs rounded ${staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
-                                        onClick={() => staff.availability && handleAssignToPhotographer(staff.id)}
-                                        disabled={!staff.availability}
-                                    >
-                                        Assign
-                                    </button>
-                                    <button
-                                        className="flex-1 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-                                        onClick={() => goToUpdatePage(staff.id)}
-                                    >
-                                        Update
-                                    </button>
-                                    <button
-                                        className="flex-1 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
-                                        onClick={() => handleDelete(staff.id)}
-                                    >
-                                        Delete
-                                    </button>
+                                    <button className={`flex-1 px-3 py-1 text-xs rounded ${staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`} onClick={() => staff.availability && handleAssignToPhotographer(staff.id)} disabled={!staff.availability}>Assign</button>
+                                    <button className="flex-1 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" onClick={() => goToUpdatePage(staff.id)}>Update</button>
+                                    <button className="flex-1 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" onClick={() => handleDelete(staff.id)}>Delete</button>
                                 </div>
                             </div>
                         ))

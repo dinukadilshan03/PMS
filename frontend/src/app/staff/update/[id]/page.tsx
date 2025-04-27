@@ -190,6 +190,17 @@ const UpdateStaffPage: React.FC = () => {
                     </select>
                 </div>
 
+                <div>
+                    <label className="block text-xs font-medium text-gray-700">Availability Date:</label>
+                    <input
+                        type="date"
+                        name="availabilityDate"
+                        value={staffData.availabilityDate || ""}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                    />
+                </div>
+
                 <button
                     type="submit"
                     className="w-full bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-700 mt-4"
