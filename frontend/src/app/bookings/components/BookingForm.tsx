@@ -20,7 +20,7 @@ const CreateBookingForm = () => {
         dateTime: "",
         form: ""
     });
-    const [packages, setPackages] = useState<{id: string, name: string}[]>([]);
+    const [packages, setPackages] = useState<{id: string, name: string, investment: number, packageType: string, servicesIncluded: string[], additionalItems: any}[]>([]);
     const [loading, setLoading] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -197,6 +197,79 @@ const CreateBookingForm = () => {
         }
     };
 
+    const PackageDetails = ({ selectedPackage }: { selectedPackage: any }) => {
+        if (!selectedPackage) return null;
+        
+        return (
+            <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Price:</span>
+                    <span className="font-medium text-gray-900">{selectedPackage.investment} LKR</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Type:</span>
+                    <span className="font-medium text-gray-900">{selectedPackage.packageType}</span>
+                </div>
+                
+                <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Services Included:</h4>
+                    <ul className="list-disc pl-5 space-y-1">
+                        {selectedPackage.servicesIncluded.map((service: string, index: number) => (
+                            <li key={index} className="text-gray-600">{service}</li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Additional Items:</h4>
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Edited Images:</span>
+                            <span className="font-medium text-gray-900">{selectedPackage.additionalItems.editedImages}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Unedited Images:</span>
+                            <span className="font-medium text-gray-900">{selectedPackage.additionalItems.uneditedImages}</span>
+                        </div>
+                        
+                        {selectedPackage.additionalItems.albums && selectedPackage.additionalItems.albums.length > 0 && (
+                            <div>
+                                <h5 className="text-sm font-medium text-gray-700 mb-1">Albums:</h5>
+                                <ul className="list-disc pl-5 space-y-1">
+                                    {selectedPackage.additionalItems.albums.map((album: any, index: number) => (
+                                        <li key={index} className="text-gray-600">
+                                            {album.size} {album.type} (Spread Count: {album.spreadCount})
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {selectedPackage.additionalItems.framedPortraits && selectedPackage.additionalItems.framedPortraits.length > 0 && (
+                            <div>
+                                <h5 className="text-sm font-medium text-gray-700 mb-1">Framed Portraits:</h5>
+                                <ul className="list-disc pl-5 space-y-1">
+                                    {selectedPackage.additionalItems.framedPortraits.map((portrait: any, index: number) => (
+                                        <li key={index} className="text-gray-600">
+                                            {portrait.size} (Quantity: {portrait.quantity})
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {selectedPackage.additionalItems.thankYouCards && (
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">Thank You Cards:</span>
+                                <span className="font-medium text-gray-900">{selectedPackage.additionalItems.thankYouCards}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-6">
             {isLoading ? (
@@ -334,6 +407,15 @@ const CreateBookingForm = () => {
                                     <p className="mt-2 text-sm text-red-600">{errors.selectedPackage}</p>
                                 )}
                             </div>
+
+                            {formData.selectedPackage && (
+                                <div className="sm:col-span-2">
+                                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Package Details</h3>
+                                        <PackageDetails selectedPackage={packages.find(pkg => pkg.name === formData.selectedPackage)} />
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="sm:col-span-2">
                                 <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">Date & Time</label>
