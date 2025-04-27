@@ -277,38 +277,28 @@ const CreateBookingForm = () => {
             });
 
             if (!response.ok) {
-                let errorMessage = 'An error occurred while creating the booking';
-                try {
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        const errorData = await response.json();
-                        errorMessage = errorData.message || errorData;
-                    } else {
-                        errorMessage = await response.text();
-                    }
-                } catch (e) {
-                    console.error('Error parsing error response:', e);
+                const errorData = await response.json();
+                if (errorData.message?.includes('Cannot create more than')) {
+                    setLimitDialog({
+                        open: true,
+                        title: 'Booking Limit Reached',
+                        message: errorData.message
+                    });
+                    return;
                 }
-                setLimitDialog({
-                    open: true,
-                    title: 'Booking Error',
-                    message: errorMessage
-                });
-                return;
+                throw new Error(errorData.message || 'Failed to create booking');
             }
 
+            const newBooking = await response.json();
             router.push("/bookings?success=true");
-
         } catch (err) {
-            const errorMessage = err instanceof Error
-                ? err.message
-                : "An unknown error occurred";
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
             setLimitDialog({
                 open: true,
                 title: 'Error',
-                message: `Error creating booking: ${errorMessage}`
+                message: errorMessage
             });
-            console.error(err);
+            console.error('Booking creation error:', err);
         } finally {
             setLoading(false);
         }

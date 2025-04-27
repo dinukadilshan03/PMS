@@ -3,6 +3,7 @@ package com.beni.backend.bookings.controller;
 import com.beni.backend.bookings.model.Booking;
 import com.beni.backend.bookings.service.AdminBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,15 @@ public class AdminBookingController {
 
     // Update booking details
     @PutMapping("/{id}")
-    public Booking updateBooking(@PathVariable String id, @RequestBody Booking booking) {
-        return adminBookingService.updateBooking(id, booking);
+    public ResponseEntity<?> updateBooking(@PathVariable String id, @RequestBody Booking booking) {
+        try {
+            Booking updatedBooking = adminBookingService.updateBooking(id, booking);
+            return ResponseEntity.ok(updatedBooking);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
     // Delete a booking by ID (only if the status is "cancelled" or manually cancelled)

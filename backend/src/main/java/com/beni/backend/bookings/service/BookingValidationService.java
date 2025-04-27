@@ -3,21 +3,21 @@ package com.beni.backend.bookings.service;
 import com.beni.backend.bookings.exception.BookingException;
 import com.beni.backend.bookings.model.Booking;
 import com.beni.backend.bookings.repository.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
 public class BookingValidationService {
-    private final BookingRepository bookingRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
     private final LocationPricingService locationPricingService;
     private final BookingConfigService bookingConfigService;
 
     public BookingValidationService(
-            BookingRepository bookingRepository, 
             LocationPricingService locationPricingService,
             BookingConfigService bookingConfigService) {
-        this.bookingRepository = bookingRepository;
         this.locationPricingService = locationPricingService;
         this.bookingConfigService = bookingConfigService;
     }
@@ -30,6 +30,8 @@ public class BookingValidationService {
     public void validateBooking(Booking booking) {
         validateLocation(booking.getLocation());
         validateBookingLimit(booking.getDateTime());
+        validateAdvanceBooking(booking.getDateTime());
+        validateNotInPast(booking.getDateTime());
         validateBookingData(booking);
     }
 
@@ -53,7 +55,7 @@ public class BookingValidationService {
         }
     }
 
-    private void validateBookingLimit(LocalDateTime dateTime) {
+    public void validateBookingLimit(LocalDateTime dateTime) {
         var startOfDay = dateTime.toLocalDate().atStartOfDay();
         var endOfDay = dateTime.toLocalDate().atTime(23, 59, 59);
         
@@ -66,7 +68,7 @@ public class BookingValidationService {
         }
     }
 
-    private void validateAdvanceBooking(LocalDateTime dateTime) {
+    public void validateAdvanceBooking(LocalDateTime dateTime) {
         var config = bookingConfigService.getConfig();
         var now = LocalDateTime.now();
         var daysInAdvance = java.time.temporal.ChronoUnit.DAYS.between(now.toLocalDate(), dateTime.toLocalDate());
@@ -77,6 +79,12 @@ public class BookingValidationService {
         
         if (daysInAdvance > config.getMaxAdvanceBookingDays()) {
             throw new BookingException("Bookings cannot be made more than " + config.getMaxAdvanceBookingDays() + " days in advance");
+        }
+    }
+
+    public void validateNotInPast(LocalDateTime dateTime) {
+        if (dateTime.isBefore(LocalDateTime.now())) {
+            throw new BookingException("Cannot create booking for a past date/time");
         }
     }
 

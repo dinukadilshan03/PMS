@@ -77,20 +77,28 @@ const BookingList = () => {
             format: 'a4'
         });
 
-        // Add title
-        doc.setFontSize(20);
-        doc.text('Your Bookings', 105, 20, { align: 'center' });
+        // Add header with logo and title
+        doc.setFontSize(24);
+        doc.setTextColor(79, 70, 229); // Indigo color
+        doc.setFont('helvetica', 'bold');
+        doc.text('Your Bookings', 105, 25, { align: 'center' });
 
-        // Add current date
+        // Add subtitle
         doc.setFontSize(12);
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
+        doc.setTextColor(100, 116, 139); // Slate color
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' });
 
-        let yPosition = 40;
+        // Add decorative line
+        doc.setDrawColor(79, 70, 229); // Indigo color
+        doc.setLineWidth(0.5);
+        doc.line(20, 40, 190, 40);
+
+        let yPosition = 50;
         const pageHeight = doc.internal.pageSize.height - 20;
         const margin = 20;
 
-        // Add each booking
-        doc.setFontSize(12);
+        // Add each booking with modern styling
         bookings.forEach((booking, index) => {
             // Add new page if needed
             if (yPosition > pageHeight) {
@@ -98,25 +106,168 @@ const BookingList = () => {
                 yPosition = margin;
             }
 
+            // Booking header
+            doc.setFontSize(14);
+            doc.setTextColor(79, 70, 229); // Indigo color
             doc.setFont('helvetica', 'bold');
             doc.text(`Booking #${index + 1}`, margin, yPosition);
-            yPosition += 8;
-
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Package: ${booking.packageName}`, margin, yPosition);
-            yPosition += 8;
-
-            doc.text(`Date: ${new Date(booking.dateTime).toLocaleString()}`, margin, yPosition);
-            yPosition += 8;
-
-            doc.text(`Status: ${booking.bookingStatus}`, margin, yPosition);
-            yPosition += 8;
-
-            // Add some space between bookings
             yPosition += 10;
+
+            // Package name
+            doc.setFontSize(12);
+            doc.setTextColor(51, 65, 85); // Slate color
+            doc.setFont('helvetica', 'bold');
+            doc.text('Package:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(booking.packageName, margin + 25, yPosition);
+            yPosition += 8;
+
+            // Date and Time
+            doc.setFont('helvetica', 'bold');
+            doc.text('Date & Time:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(new Date(booking.dateTime).toLocaleString(), margin + 35, yPosition);
+            yPosition += 8;
+
+            // Status with colored badge
+            doc.setFont('helvetica', 'bold');
+            doc.text('Status:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            const statusColor = getStatusColor(booking.bookingStatus);
+            let statusRGB;
+            if (statusColor === 'bg-red-100 text-red-800') {
+                statusRGB = { r: 220, g: 38, b: 38 }; // Red
+            } else if (statusColor === 'bg-green-100 text-green-800') {
+                statusRGB = { r: 22, g: 163, b: 74 }; // Green
+            } else if (statusColor === 'bg-blue-100 text-blue-800') {
+                statusRGB = { r: 29, g: 78, b: 216 }; // Blue
+            } else {
+                statusRGB = { r: 51, g: 65, b: 85 }; // Slate
+            }
+            doc.setTextColor(statusRGB.r, statusRGB.g, statusRGB.b);
+            doc.text(booking.bookingStatus, margin + 25, yPosition);
+            yPosition += 8;
+
+            // Location
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(51, 65, 85);
+            doc.text('Location:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(booking.location, margin + 25, yPosition);
+            yPosition += 8;
+
+            // Payment Status
+            doc.setFont('helvetica', 'bold');
+            doc.text('Payment:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(booking.paymentStatus, margin + 25, yPosition);
+            yPosition += 8;
+
+            // Add decorative separator
+            doc.setDrawColor(226, 232, 240); // Light slate color
+            doc.setLineWidth(0.2);
+            doc.line(margin, yPosition, 190, yPosition);
+            yPosition += 15;
         });
 
+        // Add footer
+        const pageCount = doc.internal.pages.length;
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${i} of ${pageCount}`, 105, 287, { align: 'center' });
+        }
+
         doc.save('bookings-list.pdf');
+    };
+
+    const generateSingleBookingPDF = (booking: Booking) => {
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Add header with logo and title
+        doc.setFontSize(24);
+        doc.setTextColor(79, 70, 229); // Indigo color
+        doc.setFont('helvetica', 'bold');
+        doc.text('Booking Details', 105, 25, { align: 'center' });
+
+        // Add subtitle
+        doc.setFontSize(12);
+        doc.setTextColor(100, 116, 139); // Slate color
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' });
+
+        // Add decorative line
+        doc.setDrawColor(79, 70, 229); // Indigo color
+        doc.setLineWidth(0.5);
+        doc.line(20, 40, 190, 40);
+
+        let yPosition = 50;
+        const margin = 20;
+
+        // Package name
+        doc.setFontSize(14);
+        doc.setTextColor(79, 70, 229); // Indigo color
+        doc.setFont('helvetica', 'bold');
+        doc.text('Package:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(51, 65, 85); // Slate color
+        doc.text(booking.packageName, margin + 25, yPosition);
+        yPosition += 10;
+
+        // Date and Time
+        doc.setFont('helvetica', 'bold');
+        doc.text('Date & Time:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(new Date(booking.dateTime).toLocaleString(), margin + 35, yPosition);
+        yPosition += 10;
+
+        // Status with colored badge
+        doc.setFont('helvetica', 'bold');
+        doc.text('Status:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        const statusColor = getStatusColor(booking.bookingStatus);
+        let statusRGB;
+        if (statusColor === 'bg-red-100 text-red-800') {
+            statusRGB = { r: 220, g: 38, b: 38 }; // Red
+        } else if (statusColor === 'bg-green-100 text-green-800') {
+            statusRGB = { r: 22, g: 163, b: 74 }; // Green
+        } else if (statusColor === 'bg-blue-100 text-blue-800') {
+            statusRGB = { r: 29, g: 78, b: 216 }; // Blue
+        } else {
+            statusRGB = { r: 51, g: 65, b: 85 }; // Slate
+        }
+        doc.setTextColor(statusRGB.r, statusRGB.g, statusRGB.b);
+        doc.text(booking.bookingStatus, margin + 25, yPosition);
+        yPosition += 10;
+
+        // Location
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(51, 65, 85);
+        doc.text('Location:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(booking.location, margin + 25, yPosition);
+        yPosition += 10;
+
+        // Payment Status
+        doc.setFont('helvetica', 'bold');
+        doc.text('Payment:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(booking.paymentStatus, margin + 25, yPosition);
+        yPosition += 10;
+
+        // Add footer
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Page 1 of 1', 105, 287, { align: 'center' });
+
+        doc.save(`booking-${booking.id}.pdf`);
     };
 
     const handleCancel = async (bookingId: string) => {
@@ -141,7 +292,7 @@ const BookingList = () => {
             }
 
             setBookings(bookings.map(booking =>
-                booking.id === bookingId ? { ...booking, bookingStatus: 'Cancelled' } : booking
+                booking.id === bookingId ? { ...booking, bookingStatus: 'cancelled' } : booking
             ));
         } catch (err) {
             const message = (err as Error).message;
@@ -201,6 +352,11 @@ const BookingList = () => {
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
             setError(errorMessage);
+            setLimitDialog({
+                open: true,
+                title: 'Error',
+                message: errorMessage
+            });
             console.error('Rescheduling error:', err);
         }
     };
@@ -368,9 +524,9 @@ const BookingList = () => {
                                     <div className="mt-5 flex space-x-2">
                                         <button
                                             onClick={() => handleCancel(booking.id)}
-                                            disabled={booking.bookingStatus === 'Cancelled'}
+                                            disabled={booking.bookingStatus.toLowerCase() === 'cancelled'}
                                             className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white ${
-                                                booking.bookingStatus === 'Cancelled' 
+                                                booking.bookingStatus.toLowerCase() === 'cancelled' 
                                                     ? 'bg-gray-400 cursor-not-allowed' 
                                                     : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
                                             }`}
@@ -382,9 +538,9 @@ const BookingList = () => {
                                         </button>
                                         <button
                                             onClick={() => handleReschedule(booking)}
-                                            disabled={booking.bookingStatus === 'Cancelled'}
+                                            disabled={booking.bookingStatus.toLowerCase() === 'cancelled'}
                                             className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white ${
-                                                booking.bookingStatus === 'Cancelled' 
+                                                booking.bookingStatus.toLowerCase() === 'cancelled' 
                                                     ? 'bg-gray-400 cursor-not-allowed' 
                                                     : 'bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500'
                                             }`}
@@ -393,6 +549,15 @@ const BookingList = () => {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Reschedule
+                                        </button>
+                                        <button
+                                            onClick={() => generateSingleBookingPDF(booking)}
+                                            className="inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            title="Download PDF"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>
