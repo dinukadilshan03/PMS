@@ -37,6 +37,7 @@ const Header = () => {
         { name: 'Albums', href: '/Album-Portfolio/album/pages/user/' },
         { name: 'Packages', href: '/packages/Dashboard' },
         { name: 'Testimonials', href: '/testimonials' },
+        { name: 'Wishlist', href: '/wishlist' },
     ];
 
     const isActive = (path: string) => pathname === path;

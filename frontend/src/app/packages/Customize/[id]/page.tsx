@@ -159,7 +159,7 @@ const CustomizePage = () => {
         doc.text('Base Services Included', left, y);
         y += 22;
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(12);
+            doc.setFontSize(12);
         doc.setTextColor(colorText);
         package_.servicesIncluded.forEach((service, idx) => {
             doc.text(`• ${service}`, left + 18, y);
@@ -184,7 +184,7 @@ const CustomizePage = () => {
             selectedServices.forEach((service, idx) => {
                 doc.text(`• ${service.name} - ${service.price} LKR`, left + 18, y);
                 y += 18;
-            });
+        });
         }
         y += 22;
 
@@ -270,48 +270,48 @@ const CustomizePage = () => {
                         <CurrencyDollarIcon className="h-5 w-5 text-[#b6a489]" />
                         <span className="text-lg font-medium text-[#2d2926]">Base Price: {package_?.investment} LKR</span>
                     </div>
-                </div>
+                    </div>
                 <hr className="my-2 border-[#ede7df]" />
-                {/* Base Services */}
+                        {/* Base Services */}
                 <section>
                     <h3 className="text-lg font-serif font-medium text-[#2d2926] mb-3">Base Services Included</h3>
                     <ul className="list-none pl-0 space-y-2 text-[#4b4b4b]">
-                        {package_?.servicesIncluded.map((service, index) => (
-                            <li key={index} className="flex items-center gap-2">
-                                <CheckIcon className="h-4 w-4 text-emerald-500" />
-                                {service}
-                            </li>
-                        ))}
-                    </ul>
+                                {package_?.servicesIncluded.map((service, index) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                        <CheckIcon className="h-4 w-4 text-emerald-500" />
+                                        {service}
+                                    </li>
+                                ))}
+                            </ul>
                 </section>
                 <hr className="my-2 border-[#ede7df]" />
-                {/* Additional Services */}
+                        {/* Additional Services */}
                 <section>
                     <h3 className="text-lg font-serif font-medium text-[#2d2926] mb-3">Additional Services</h3>
                     <div className="grid gap-3 sm:grid-cols-2">
-                        {package_?.additionalServices.map((service, index) => {
-                            const Icon = additionalServicesOptions[index].icon;
-                            return (
+                                {package_?.additionalServices.map((service, index) => {
+                                    const Icon = additionalServicesOptions[index].icon;
+                                    return (
                                 <label
-                                    key={index}
+                                            key={index}
                                     className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${service.selected ? 'bg-[#e0ecec] border-[#b6a489]' : 'bg-white border-[#e5e1da] hover:bg-[#f7f6f2]'}`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={service.selected}
-                                        onChange={() => handleServiceToggle(index)}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={service.selected}
+                                                onChange={() => handleServiceToggle(index)}
                                         className="accent-[#b6a489] w-4 h-4 rounded-full border border-[#b6a489]"
-                                    />
+                                            />
                                     <Icon className="h-5 w-5 text-[#b6a489]" />
                                     <span className="flex-1 text-sm text-[#2d2926]">{service.name}</span>
                                     <span className="text-xs text-[#6b6b6b]">{service.price} LKR</span>
                                 </label>
-                            );
-                        })}
-                    </div>
+                                    );
+                                })}
+                            </div>
                 </section>
                 <hr className="my-2 border-[#ede7df]" />
-                {/* Package Items */}
+                        {/* Package Items */}
                 <section>
                     <h3 className="text-lg font-serif font-medium text-[#2d2926] mb-3">Package Items</h3>
                     <div className="overflow-x-auto">
@@ -361,23 +361,23 @@ const CustomizePage = () => {
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                                    </div>
                 </section>
                 <hr className="my-2 border-[#ede7df]" />
-                {/* Total Price */}
+                        {/* Total Price */}
                 <section className="flex items-center justify-between mt-2">
                     <span className="text-base font-serif font-medium text-[#2d2926]">Total Investment</span>
                     <span className="text-xl font-bold text-[#b6a489]">{totalPrice} LKR</span>
                 </section>
-                {/* Actions */}
+                        {/* Actions */}
                 <div className="flex justify-end gap-4 mt-4">
-                    <button
-                        onClick={() => router.back()}
+                            <button
+                                onClick={() => router.back()}
                         className="py-3 px-8 rounded-full bg-[#ede7df] text-[#2d2926] font-medium text-sm shadow hover:bg-[#e9e5dc] transition"
                         type="button"
-                    >
-                        Back
-                    </button>
+                            >
+                                Back
+                            </button>
                     <button
                         onClick={() => router.push(`/bookings/create?packageName=${encodeURIComponent(package_.name)}`)}
                         className="py-3 px-8 rounded-full bg-[#b6a489] text-white font-medium text-sm shadow hover:bg-[#937d5e] transition"
@@ -385,14 +385,14 @@ const CustomizePage = () => {
                     >
                         Book Now
                     </button>
-                    <button
-                        onClick={handleDownloadPDF}
+                            <button
+                                onClick={handleDownloadPDF}
                         className="py-3 px-8 rounded-full bg-[#a08c6b] text-white font-medium text-sm shadow hover:bg-[#7c6a53] transition"
                         type="button"
                         aria-label="Download PDF"
-                    >
+                            >
                         <ArrowDownOnSquareIcon className="w-5 h-5" />
-                    </button>
+                            </button>
                 </div>
             </div>
         </div>
