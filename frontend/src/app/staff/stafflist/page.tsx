@@ -46,6 +46,12 @@ const AdminStaffList: React.FC = () => {
 
     const summary = calculateSummary();
 
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
     const goToUpdatePage = (id: string) => {
         router.push(`/staff/update/${id}`);
     };
@@ -81,8 +87,19 @@ const AdminStaffList: React.FC = () => {
         router.push(`/staff/assign/${id}`);
     };
 
-    const getStatusDot = (availability: boolean) => {
-        return availability ? "\u25AA Active" : "\u25AA InActive";
+    const renderStatus = (staff: Staff) => {
+        return (
+            <div className="flex flex-col">
+                <span className={staff.availability ? "text-green-600" : "text-red-600"}>
+                    {staff.availability ? "Active" : "InActive"}
+                </span>
+                {staff.availabilityDate && (
+                    <span className="text-xs text-gray-500">
+                        {formatDate(staff.availabilityDate)}
+                    </span>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -90,39 +107,48 @@ const AdminStaffList: React.FC = () => {
             <h1 className="text-2xl font-semibold mb-2">Employee</h1>
             <p className="text-gray-600 mb-6">Manage your staff members and their availability.</p>
 
-            <div className="bg-blue-100 p-4 rounded-lg mb-6">
-                <div className="flex justify-between items-center text-sm text-gray-700">
-                    <div><span className="font-bold">Available Photographer:</span> {summary.availableStaff}</div>
-                    <div><span className="font-bold">Total Staff:</span> {summary.totalStaff}</div>
-                    <div><span className="font-bold">Average Base Rate:</span> ${summary.averageHourlyRate}/hr</div>
+            <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100">
+                <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
+                    <div className="bg-white p-3 rounded-lg shadow-sm">
+                        <div className="font-bold text-blue-600">Available Photographer</div>
+                        <div className="text-xl font-semibold">{summary.availableStaff}</div>
+                    </div>
+                    <div className="bg-white p-3 rounded-lg shadow-sm">
+                        <div className="font-bold text-blue-600">Total Staff</div>
+                        <div className="text-xl font-semibold">{summary.totalStaff}</div>
+                    </div>
+                    <div className="bg-white p-3 rounded-lg shadow-sm">
+                        <div className="font-bold text-blue-600">Average Base Rate</div>
+                        <div className="text-xl font-semibold">${summary.averageHourlyRate}/hr</div>
+                    </div>
                 </div>
             </div>
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex space-x-2">
                     <button
-                        className={`px-4 py-2 rounded ${viewMode === 'table' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-lg ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
                         onClick={() => setViewMode('table')}
                     >
                         Table View
                     </button>
                     <button
-                        className={`px-4 py-2 rounded ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-lg ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
                         onClick={() => setViewMode('grid')}
                     >
                         Grid View
                     </button>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
                     <input
                         type="text"
                         placeholder="Search by name, email, or phone"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-4 py-2 shadow-sm"
+                        className="border border-gray-300 rounded-lg px-4 py-2 shadow-sm w-full"
                     />
                     <button
-                        className="bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600"
+                        className="bg-blue-600 text-white rounded-lg py-2 px-4 hover:bg-blue-700 whitespace-nowrap w-full md:w-auto"
                         onClick={() => router.push('/staff/add')}
                     >
                         Add New Staff
@@ -130,11 +156,11 @@ const AdminStaffList: React.FC = () => {
                 </div>
             </div>
 
-            {error && <p className="text-red-500 text-center">{error}</p>}
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
             {viewMode === 'table' ? (
-                <div className="overflow-x-auto bg-white rounded-lg">
-                    <table className="w-full border-collapse">
+                <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
+                    <table className="w-full">
                         <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -146,7 +172,7 @@ const AdminStaffList: React.FC = () => {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200">
                         {filteredStaff.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
@@ -156,16 +182,36 @@ const AdminStaffList: React.FC = () => {
                         ) : (
                             filteredStaff.map((staff) => (
                                 <tr key={staff.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{staff.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.email}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.phone}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.experience} {staff.experience ? "years" : "N/A"}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${staff.hourlyRate}/hr</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getStatusDot(staff.availability)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex space-x-2">
-                                        <button className={`px-3 py-1 text-xs rounded ${staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`} onClick={() => staff.availability && handleAssignToPhotographer(staff.id)} disabled={!staff.availability}>Assign</button>
-                                        <button className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" onClick={() => goToUpdatePage(staff.id)}>Update</button>
-                                        <button className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" onClick={() => handleDelete(staff.id)}>Delete</button>
+                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{staff.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">{staff.email}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">{staff.phone}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                                        {staff.experience || "N/A"} {staff.experience ? "years" : ""}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">${staff.hourlyRate}/hr</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {renderStatus(staff)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                                        <button
+                                            className={`px-3 py-1 rounded text-xs ${staff.availability ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-300 text-gray-600 cursor-not-allowed"}`}
+                                            onClick={() => staff.availability && handleAssignToPhotographer(staff.id)}
+                                            disabled={!staff.availability}
+                                        >
+                                            Assign
+                                        </button>
+                                        <button
+                                            className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                                            onClick={() => goToUpdatePage(staff.id)}
+                                        >
+                                            Update
+                                        </button>
+                                        <button
+                                            className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                                            onClick={() => handleDelete(staff.id)}
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))
@@ -181,17 +227,41 @@ const AdminStaffList: React.FC = () => {
                         </div>
                     ) : (
                         filteredStaff.map((staff) => (
-                            <div key={staff.id} className="bg-white p-4 rounded-lg shadow border border-gray-200">
-                                <h3 className="text-lg font-semibold mb-2">{staff.name}</h3>
-                                <p className="text-sm text-gray-500 mb-1">Email: {staff.email}</p>
-                                <p className="text-sm text-gray-500 mb-1">Phone: {staff.phone}</p>
-                                <p className="text-sm text-gray-500 mb-1">Experience: {staff.experience} {staff.experience ? "years" : "N/A"}</p>
-                                <p className="text-sm text-gray-500 mb-3">Hourly Rate: ${staff.hourlyRate}/hr</p>
-                                <p className="text-sm font-semibold mb-3">{getStatusDot(staff.availability)}</p>
-                                <div className="flex space-x-2">
-                                    <button className={`flex-1 px-3 py-1 text-xs rounded ${staff.availability ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`} onClick={() => staff.availability && handleAssignToPhotographer(staff.id)} disabled={!staff.availability}>Assign</button>
-                                    <button className="flex-1 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600" onClick={() => goToUpdatePage(staff.id)}>Update</button>
-                                    <button className="flex-1 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600" onClick={() => handleDelete(staff.id)}>Delete</button>
+                            <div key={staff.id} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                                <div className="p-4">
+                                    <h3 className="text-lg font-semibold mb-1">{staff.name}</h3>
+                                    <p className="text-sm text-gray-500 mb-1">{staff.email}</p>
+                                    <p className="text-sm text-gray-500 mb-1">{staff.phone}</p>
+                                    <div className="flex justify-between text-sm mt-3">
+                                        <span className="text-gray-500">Exp: {staff.experience || "N/A"} {staff.experience ? "yrs" : ""}</span>
+                                        <span className="font-medium">${staff.hourlyRate}/hr</span>
+                                    </div>
+                                    <div className="mt-3">
+                                        {renderStatus(staff)}
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 px-4 py-3 flex justify-between">
+                                    <button
+                                        className={`text-xs px-3 py-1 rounded ${staff.availability ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-300 text-gray-600 cursor-not-allowed"}`}
+                                        onClick={() => staff.availability && handleAssignToPhotographer(staff.id)}
+                                        disabled={!staff.availability}
+                                    >
+                                        Assign
+                                    </button>
+                                    <div className="flex space-x-2">
+                                        <button
+                                            className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            onClick={() => goToUpdatePage(staff.id)}
+                                        >
+                                            Update
+                                        </button>
+                                        <button
+                                            className="text-xs px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                            onClick={() => handleDelete(staff.id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))
