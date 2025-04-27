@@ -100,81 +100,141 @@ const CustomizePage = () => {
     const handleDownloadPDF = () => {
         if (!package_) return;
 
-        const doc = new jsPDF();
-        let yOffset = 10;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
 
-        // Title
-        doc.setFontSize(22);
-        doc.text(`${package_.name} - Customized`, 10, yOffset);
-        yOffset += 15;
+        // Colors
+        const colorHeader = '#b6a489'; // darker taupe/greige for header
+        const colorMain = '#f7f6f2';   // very light for content
+        const colorFooter = '#f7f6f2';
+        const colorText = '#2d2926';
+        const colorAccent = '#b6a489';
+        const colorBorder = '#e5e1da';
 
-        // Base Package Details
-        doc.setFontSize(16);
-        doc.text(`Base Package Price: ${package_.investment} LKR`, 10, yOffset);
-        yOffset += 10;
+        // HEADER (darker)
+        doc.setFillColor(colorHeader);
+        doc.rect(0, 0, pageWidth, 90, 'F');
+        doc.setFontSize(26);
+        doc.setTextColor('#fff');
+        doc.setFont('helvetica', 'bold');
+        doc.text('PhotoStudio', 48, 55);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor('#ede7df');
+        doc.text('Customized Package Details', 48, 78);
+        doc.setDrawColor(colorBorder);
+        doc.setLineWidth(1.2);
+        doc.line(48, 92, pageWidth - 48, 92);
+
+        // MAIN CONTENT BACKGROUND (light)
+        const contentTop = 110;
+        const contentHeight = pageHeight - 210;
+        doc.setFillColor(colorMain);
+        doc.roundedRect(38, contentTop, pageWidth - 76, contentHeight, 18, 18, 'F');
+
+        // BODY
+        let y = contentTop + 38;
+        const left = 70;
+        doc.setFontSize(20);
+        doc.setTextColor(colorText);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${package_.name} - Customized`, left, y);
+        y += 32;
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(colorAccent);
+        doc.text(`Base Price: ${package_.investment} LKR`, left, y);
+        doc.setTextColor(colorText);
+        y += 22;
+        doc.setDrawColor(colorBorder);
+        doc.setLineWidth(0.7);
+        doc.line(left, y, pageWidth - left, y);
+        y += 28;
 
         // Services Included
-        doc.text('Base Services Included:', 10, yOffset);
-        yOffset += 10;
-        package_.servicesIncluded.forEach((service, index) => {
-            doc.setFontSize(12);
-            doc.text(`${index + 1}. ${service}`, 15, yOffset);
-            yOffset += 7;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(colorAccent);
+        doc.text('Base Services Included', left, y);
+        y += 22;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(colorText);
+        package_.servicesIncluded.forEach((service, idx) => {
+            doc.text(`• ${service}`, left + 18, y);
+            y += 18;
         });
+        y += 22;
 
         // Additional Services
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
-        yOffset += 5;
-        doc.text('Additional Services Selected:', 10, yOffset);
-        yOffset += 10;
-        
+        doc.setTextColor(colorAccent);
+        doc.text('Additional Services Selected', left, y);
+        y += 22;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(colorText);
         const selectedServices = package_.additionalServices.filter(service => service.selected);
-        selectedServices.forEach((service, index) => {
-            doc.setFontSize(12);
-            doc.text(`${index + 1}. ${service.name} - ${service.price} LKR`, 15, yOffset);
-            yOffset += 7;
-        });
+        if (selectedServices.length === 0) {
+            doc.text('None', left + 18, y);
+            y += 18;
+        } else {
+            selectedServices.forEach((service, idx) => {
+                doc.text(`• ${service.name} - ${service.price} LKR`, left + 18, y);
+                y += 18;
+            });
+        }
+        y += 22;
 
         // Additional Items
-        yOffset += 5;
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
-        doc.text('Package Items:', 10, yOffset);
-        yOffset += 10;
-
+        doc.setTextColor(colorAccent);
+        doc.text('Package Items', left, y);
+        y += 22;
+        doc.setFont('helvetica', 'normal');
         doc.setFontSize(12);
-        doc.text(`Edited Images: ${package_.additionalItems.editedImages}`, 15, yOffset);
-        yOffset += 7;
-        doc.text(`Unedited Images: ${package_.additionalItems.uneditedImages}`, 15, yOffset);
-        yOffset += 7;
-
-        // Albums
+        doc.setTextColor(colorText);
+        doc.text(`Edited Images: ${package_.additionalItems.editedImages}`, left + 18, y);
+        y += 18;
+        doc.text(`Unedited Images: ${package_.additionalItems.uneditedImages}`, left + 18, y);
+        y += 18;
         if (package_.additionalItems.albums?.length) {
-            doc.text('Albums:', 15, yOffset);
-            yOffset += 7;
+            doc.text('Albums:', left + 18, y);
+            y += 18;
             package_.additionalItems.albums.forEach((album) => {
-                doc.text(`- ${album.size} ${album.type} (${album.spreadCount} spreads)`, 20, yOffset);
-                yOffset += 7;
+                doc.text(`- ${album.size} ${album.type} (${album.spreadCount} spreads)`, left + 36, y);
+                y += 16;
             });
         }
-
-        // Framed Portraits
         if (package_.additionalItems.framedPortraits?.length) {
-            doc.text('Framed Portraits:', 15, yOffset);
-            yOffset += 7;
+            doc.text('Framed Portraits:', left + 18, y);
+            y += 18;
             package_.additionalItems.framedPortraits.forEach((portrait) => {
-                doc.text(`- ${portrait.size} (Quantity: ${portrait.quantity})`, 20, yOffset);
-                yOffset += 7;
+                doc.text(`- ${portrait.size} (Quantity: ${portrait.quantity})`, left + 36, y);
+                y += 16;
             });
         }
-
-        // Thank You Cards
-        doc.text(`Thank You Cards: ${package_.additionalItems.thankYouCards}`, 15, yOffset);
-        yOffset += 15;
+        doc.text(`Thank You Cards: ${package_.additionalItems.thankYouCards}`, left + 18, y);
+        y += 28;
 
         // Total Price
-        doc.setFontSize(16);
-        doc.setFont("helvetica", 'bold');
-        doc.text(`Total Investment: ${totalPrice} LKR`, 10, yOffset);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.setTextColor(colorAccent);
+        doc.text(`Total Investment: ${totalPrice} LKR`, left, y);
+
+        // FOOTER
+        doc.setFillColor(colorFooter);
+        doc.rect(0, pageHeight - 60, pageWidth, 60, 'F');
+        doc.setFontSize(11);
+        doc.setTextColor(colorText);
+        doc.text('Contact: info@photostudio.com | +94 77 123 4567 | www.photostudio.com', 48, pageHeight - 30);
+        doc.setFontSize(10);
+        doc.setTextColor(colorAccent);
+        doc.text('Capturing Moments, Creating Memories', 48, pageHeight - 12);
 
         doc.save(`${package_.name}-customized.pdf`);
     };
@@ -200,7 +260,7 @@ const CustomizePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#e9e5dc] via-[#e0ecec] to-[#cfd8dc] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[#b09f88] flex items-center justify-center p-4">
             <div className="w-full max-w-3xl bg-white rounded-[3rem_1rem_3rem_1rem] shadow-2xl p-10 flex flex-col gap-10">
                 {/* Header */}
                 <div className="flex flex-col items-center gap-2 mb-2">
@@ -319,11 +379,19 @@ const CustomizePage = () => {
                         Back
                     </button>
                     <button
+                        onClick={() => router.push(`/bookings/create?packageName=${encodeURIComponent(package_.name)}`)}
+                        className="py-3 px-8 rounded-full bg-[#b6a489] text-white font-medium text-sm shadow hover:bg-[#937d5e] transition"
+                        type="button"
+                    >
+                        Book Now
+                    </button>
+                    <button
                         onClick={handleDownloadPDF}
                         className="py-3 px-8 rounded-full bg-[#a08c6b] text-white font-medium text-sm shadow hover:bg-[#7c6a53] transition"
                         type="button"
+                        aria-label="Download PDF"
                     >
-                        Download PDF
+                        <ArrowDownOnSquareIcon className="w-5 h-5" />
                     </button>
                 </div>
             </div>

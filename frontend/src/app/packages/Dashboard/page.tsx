@@ -69,48 +69,107 @@ const CustomerDashboard = () => {
 
     // Generate PDF for each package
     const handleDownloadPDF = (pkg: Package) => {
-        const doc = new jsPDF();
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
 
+        // Colors
+        const colorBackground = '#e2dacf';
+        const colorSurface = '#f7f6f2';
+        const colorText = '#2d2926';
+        const colorAccent = '#b6a489';
+        const colorBorder = '#e5e1da';
+
+        // HEADER
+        doc.setFillColor(colorBackground);
+        doc.rect(0, 0, pageWidth, 70, 'F');
         doc.setFontSize(22);
-        doc.text(pkg.name, 10, 10);
-        doc.setFontSize(16);
-        doc.text(`Package Type: ${pkg.packageType}`, 10, 20);
-        doc.text(`Price: ${pkg.investment} LKR`, 10, 30);
-        doc.text('Services Included:', 10, 40);
-        pkg.servicesIncluded.forEach((service, index) => {
-            doc.text(`${index + 1}. ${service}`, 10, 50 + (index * 10));
+        doc.setTextColor(colorText);
+        doc.setFont('helvetica', 'bold');
+        doc.text('PhotoStudio', 40, 45);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(colorAccent);
+        doc.text('Package Details', 40, 62);
+        doc.setDrawColor(colorBorder);
+        doc.setLineWidth(1);
+        doc.line(40, 75, pageWidth - 40, 75);
+
+        // MAIN CONTENT BACKGROUND
+        const contentTop = 95;
+        const contentHeight = pageHeight - 180;
+        doc.setFillColor(colorSurface);
+        doc.roundedRect(30, contentTop, pageWidth - 60, contentHeight, 16, 16, 'F');
+
+        // BODY
+        let y = contentTop + 35;
+        const left = 60;
+        doc.setFontSize(18);
+        doc.setTextColor(colorText);
+        doc.setFont('helvetica', 'bold');
+        doc.text(pkg.name, left, y);
+        y += 28;
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(colorAccent);
+        doc.text(pkg.packageType, left, y);
+        doc.setTextColor(colorText);
+        doc.text(`${pkg.investment.toLocaleString()} LKR`, pageWidth - left, y, { align: 'right' });
+        y += 18;
+
+        // Services Included
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.setTextColor(colorAccent);
+        doc.text('Services Included', left, y);
+        y += 20;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(colorText);
+        pkg.servicesIncluded.forEach((service, idx) => {
+            doc.text(`• ${service}`, left + 15, y);
+            y += 18;
         });
+        y += 18;
 
-        let yOffset = 50 + (pkg.servicesIncluded.length || 0) * 10;
-        doc.text('Additional Items:', 10, yOffset);
-        yOffset += 10;
-
-        doc.text(`Edited Images: ${pkg.additionalItems.editedImages || 'N/A'}`, 10, yOffset);
-        yOffset += 10;
-        doc.text(`Unedited Images: ${pkg.additionalItems.uneditedImages || 'N/A'}`, 10, yOffset);
-        yOffset += 10;
-
-        if (pkg.additionalItems.albums) {
-            doc.text('Albums:', 10, yOffset);
-            yOffset += 10;
-            pkg.additionalItems.albums.forEach((album, index) => {
-                doc.text(`${index + 1}. Size: ${album.size}, Type: ${album.type}, Spread Count: ${album.spreadCount}`, 10, yOffset);
-                yOffset += 10;
+        // Additional Items
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.setTextColor(colorAccent);
+        doc.text('Additional Items', left, y);
+        y += 20;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(colorText);
+        if (pkg.additionalItems.editedImages)
+            doc.text(`Edited Images: ${pkg.additionalItems.editedImages}`, left + 15, y), y += 18;
+        if (pkg.additionalItems.uneditedImages)
+            doc.text(`Unedited Images: ${pkg.additionalItems.uneditedImages}`, left + 15, y), y += 18;
+        if (pkg.additionalItems.thankYouCards)
+            doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards}`, left + 15, y), y += 18;
+        if (pkg.additionalItems.albums && pkg.additionalItems.albums.length > 0) {
+            pkg.additionalItems.albums.forEach((album, idx) => {
+                doc.text(`Album: ${album.size}, ${album.type}, ${album.spreadCount} spreads`, left + 15, y);
+                y += 18;
+            });
+        }
+        if (pkg.additionalItems.framedPortraits && pkg.additionalItems.framedPortraits.length > 0) {
+            pkg.additionalItems.framedPortraits.forEach((portrait, idx) => {
+                doc.text(`Framed Portrait: ${portrait.size}, Quantity: ${portrait.quantity}`, left + 15, y);
+                y += 18;
             });
         }
 
-        if (pkg.additionalItems.framedPortraits) {
-            doc.text('Framed Portraits:', 10, yOffset);
-            yOffset += 10;
-            pkg.additionalItems.framedPortraits.forEach((portrait, index) => {
-                doc.text(`${index + 1}. Size: ${portrait.size}, Quantity: ${portrait.quantity}`, 10, yOffset);
-                yOffset += 10;
-            });
-        }
+        // FOOTER
+        doc.setFillColor(colorSurface);
+        doc.rect(0, pageHeight - 50, pageWidth, 50, 'F');
+        doc.setFontSize(10);
+        doc.setTextColor(colorText);
+        doc.text('Contact: info@photostudio.com | +94 77 123 4567 | www.photostudio.com', 40, pageHeight - 25);
+        doc.setFontSize(9);
+        doc.setTextColor(colorAccent);
+        doc.text('Capturing Moments, Creating Memories', 40, pageHeight - 10);
 
-        doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards || 'N/A'}`, 10, yOffset);
-
-        // Save PDF
         doc.save(`${pkg.name || 'custom-package'}.pdf`);
     };
 
@@ -234,6 +293,13 @@ const CustomerDashboard = () => {
                                 >
                                     <PencilIcon className="w-5 h-5" />
                                     Customize
+                                </button>
+                                <button
+                                    onClick={() => handleDownloadPDF(pkg)}
+                                    className={styles.downloadButton}
+                                    aria-label="Download PDF"
+                                >
+                                    <DocumentArrowDownIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
