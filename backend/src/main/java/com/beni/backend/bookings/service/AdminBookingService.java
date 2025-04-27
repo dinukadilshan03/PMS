@@ -47,14 +47,10 @@ public class AdminBookingService {
         return bookingRepository.save(existingBooking);
     }
 
-    // Delete a booking by ID (only if the status is "cancelled" or manually cancelled)
+    // Delete a booking by ID
     public String deleteBooking(String id) {
         Booking booking = getBookingById(id);
-        if ("cancelled".equals(booking.getBookingStatus()) || "cancelled".equals(booking.getPaymentStatus())) {
-            bookingRepository.deleteById(id);
-            return "Booking deleted successfully";
-        } else {
-            return "Booking cannot be deleted as it is not cancelled";
-        }
+        bookingRepository.deleteById(id);
+        return "Booking deleted successfully";
     }
 }

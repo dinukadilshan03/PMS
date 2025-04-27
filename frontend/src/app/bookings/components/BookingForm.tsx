@@ -1,18 +1,86 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { 
+    Dialog, 
+    DialogTitle, 
+    DialogContent, 
+    DialogActions, 
+    Button,
+    Typography
+} from '@mui/material';
+import PackageDetails from "./PackageDetails";
+
+const SRI_LANKAN_CITIES = [
+    { name: "Colombo", multiplier: 1.0 },
+    { name: "Gampaha", multiplier: 1.1 },
+    { name: "Kalutara", multiplier: 1.2 },
+    { name: "Kandy", multiplier: 1.3 },
+    { name: "Galle", multiplier: 1.4 },
+    { name: "Matara", multiplier: 1.5 },
+    { name: "Negombo", multiplier: 1.1 },
+    { name: "Anuradhapura", multiplier: 1.6 },
+    { name: "Jaffna", multiplier: 1.8 },
+    { name: "Trincomalee", multiplier: 1.7 },
+    { name: "Batticaloa", multiplier: 1.7 },
+    { name: "Ratnapura", multiplier: 1.4 },
+    { name: "Badulla", multiplier: 1.5 },
+    { name: "Kurunegala", multiplier: 1.3 },
+    { name: "Puttalam", multiplier: 1.4 }
+];
+
+interface Package {
+    id: string;
+    name: string;
+    investment: number;
+    packageType: string;
+    servicesIncluded: string[];
+    additionalItems: {
+        editedImages: number;
+        uneditedImages: number;
+        albums?: Array<{
+            size: string;
+            type: string;
+            spreadCount: number;
+        }>;
+        framedPortraits?: Array<{
+            size: string;
+            quantity: number;
+        }>;
+        thankYouCards?: number;
+    };
+}
+
+interface FormData {
+    email: string;
+    phoneNumber: string;
+    location: string;
+    selectedPackage: string;
+    dateTime: string;
+    calculatedPrice: number;
+}
+
+interface FormErrors {
+    email: string;
+    phoneNumber: string;
+    location: string;
+    selectedPackage: string;
+    dateTime: string;
+    form: string;
+}
 
 const CreateBookingForm = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         email: "",
         phoneNumber: "",
         location: "",
         selectedPackage: "",
-        dateTime: ""
+        dateTime: "",
+        calculatedPrice: 0
     });
-    const [errors, setErrors] = useState({
+    const [errors, setErrors] = useState<FormErrors>({
         email: "",
         phoneNumber: "",
         location: "",
@@ -20,10 +88,19 @@ const CreateBookingForm = () => {
         dateTime: "",
         form: ""
     });
-    const [packages, setPackages] = useState<{id: string, name: string, investment: number, packageType: string, servicesIncluded: string[], additionalItems: any}[]>([]);
+    const [packages, setPackages] = useState<Package[]>([]);
     const [loading, setLoading] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [limitDialog, setLimitDialog] = useState<{
+        open: boolean;
+        title: string;
+        message: string;
+    }>({
+        open: false,
+        title: '',
+        message: ''
+    });
 
     // Fetch packages from backend
     useEffect(() => {
@@ -65,7 +142,7 @@ const CreateBookingForm = () => {
     }, [formData]);
 
     const validateForm = () => {
-        const newErrors = {
+        const newErrors: FormErrors = {
             email: "",
             phoneNumber: "",
             location: "",
@@ -126,32 +203,55 @@ const CreateBookingForm = () => {
         );
     };
 
+    const calculateTotalPrice = (packagePrice: number, location: string) => {
+        if (!location) return packagePrice;
+        const city = SRI_LANKAN_CITIES.find(city => city.name === location);
+        if (!city) return packagePrice;
+        return Math.round(packagePrice * city.multiplier);
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [id]: value
-        }));
+        setFormData(prev => {
+            const newData = {
+                ...prev,
+                [id]: value
+            };
+            
+            // Calculate new price if package or location changes
+            if (id === 'selectedPackage' || id === 'location') {
+                const selectedPackage = packages.find(pkg => pkg.name === (id === 'selectedPackage' ? value : prev.selectedPackage));
+                if (selectedPackage) {
+                    newData.calculatedPrice = calculateTotalPrice(
+                        selectedPackage.investment,
+                        id === 'location' ? value : prev.location
+                    );
+                }
+            }
+            
+            return newData;
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!isFormValid) {
-            setErrors(prev => ({
-                ...prev,
-                form: "Please fix all errors before submitting"
-            }));
+            setLimitDialog({
+                open: true,
+                title: 'Form Validation Error',
+                message: 'Please fix all errors before submitting'
+            });
             return;
         }
 
-        // Retrieve userId from sessionStorage
         const userId = sessionStorage.getItem("userId");
         if (!userId) {
-            setErrors(prev => ({
-                ...prev,
-                form: "You must be logged in to make a booking"
-            }));
+            setLimitDialog({
+                open: true,
+                title: 'Authentication Error',
+                message: 'You must be logged in to make a booking'
+            });
             return;
         }
 
@@ -172,102 +272,46 @@ const CreateBookingForm = () => {
                     packageName: formData.selectedPackage,
                     dateTime: new Date(formData.dateTime).toISOString(),
                     clientId: userId,
+                    price: formData.calculatedPrice
                 }),
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Booking limit reached for this day");
+                let errorMessage = 'An error occurred while creating the booking';
+                try {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData;
+                    } else {
+                        errorMessage = await response.text();
+                    }
+                } catch (e) {
+                    console.error('Error parsing error response:', e);
+                }
+                setLimitDialog({
+                    open: true,
+                    title: 'Booking Error',
+                    message: errorMessage
+                });
+                return;
             }
 
-            // Redirect to bookings page with success message
             router.push("/bookings?success=true");
 
         } catch (err) {
             const errorMessage = err instanceof Error
-                ? `Error creating booking: ${err.message}`
-                : "Error creating booking: An unknown error occurred";
-            setErrors(prev => ({
-                ...prev,
-                form: errorMessage
-            }));
+                ? err.message
+                : "An unknown error occurred";
+            setLimitDialog({
+                open: true,
+                title: 'Error',
+                message: `Error creating booking: ${errorMessage}`
+            });
             console.error(err);
         } finally {
             setLoading(false);
         }
-    };
-
-    const PackageDetails = ({ selectedPackage }: { selectedPackage: any }) => {
-        if (!selectedPackage) return null;
-        
-        return (
-            <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Price:</span>
-                    <span className="font-medium text-gray-900">{selectedPackage.investment} LKR</span>
-                </div>
-                <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Type:</span>
-                    <span className="font-medium text-gray-900">{selectedPackage.packageType}</span>
-                </div>
-                
-                <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Services Included:</h4>
-                    <ul className="list-disc pl-5 space-y-1">
-                        {selectedPackage.servicesIncluded.map((service: string, index: number) => (
-                            <li key={index} className="text-gray-600">{service}</li>
-                        ))}
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Additional Items:</h4>
-                    <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">Edited Images:</span>
-                            <span className="font-medium text-gray-900">{selectedPackage.additionalItems.editedImages}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">Unedited Images:</span>
-                            <span className="font-medium text-gray-900">{selectedPackage.additionalItems.uneditedImages}</span>
-                        </div>
-                        
-                        {selectedPackage.additionalItems.albums && selectedPackage.additionalItems.albums.length > 0 && (
-                            <div>
-                                <h5 className="text-sm font-medium text-gray-700 mb-1">Albums:</h5>
-                                <ul className="list-disc pl-5 space-y-1">
-                                    {selectedPackage.additionalItems.albums.map((album: any, index: number) => (
-                                        <li key={index} className="text-gray-600">
-                                            {album.size} {album.type} (Spread Count: {album.spreadCount})
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        {selectedPackage.additionalItems.framedPortraits && selectedPackage.additionalItems.framedPortraits.length > 0 && (
-                            <div>
-                                <h5 className="text-sm font-medium text-gray-700 mb-1">Framed Portraits:</h5>
-                                <ul className="list-disc pl-5 space-y-1">
-                                    {selectedPackage.additionalItems.framedPortraits.map((portrait: any, index: number) => (
-                                        <li key={index} className="text-gray-600">
-                                            {portrait.size} (Quantity: {portrait.quantity})
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        {selectedPackage.additionalItems.thankYouCards && (
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Thank You Cards:</span>
-                                <span className="font-medium text-gray-900">{selectedPackage.additionalItems.thankYouCards}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        );
     };
 
     return (
@@ -278,30 +322,67 @@ const CreateBookingForm = () => {
                 </div>
             ) : (
                 <>
-                    {(errors.form || Object.values(errors).some(error => error)) && (
-                        <div className="rounded-md bg-red-50 p-4">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-red-800">Form Errors</h3>
-                                    <div className="mt-2 text-sm text-red-700">
-                                        {errors.form && <p className="font-medium">{errors.form}</p>}
-                                        <ul className="list-disc pl-5 space-y-1 mt-1">
-                                            {errors.email && <li>{errors.email}</li>}
-                                            {errors.phoneNumber && <li>{errors.phoneNumber}</li>}
-                                            {errors.location && <li>{errors.location}</li>}
-                                            {errors.selectedPackage && <li>{errors.selectedPackage}</li>}
-                                            {errors.dateTime && <li>{errors.dateTime}</li>}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    <Dialog
+                        open={limitDialog.open}
+                        onClose={() => setLimitDialog(prev => ({ ...prev, open: false }))}
+                        PaperProps={{
+                            sx: {
+                                borderRadius: '12px',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                                maxWidth: '320px',
+                                width: '100%',
+                                mx: 2
+                            }
+                        }}
+                    >
+                        <DialogTitle sx={{ 
+                            fontWeight: 600,
+                            color: 'error.main',
+                            fontSize: '1.1rem',
+                            textAlign: 'center',
+                            py: 2
+                        }}>
+                            {limitDialog.title}
+                        </DialogTitle>
+                        <DialogContent sx={{ 
+                            py: 2,
+                            px: 3,
+                            textAlign: 'center'
+                        }}>
+                            <Typography variant="body1" sx={{ 
+                                color: 'text.secondary',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                fontSize: '0.95rem',
+                                lineHeight: 1.5
+                            }}>
+                                {limitDialog.message}
+                            </Typography>
+                        </DialogContent>
+                        <DialogActions sx={{ 
+                            px: 3,
+                            py: 2,
+                            justifyContent: 'center'
+                        }}>
+                            <Button 
+                                onClick={() => setLimitDialog(prev => ({ ...prev, open: false }))}
+                                variant="outlined"
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 500,
+                                    borderRadius: '8px',
+                                    borderColor: 'error.main',
+                                    color: 'error.main',
+                                    '&:hover': {
+                                        backgroundColor: 'error.light',
+                                        borderColor: 'error.main'
+                                    }
+                                }}
+                            >
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
                     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -360,15 +441,25 @@ const CreateBookingForm = () => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </div>
-                                    <input
-                                        type="text"
+                                    <select
                                         id="location"
                                         value={formData.location}
                                         onChange={handleChange}
-                                        className={`block w-full pl-10 pr-3 py-2 border ${errors.location ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
-                                        placeholder="Enter location"
+                                        className={`block w-full pl-10 pr-10 py-2 border ${errors.location ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md sm:text-sm`}
                                         required
-                                    />
+                                    >
+                                        <option value="">Select a location</option>
+                                        {SRI_LANKAN_CITIES.map((city) => (
+                                            <option key={city.name} value={city.name}>
+                                                {city.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
                                 </div>
                                 {errors.location && (
                                     <p className="mt-2 text-sm text-red-600">{errors.location}</p>
@@ -412,7 +503,7 @@ const CreateBookingForm = () => {
                                 <div className="sm:col-span-2">
                                     <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Package Details</h3>
-                                        <PackageDetails selectedPackage={packages.find(pkg => pkg.name === formData.selectedPackage)} />
+                                        <PackageDetails selectedPackage={packages.find(pkg => pkg.name === formData.selectedPackage) || null} />
                                     </div>
                                 </div>
                             )}
@@ -440,6 +531,20 @@ const CreateBookingForm = () => {
                                 )}
                             </div>
                         </div>
+
+                        {formData.calculatedPrice > 0 && (
+                            <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-green-800 font-medium">Total Price:</span>
+                                    <span className="text-green-900 font-bold text-xl">{formData.calculatedPrice} LKR</span>
+                                </div>
+                                {formData.location && formData.selectedPackage && (
+                                    <p className="mt-2 text-sm text-green-700">
+                                        Price includes location adjustment for {formData.location}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <div className="pt-5">
                             <div className="flex justify-end">

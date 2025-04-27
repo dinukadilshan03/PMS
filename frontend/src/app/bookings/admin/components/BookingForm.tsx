@@ -22,10 +22,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ bookingId }) => {
                 const response = await axios.get(`http://localhost:8080/admin/bookings/${bookingId}`);
                 const booking = response.data;
                 setFormData({
-                    date: booking.date.split("T")[0],
-                    time: booking.time,
-                    status: booking.status,
-                    paymentStatus: booking.paymentStatus
+                    date: booking.dateTime ? new Date(booking.dateTime).toISOString().split('T')[0] : "",
+                    time: booking.dateTime ? new Date(booking.dateTime).toTimeString().split(' ')[0] : "",
+                    status: booking.bookingStatus || "",
+                    paymentStatus: booking.paymentStatus || ""
                 });
             } catch (error) {
                 console.error("Error fetching booking:", error);
@@ -38,8 +38,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ bookingId }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:8080/admin/bookings/${bookingId}`, formData);
-            router.push("/admin/bookings");
+            const dateTime = new Date(`${formData.date}T${formData.time}`);
+            const updatedBooking = {
+                dateTime: dateTime.toISOString(),
+                bookingStatus: formData.status,
+                paymentStatus: formData.paymentStatus
+            };
+            
+            await axios.put(`http://localhost:8080/admin/bookings/${bookingId}`, updatedBooking);
+            router.push("/bookings/admin");
         } catch (error) {
             console.error("Error updating booking:", error);
         }

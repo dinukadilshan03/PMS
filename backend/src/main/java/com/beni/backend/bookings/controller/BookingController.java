@@ -48,6 +48,12 @@ public class BookingController {
             return ResponseEntity.status(400).body("User ID is required");
         }
 
+        // Validate price
+        if (booking.getPrice() <= 0) {
+            logger.warn("Invalid price provided: {}", booking.getPrice());
+            return ResponseEntity.badRequest().body("Price must be greater than 0");
+        }
+
         try {
             // Set the clientId for the booking
             booking.setClientId(clientId);
@@ -140,16 +146,9 @@ public class BookingController {
         logger.info("Received cancel request for booking: {}", bookingId);
 
         try {
-            Booking booking = bookingService.getBookingById(bookingId);
-            if (booking == null) {
-                logger.warn("Booking not found: {}", bookingId);
-                return ResponseEntity.status(404).body("Booking not found");
-            }
-
-            booking.setBookingStatus("Cancelled");
-            Booking updatedBooking = bookingService.saveBooking(booking);
+            Booking cancelledBooking = bookingService.cancelBooking(bookingId);
             logger.info("Successfully cancelled booking: {}", bookingId);
-            return ResponseEntity.ok(updatedBooking);
+            return ResponseEntity.ok(cancelledBooking);
         } catch (Exception e) {
             logger.error("Error cancelling booking: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error cancelling booking: " + e.getMessage());
