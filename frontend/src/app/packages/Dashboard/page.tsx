@@ -19,6 +19,7 @@ import {
     ShoppingCartIcon
 } from "@heroicons/react/20/solid";
 import Chatbot from '@/app/components/Chatbot';
+import WishlistButton from '../../../components/WishlistButton';
 
 const CustomerDashboard = () => {
     const [packages, setPackages] = useState<Package[]>([]);
@@ -222,8 +223,18 @@ const CustomerDashboard = () => {
 
             <div className={styles.packageList}>
                 {filteredPackages.map((pkg) => (
-                    <div key={pkg.id} className={styles.packageCard}>
+                    <div key={pkg.id} className={styles.packageCard} style={{ position: 'relative' }}>
                         <div className={styles.packageCardContent}>
+                            {/* Wishlist Button in top right */}
+                            <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 2 }}>
+                                <WishlistButton
+                                    packageId={pkg.id}
+                                    packageType={pkg.packageType}
+                                    packageName={pkg.name}
+                                    price={pkg.investment}
+                                    imageUrl={pkg.image}
+                                />
+                            </div>
                             <CameraIcon className={styles.packageIcon} />
                             <h2 className={styles.packageTitle}>{pkg.name}</h2>
                             <div className={styles.packageType}>{pkg.packageType}</div>
