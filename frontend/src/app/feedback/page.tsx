@@ -14,9 +14,21 @@ interface Feedback {
     createdAt: string;
     updatedAt: string;
     isActive: boolean;
+    reply?: string;
 }
 
 const API_BASE_URL = 'http://localhost:8080';
+
+// Function to generate automatic reply based on rating and content
+function generateReply(rating: number, content: string): string {
+    if (rating >= 4) {
+        return "Thank you for your positive feedback! We're glad you enjoyed our service.";
+    } else if (rating === 3) {
+        return "Thank you for your feedback. We appreciate your suggestions and will strive to improve.";
+    } else {
+        return "We're sorry to hear about your experience. We value your feedback and will work to address your concerns.";
+    }
+}
 
 export default function FeedbackPage() {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -97,7 +109,6 @@ export default function FeedbackPage() {
             return;
         }
 
-
         try {
             setLoading(true);
             const url = editingId
@@ -106,12 +117,15 @@ export default function FeedbackPage() {
 
             const method = editingId ? 'PUT' : 'POST';
 
+            // Generate reply based on rating and content
+            const reply = generateReply(formData.rating, formData.content);
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...formData, reply }),
             });
 
             if (!response.ok) throw new Error(`Failed to ${editingId ? 'update' : 'create'} feedback`);
@@ -336,6 +350,11 @@ export default function FeedbackPage() {
                                         {'★'.repeat(feedback.rating)}{'☆'.repeat(5 - feedback.rating)}
                                     </div>
                                     <p className="mt-1">{feedback.content}</p>
+                                    {(feedback.reply || generateReply(feedback.rating, feedback.content)) && (
+                                        <div className="bg-gray-50 border-l-4 border-blue-400 p-2 mt-2">
+                                            <strong>Reply:</strong> {feedback.reply || generateReply(feedback.rating, feedback.content)}
+                                        </div>
+                                    )}
                                     <p className="text-xs text-gray-500 mt-2">
                                         Created: {new Date(feedback.createdAt).toLocaleString()}
                                     </p>
