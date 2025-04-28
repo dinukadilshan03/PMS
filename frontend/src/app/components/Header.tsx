@@ -29,9 +29,11 @@ const Header = () => {
 
         checkLoginStatus();
         window.addEventListener('storage', checkLoginStatus);
+        window.addEventListener('loginStateChange', checkLoginStatus);
         
         return () => {
             window.removeEventListener('storage', checkLoginStatus);
+            window.removeEventListener('loginStateChange', checkLoginStatus);
         };
     }, []);
 
@@ -44,23 +46,30 @@ const Header = () => {
     };
 
     const handleEmailClick = async () => {
-        try {
-            // Search for staff by email
-            const response = await fetch(`http://localhost:8080/api/staff/search?email=${encodeURIComponent(email)}`);
-            if (!response.ok) {
-                throw new Error('Failed to find staff profile');
+        const role = sessionStorage.getItem('role');
+        const userId = sessionStorage.getItem('userId');
+        
+        if (role === 'CUSTOMER' && userId) {
+            router.push(`/UserProfile/profile`);
+        } else {
+            try {
+                // Search for staff by email
+                const response = await fetch(`http://localhost:8080/api/staff/search?email=${encodeURIComponent(email)}`);
+                if (!response.ok) {
+                    throw new Error('Failed to find staff profile');
+                }
+                
+                const staffData = await response.json();
+                if (staffData && staffData.id) {
+                    // Navigate to staff profile page
+                    router.push(`/staff/staffprofile/${staffData.id}`);
+                    setIsProfileMenuOpen(false);
+                } else {
+                    console.error('Staff profile not found');
+                }
+            } catch (error) {
+                console.error('Error fetching staff profile:', error);
             }
-            
-            const staffData = await response.json();
-            if (staffData && staffData.id) {
-                // Navigate to staff profile page
-                router.push(`/staff/staffprofile/${staffData.id}`);
-                setIsProfileMenuOpen(false);
-            } else {
-                console.error('Staff profile not found');
-            }
-        } catch (error) {
-            console.error('Error fetching staff profile:', error);
         }
     };
 

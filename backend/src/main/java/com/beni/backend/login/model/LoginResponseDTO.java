@@ -9,12 +9,14 @@ public class LoginResponseDTO {
 
     private String userId;
     private String role;
+    private String email;
     private String message;
 
     // Constructor for success response
-    public LoginResponseDTO(String userId, String role) {
+    public LoginResponseDTO(String userId, String role, String email) {
         this.userId = userId;
         this.role = role;
+        this.email = email;
     }
 
     // Constructor for error response (e.g., invalid credentials)
@@ -37,6 +39,14 @@ public class LoginResponseDTO {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getMessage() {

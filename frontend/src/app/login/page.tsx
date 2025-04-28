@@ -41,7 +41,10 @@ export default function LoginPage() {
             // Store user data in session storage
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('role', data.role);
-            sessionStorage.setItem('email', email); // Store full email
+            sessionStorage.setItem('email', data.email); // Store email from response
+
+            // Dispatch custom event for login state change
+            window.dispatchEvent(new Event('loginStateChange'));
 
             router.push('/');
         } catch (err) {
