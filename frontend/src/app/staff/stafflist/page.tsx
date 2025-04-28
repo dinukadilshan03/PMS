@@ -93,9 +93,9 @@ const AdminStaffList: React.FC = () => {
                 <span className={staff.availability ? "text-green-600" : "text-red-600"}>
                     {staff.availability ? "Active" : "InActive"}
                 </span>
-                {staff.availabilityDate && (
+                {staff.availabilityStartDate && staff.availabilityEndDate && (
                     <span className="text-xs text-gray-500">
-                        {formatDate(staff.availabilityDate)}
+                        {formatDate(staff.availabilityStartDate)} - {formatDate(staff.availabilityEndDate)}
                     </span>
                 )}
             </div>

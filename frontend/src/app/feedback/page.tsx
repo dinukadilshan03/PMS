@@ -16,6 +16,11 @@ interface Feedback {
     isActive: boolean;
 }
 
+interface Package {
+    id: string;
+    name: string;
+}
+
 const API_BASE_URL = 'http://localhost:8080';
 
 export default function FeedbackPage() {
@@ -32,6 +37,36 @@ export default function FeedbackPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [selectedPackage, setSelectedPackage] = useState('');
+    const [packages, setPackages] = useState<Package[]>([]);
+
+    // Auto-fill form data from sessionStorage
+    useEffect(() => {
+        const userEmail = sessionStorage.getItem('email');
+        const userRole = sessionStorage.getItem('role');
+        
+        if (userEmail) {
+            setFormData(prev => ({
+                ...prev,
+                clientEmail: userEmail,
+                clientName: userRole || 'User' // Use role as name if available, otherwise 'User'
+            }));
+        }
+    }, []);
+
+    // Fetch packages from backend
+    useEffect(() => {
+        const fetchPackages = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/api/packages');
+                if (!response.ok) throw new Error('Failed to fetch packages');
+                const data = await response.json();
+                setPackages(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch packages');
+            }
+        };
+        fetchPackages();
+    }, []);
 
     // Fetch all active feedbacks
     const fetchFeedbacks = async () => {
@@ -219,10 +254,11 @@ export default function FeedbackPage() {
                             required
                         >
                             <option value="">Select a package</option>
-                            <option value="basic">Basic Package</option>
-                            <option value="standard">Standard Package</option>
-                            <option value="premium">Premium Package</option>
-                            <option value="enterprise">Enterprise Package</option>
+                            {packages.map((pkg) => (
+                                <option key={pkg.id} value={pkg.name}>
+                                    {pkg.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -294,10 +330,11 @@ export default function FeedbackPage() {
                         className="p-2 border rounded"
                     >
                         <option value="">All Packages</option>
-                        <option value="basic">Basic Package</option>
-                        <option value="standard">Standard Package</option>
-                        <option value="premium">Premium Package</option>
-                        <option value="enterprise">Enterprise Package</option>
+                        {packages.map((pkg) => (
+                            <option key={pkg.id} value={pkg.name}>
+                                {pkg.name}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 {loading && feedbacks.length === 0 ? (

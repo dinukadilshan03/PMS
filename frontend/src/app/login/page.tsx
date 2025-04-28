@@ -27,7 +27,7 @@ export default function LoginPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
-                credentials: 'include' //added
+                credentials: 'include'
             });
 
             if (!res.ok) {
@@ -35,15 +35,15 @@ export default function LoginPage() {
                 return;
             }
 
-            const data = await res.json();  // Parse the JSON response
-            console.log('Login successful:', data);  // Log the response to inspect it
+            const data = await res.json();
+            console.log('Login successful:', data);
 
-            // Use sessionStorage instead of localStorage
+            // Store user data in session storage
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('role', data.role);
+            sessionStorage.setItem('email', email); // Store full email
 
-            router.push('/'); // Navigate to home page after login
-
+            router.push('/');
         } catch (err) {
             setError('Something went wrong');
             console.log(err);

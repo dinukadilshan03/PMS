@@ -2,6 +2,8 @@ package com.beni.backend.staff.service;
 
 import com.beni.backend.staff.model.Staff;
 import com.beni.backend.staff.repository.StaffRepository;
+import com.beni.backend.login.model.User;
+import com.beni.backend.login.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,9 @@ public class StaffService {
     @Autowired
     private StaffRepository staffRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     // Get all staff (Admin can view all staff)
     public List<Staff> getAllStaff() {
         return staffRepository.findAll();
@@ -24,10 +29,25 @@ public class StaffService {
         return staffRepository.findById(id);
     }
 
+    // Find staff by email
+    public Staff findByEmail(String email) {
+        return staffRepository.findByEmail(email);
+    }
+
     // Add new staff member (Admin can add staff)
     public Staff addStaff(Staff staff) {
         try {
-            return staffRepository.save(staff); // Save the staff object with the updated availabilityDate field
+            // First create the user account
+            User user = new User();
+            user.setName(staff.getName());
+            user.setEmail(staff.getEmail());
+            user.setPassword(staff.getPassword()); // Password should be hashed in production
+            user.setRole("staff");
+            user.setContactNumber(staff.getPhone());
+            userRepository.save(user);
+
+            // Then save the staff member
+            return staffRepository.save(staff);
         } catch (Exception e) {
             throw new RuntimeException("Error adding staff", e);
         }
@@ -43,8 +63,9 @@ public class StaffService {
             staff.setExperience(updatedStaff.getExperience());
             staff.setHourlyRate(updatedStaff.getHourlyRate());
             staff.setSpecialization(updatedStaff.getSpecialization());
-            staff.setAvailability(updatedStaff.isAvailability()); // Update availability (boolean)
-            staff.setAvailabilityDate(updatedStaff.getAvailabilityDate()); // Update availabilityDate
+            staff.setAvailability(updatedStaff.isAvailability());
+            staff.setAvailabilityStartDate(updatedStaff.getAvailabilityStartDate());
+            staff.setAvailabilityEndDate(updatedStaff.getAvailabilityEndDate());
             return staffRepository.save(staff);
         }).orElse(null);
     }

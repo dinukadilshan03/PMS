@@ -29,6 +29,12 @@ public class StaffController {
         return staffService.getStaffById(id);
     }
 
+    // Search staff by email
+    @GetMapping("/search")
+    public Staff searchStaffByEmail(@RequestParam String email) {
+        return staffService.findByEmail(email);
+    }
+
     // Admin: Add a new staff member (including name, email, phone, address, experience, hourly rate, specialization, availability, and availabilityDate)
     @PostMapping
     public Staff addStaff(@RequestBody Staff staff) {
@@ -60,15 +66,15 @@ public class StaffController {
         return staffService.updateAvailability(id, request.get("availability"));
     }
 
-    // Assign staff to a booking
-    @PutMapping("/{id}/assign")
+    // Admin: Assign staff to a booking
+    @PutMapping("/assign/{id}")
     public Staff assignToBooking(@PathVariable String id, @RequestBody Map<String, String> request) {
         String bookingId = request.get("bookingId");
         return staffService.assignToBooking(id, bookingId);
     }
 
-    // Unassign staff from a booking
-    @PutMapping("/{id}/unassign")
+    // Admin: Unassign staff from a booking
+    @PutMapping("/unassign/{id}")
     public Staff unassignFromBooking(@PathVariable String id) {
         return staffService.unassignFromBooking(id);
     }

@@ -191,14 +191,29 @@ const UpdateStaffPage: React.FC = () => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-700">Availability Date:</label>
-                    <input
-                        type="date"
-                        name="availabilityDate"
-                        value={staffData.availabilityDate || ""}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
-                    />
+                    <label className="block text-xs font-medium text-gray-700">Availability Range:</label>
+                    <div className="flex gap-2">
+                        <div className="flex-1">
+                            <label className="block text-xs text-gray-600">From</label>
+                            <input
+                                type="date"
+                                name="availabilityStartDate"
+                                value={staffData.availabilityStartDate ? staffData.availabilityStartDate.split('T')[0] : ""}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-xs text-gray-600">To</label>
+                            <input
+                                type="date"
+                                name="availabilityEndDate"
+                                value={staffData.availabilityEndDate ? staffData.availabilityEndDate.split('T')[0] : ""}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <button

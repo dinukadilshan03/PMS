@@ -8,12 +8,23 @@ const Header = () => {
     const pathname = usePathname();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const [email, setEmail] = useState('');
 
     useEffect(() => {
         // Check login status on mount and when storage changes
         const checkLoginStatus = () => {
             const userId = sessionStorage.getItem('userId');
+            const userEmail = sessionStorage.getItem('email');
+            const role = sessionStorage.getItem('role');
+            
+            console.log('Session Storage Values:');
+            console.log('User ID:', userId);
+            console.log('Email:', userEmail);
+            console.log('Role:', role);
+            
             setIsLoggedIn(!!userId);
+            setEmail(userEmail || '');
         };
 
         checkLoginStatus();
@@ -25,9 +36,32 @@ const Header = () => {
     }, []);
 
     const handleLogout = () => {
+        console.log('Logging out user:', email);
         sessionStorage.clear();
         setIsLoggedIn(false);
+        setIsProfileMenuOpen(false);
         router.push('/');
+    };
+
+    const handleEmailClick = async () => {
+        try {
+            // Search for staff by email
+            const response = await fetch(`http://localhost:8080/api/staff/search?email=${encodeURIComponent(email)}`);
+            if (!response.ok) {
+                throw new Error('Failed to find staff profile');
+            }
+            
+            const staffData = await response.json();
+            if (staffData && staffData.id) {
+                // Navigate to staff profile page
+                router.push(`/staff/staffprofile/${staffData.id}`);
+                setIsProfileMenuOpen(false);
+            } else {
+                console.error('Staff profile not found');
+            }
+        } catch (error) {
+            console.error('Error fetching staff profile:', error);
+        }
     };
 
     const navigation = [
@@ -36,7 +70,7 @@ const Header = () => {
         { name: 'Portfolio', href: '/Album-Portfolio/portfolio/pages/user/' },
         { name: 'Albums', href: '/Album-Portfolio/album/pages/user/' },
         { name: 'Packages', href: '/packages/Dashboard' },
-        { name: 'Testimonials', href: '/testimonials' },
+        { name: 'Testimonials', href: '/feedback' },
         { name: 'Wishlist', href: '/wishlist' },
     ];
 
@@ -69,13 +103,37 @@ const Header = () => {
                                     {item.name}
                                 </Link>
                             ))}
+                            
                             {isLoggedIn ? (
-                                <button
-                                    onClick={handleLogout}
-                                    className="inline-flex items-center justify-center px-4 py-2 border border-red-500 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition duration-150"
-                                >
-                                    Sign Out
-                                </button>
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                                        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300 hover:border-gray-400 transition-colors duration-200">
+                                            <span className="text-lg font-semibold text-gray-700">
+                                                {email.charAt(0).toUpperCase()}
+                                            </span>
+                                        </div>
+                                    </button>
+                                    
+                                    {isProfileMenuOpen && (
+                                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+                                            <div 
+                                                onClick={handleEmailClick}
+                                                className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+                                            >
+                                                {email}
+                                            </div>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            >
+                                                Sign Out
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 <button
                                     onClick={() => router.push('/login')}
@@ -125,16 +183,30 @@ const Header = () => {
                                         {item.name}
                                     </Link>
                                 ))}
+                                
                                 {isLoggedIn ? (
-                                    <button
-                                        onClick={() => {
-                                            handleLogout();
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                        Sign Out
-                                    </button>
+                                    <div className="px-3 py-2">
+                                        <div 
+                                            onClick={handleEmailClick}
+                                            className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+                                        >
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                                                <span className="text-lg font-semibold text-gray-700">
+                                                    {email.charAt(0).toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <span className="text-base font-medium text-gray-700">{email}</span>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                handleLogout();
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className="mt-2 block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+                                        >
+                                            Sign Out
+                                        </button>
+                                    </div>
                                 ) : (
                                     <button
                                         onClick={() => {
