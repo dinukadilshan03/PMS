@@ -24,7 +24,7 @@ public class AuthenticationController {
 
         if (user != null && user.getPassword().equals(loginDTO.getPassword())) {
             session.setAttribute("userId", user.getId()); // Store the userId in session
-            LoginResponseDTO response = new LoginResponseDTO(user.getId(), user.getRole());
+            LoginResponseDTO response = new LoginResponseDTO(user.getId(), user.getRole(), user.getEmail());
             return ResponseEntity.ok(response);
         }
 
