@@ -144,14 +144,29 @@ const StaffProfilePage: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-500 mb-1">Next Available Date</label>
-                                    <input
-                                        type="date"
-                                        name="availabilityDate"
-                                        value={staffData.availabilityDate ? staffData.availabilityDate.split('T')[0] : ""}
-                                        onChange={handleChange}
-                                        className="w-full border-b border-gray-300 px-1 py-2 focus:border-blue-500 outline-none"
-                                    />
+                                    <label className="block text-sm font-medium text-gray-500 mb-1">Availability Range</label>
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <label className="block text-xs text-gray-600">From</label>
+                                            <input
+                                                type="date"
+                                                name="availabilityStartDate"
+                                                value={staffData.availabilityStartDate ? staffData.availabilityStartDate.split('T')[0] : ""}
+                                                onChange={handleChange}
+                                                className="w-full border-b border-gray-300 px-1 py-2 focus:border-blue-500 outline-none"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-xs text-gray-600">To</label>
+                                            <input
+                                                type="date"
+                                                name="availabilityEndDate"
+                                                value={staffData.availabilityEndDate ? staffData.availabilityEndDate.split('T')[0] : ""}
+                                                onChange={handleChange}
+                                                className="w-full border-b border-gray-300 px-1 py-2 focus:border-blue-500 outline-none"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -213,10 +228,12 @@ const StaffProfilePage: React.FC = () => {
                             </div>
 
                             <div className="mb-4">
-                                <p className="text-sm font-medium text-gray-500">Next Available Date</p>
+                                <p className="text-sm font-medium text-gray-500">Availability Range</p>
                                 <p className="text-lg">
-                                    {staffData.availabilityDate ?
-                                        new Date(staffData.availabilityDate).toLocaleDateString('en-US') :
+                                    {staffData.availabilityStartDate ?
+                                        new Date(staffData.availabilityStartDate).toLocaleDateString('en-US') :
+                                        "Not specified"} - {staffData.availabilityEndDate ?
+                                        new Date(staffData.availabilityEndDate).toLocaleDateString('en-US') :
                                         "Not specified"}
                                 </p>
                             </div>

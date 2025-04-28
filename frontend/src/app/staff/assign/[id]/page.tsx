@@ -44,9 +44,12 @@ const AssignStaffToBooking: React.FC<AssignStaffProps> = ({ params }) => {
     useEffect(() => {
         if (staff && bookings.length > 0) {
             const filtered = bookings.filter(booking => {
-                const bookingDate = new Date(booking.dateTime).toLocaleDateString();
-                const availabilityDate = new Date(staff.availabilityDate).toLocaleDateString();
-                return bookingDate === availabilityDate;
+                const bookingDate = new Date(booking.dateTime);
+                const startDate = new Date(staff.availabilityStartDate);
+                const endDate = new Date(staff.availabilityEndDate);
+                
+                // Check if booking date falls within staff's availability range
+                return bookingDate >= startDate && bookingDate <= endDate;
             });
 
             setFilteredBookings(filtered);

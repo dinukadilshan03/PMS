@@ -11,7 +11,9 @@ const AddStaffForm = () => {
     const [hourlyRate, setHourlyRate] = useState("");
     const [specialization, setSpecialization] = useState("");
     const [availability, setAvailability] = useState(true);
-    const [availabilityDate, setAvailabilityDate] = useState<string>(new Date().toISOString().split("T")[0]); // Default to today's date (in YYYY-MM-DD format)
+    const [availabilityStartDate, setAvailabilityStartDate] = useState<string>(new Date().toISOString().split("T")[0]);
+    const [availabilityEndDate, setAvailabilityEndDate] = useState<string>(new Date().toISOString().split("T")[0]);
+    const [password, setPassword] = useState("");
     const router = useRouter();
 
     // Validate form fields
@@ -44,6 +46,10 @@ const AddStaffForm = () => {
             alert("Specialization is required.");
             return false;
         }
+        if (!password.trim() || password.length < 6) {
+            alert("Password is required and must be at least 6 characters long.");
+            return false;
+        }
         return true;
     };
 
@@ -62,7 +68,9 @@ const AddStaffForm = () => {
             hourlyRate: parseFloat(hourlyRate),
             specialization,
             availability,
-            availabilityDate, // Add the availability date here
+            availabilityStartDate,
+            availabilityEndDate,
+            password,
         };
 
         try {
@@ -190,12 +198,39 @@ const AddStaffForm = () => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-700">Availability Date:</label>
+                    <label className="block text-xs font-medium text-gray-700">Availability Range:</label>
+                    <div className="flex gap-2">
+                        <div className="flex-1">
+                            <label className="block text-xs text-gray-600">From</label>
+                            <input
+                                type="date"
+                                value={availabilityStartDate}
+                                onChange={(e) => setAvailabilityStartDate(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-xs text-gray-600">To</label>
+                            <input
+                                type="date"
+                                value={availabilityEndDate}
+                                onChange={(e) => setAvailabilityEndDate(e.target.value)}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-medium text-gray-700">Password:</label>
                     <input
-                        type="date"
-                        value={availabilityDate}
-                        onChange={(e) => setAvailabilityDate(e.target.value)} // Now the user can edit the date
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-3 py-1 mt-1 text-xs"
+                        placeholder="Enter password"
+                        required
+                        minLength={6}
                     />
                 </div>
 

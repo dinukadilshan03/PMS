@@ -14,4 +14,7 @@ public interface StaffRepository extends MongoRepository<Staff, String> {
 
     // Find staff by specialization (e.g., Portraits, Weddings, Events)
     List<Staff> findBySpecialization(String specialization);
+
+    // Find staff by email
+    Staff findByEmail(String email);
 }

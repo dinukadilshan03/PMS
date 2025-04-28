@@ -24,8 +24,10 @@ public class Staff {
     private String checkOutTime;
     private Earnings earnings;
     private List<Rating> ratings;
-    private String availabilityDate;  // New field for storing the availability date (ISO 8601 format)
+    private String availabilityStartDate;  // Start date of availability range (ISO 8601 format)
+    private String availabilityEndDate;    // End date of availability range (ISO 8601 format)
     private String assignedBookingId; // ID of the booking this staff is assigned to
+    private String password; // Password for user account creation
 
     // Subclasses for Earnings and Ratings
     @Data
