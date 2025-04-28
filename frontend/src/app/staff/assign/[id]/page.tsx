@@ -1,45 +1,44 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Booking } from "@/app/bookings/types/booking";
 import { Staff } from "@/app/staff/types/staff";
 
-interface AssignStaffProps {
-    params: {
-        id: string;
-    };
-}
-
-const AssignStaffToBooking: React.FC<AssignStaffProps> = ({ params }) => {
+export default function AssignStaffToBooking() {
+    const [staff, setStaff] = useState<Staff | null>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
-    const [staff, setStaff] = useState<Staff | null>(null);
-    const [error, setError] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(true);
+    const [selectedBooking, setSelectedBooking] = useState<string>('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [showNoBookingsAlert, setShowNoBookingsAlert] = useState<boolean>(false);
     const router = useRouter();
+    const params = useParams();
+    const staffId = params.id as string;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch staff details
-                const staffResponse = await axios.get<Staff>(`http://localhost:8080/api/staff/${params.id}`);
-                setStaff(staffResponse.data);
+                const staffResponse = await fetch(`http://localhost:8080/api/staff/${staffId}`);
+                if (!staffResponse.ok) throw new Error('Failed to fetch staff');
+                const staffData = await staffResponse.json();
+                setStaff(staffData);
 
-                // Fetch all bookings
-                const bookingsResponse = await axios.get<Booking[]>("http://localhost:8080/admin/bookings");
-                setBookings(bookingsResponse.data);
+                const bookingsResponse = await fetch('http://localhost:8080/admin/bookings');
+                if (!bookingsResponse.ok) throw new Error('Failed to fetch bookings');
+                const bookingsData = await bookingsResponse.json();
+                setBookings(bookingsData);
             } catch (err) {
-                setError("Failed to fetch data");
-                console.error(err);
+                setError(err instanceof Error ? err.message : 'An error occurred');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchData();
-    }, [params.id]);
+        if (staffId) {
+            fetchData();
+        }
+    }, [staffId]);
 
     useEffect(() => {
         if (staff && bookings.length > 0) {
@@ -67,13 +66,21 @@ const AssignStaffToBooking: React.FC<AssignStaffProps> = ({ params }) => {
     const handleAssign = async (bookingId: string) => {
         try {
             // Update the staff's assigned booking
-            await axios.put(`http://localhost:8080/api/staff/${params.id}/assign`, {
-                bookingId
+            await fetch(`http://localhost:8080/api/staff/assign/${staffId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ bookingId })
             });
 
             // Update the booking's assigned staff
-            await axios.put(`http://localhost:8080/api/bookings/${bookingId}/assign`, {
-                staffId: params.id
+            await fetch(`http://localhost:8080/api/bookings/${bookingId}/assign`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ staffId })
             });
 
             alert("Staff assigned successfully!");
@@ -161,6 +168,4 @@ const AssignStaffToBooking: React.FC<AssignStaffProps> = ({ params }) => {
             </div>
         </div>
     );
-};
-
-export default AssignStaffToBooking;
+}
