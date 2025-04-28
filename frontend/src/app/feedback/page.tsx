@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Feedback {
     id: string;
@@ -51,6 +52,7 @@ export default function FeedbackPage() {
     const [selectedPackage, setSelectedPackage] = useState('');
     const [packages, setPackages] = useState<Package[]>([]);
     const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
+    const router = useRouter();
 
     // Auto-fill form data from sessionStorage
     useEffect(() => {
@@ -224,121 +226,20 @@ export default function FeedbackPage() {
 
     return (
         <div className="container mx-auto p-4 max-w-4xl">
-            <h1 className="text-3xl font-bold mb-8 text-center">Feedback Management</h1>
-
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-center">Feedback Management</h1>
+                <button
+                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                    onClick={() => router.push('/feedback/create')}
+                >
+                    Add Feedback
+                </button>
+            </div>
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {error}
                 </div>
             )}
-
-            {/* Feedback Form */}
-            <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h2 className="text-xl font-semibold mb-4">
-                    {editingId ? 'Edit Feedback' : 'Add New Feedback'}
-                </h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Name</label>
-                            <input
-                                type="text"
-                                name="clientName"
-                                value={formData.clientName}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Email</label>
-                            <input
-                                type="email"
-                                name="clientEmail"
-                                value={formData.clientEmail}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Package</label>
-                        <select
-                            name="packageName"
-                            value={formData.packageName}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded"
-                            required
-                        >
-                            <option value="">Select a package</option>
-                            {packages.map((pkg) => (
-                                <option key={pkg.id} value={pkg.name}>
-                                    {pkg.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Rating</label>
-                        <input
-                            type="range"
-                            name="rating"
-                            min="1"
-                            max="5"
-                            value={formData.rating}
-                            onChange={handleInputChange}
-                            className="w-full"
-                        />
-                        <div className="flex justify-between">
-                            <span>1 ★</span>
-                            <span>2 ★</span>
-                            <span>3 ★</span>
-                            <span>4 ★</span>
-                            <span>5 ★</span>
-                        </div>
-                        <div className="text-center mt-1">
-                            Current: {formData.rating} ★
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Feedback Content</label>
-                        <textarea
-                            name="content"
-                            value={formData.content}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded"
-                            rows={4}
-                            required
-                        />
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300"
-                        >
-                            {loading ? 'Processing...' : editingId ? 'Update Feedback' : 'Submit Feedback'}
-                        </button>
-
-                        {editingId && (
-                            <button
-                                type="button"
-                                onClick={resetForm}
-                                disabled={loading}
-                                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 disabled:bg-gray-300"
-                            >
-                                Cancel
-                            </button>
-                        )}
-                    </div>
-                </form>
-            </div>
-
             {/* Feedback List */}
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">

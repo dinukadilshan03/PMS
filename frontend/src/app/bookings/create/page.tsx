@@ -1,4 +1,4 @@
-// pages/bookings/create.tsx
+// pages/bookings/page.tsx
 import CreateBookingForm from '@/app/bookings/components/BookingForm';
 
 const CreateBookingPage = () => {
