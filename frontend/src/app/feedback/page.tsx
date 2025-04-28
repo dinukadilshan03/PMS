@@ -50,6 +50,7 @@ export default function FeedbackPage() {
     const [error, setError] = useState('');
     const [selectedPackage, setSelectedPackage] = useState('');
     const [packages, setPackages] = useState<Package[]>([]);
+    const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
 
     // Auto-fill form data from sessionStorage
     useEffect(() => {
@@ -101,6 +102,10 @@ export default function FeedbackPage() {
     useEffect(() => {
         fetchFeedbacks();
     }, [selectedPackage]);
+
+    useEffect(() => {
+        setLoggedInUserEmail(sessionStorage.getItem('email'));
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -366,20 +371,24 @@ export default function FeedbackPage() {
                                         <p className="text-sm text-gray-600">Package: {feedback.packageName}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => handleEdit(feedback)}
-                                            disabled={loading}
-                                            className="text-blue-600 hover:text-blue-800 text-sm disabled:text-blue-300"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(feedback.id)}
-                                            disabled={loading}
-                                            className="text-red-600 hover:text-red-800 text-sm disabled:text-red-300"
-                                        >
-                                            Delete
-                                        </button>
+                                        {loggedInUserEmail === feedback.clientEmail && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleEdit(feedback)}
+                                                    disabled={loading}
+                                                    className="text-blue-600 hover:text-blue-800 text-sm disabled:text-blue-300"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(feedback.id)}
+                                                    disabled={loading}
+                                                    className="text-red-600 hover:text-red-800 text-sm disabled:text-red-300"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="mt-2">
