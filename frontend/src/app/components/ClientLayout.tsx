@@ -15,7 +15,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         pathname?.startsWith('/bookings/admin') ||
         pathname?.startsWith('/Album-Portfolio/album/pages') ||
         pathname?.startsWith('/packages/Ad_View') ||
-        pathname?.startsWith('/Album-Portfolio/portfolio/pages');
+        pathname?.startsWith('/Album-Portfolio/portfolio/pages') ||
+        pathname?.startsWith('/bookings/config') ;
 
     return (
         <WishlistProvider>
