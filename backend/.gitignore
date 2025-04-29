@@ -34,5 +34,3 @@ build/
 
 ### dot env ###
 .env
-
-backend\src\main\java\com\beni\backend\WebConfig.java
