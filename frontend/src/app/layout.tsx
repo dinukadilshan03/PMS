@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import { WishlistProvider } from '../context/WishlistContext'
+import ClientLayout from "./components/ClientLayout";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,13 +26,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen`}>
-                <WishlistProvider>
-                    <Header />
-                    <main className="flex-grow">
-                        {children}
-                    </main>
-                    <Footer />
-                </WishlistProvider>
+                <ClientLayout>
+                    {children}
+                </ClientLayout>
             </body>
         </html>
     );
