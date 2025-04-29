@@ -118,110 +118,164 @@ const BookingList = () => {
             format: 'a4'
         });
 
-        // Add header with logo and title
-        doc.setFontSize(24);
-        doc.setTextColor(79, 70, 229); // Indigo color
-        doc.setFont('helvetica', 'bold');
-        doc.text('Your Bookings', 105, 25, { align: 'center' });
-
-        // Add subtitle
-        doc.setFontSize(12);
-        doc.setTextColor(100, 116, 139); // Slate color
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' });
-
-        // Add decorative line
-        doc.setDrawColor(79, 70, 229); // Indigo color
-        doc.setLineWidth(0.5);
-        doc.line(20, 40, 190, 40);
-
-        let yPosition = 50;
-        const pageHeight = doc.internal.pageSize.height - 20;
+        const pageWidth = doc.internal.pageSize.getWidth();
         const margin = 20;
+        let yPosition = 0;
 
-        // Add each booking with modern styling
+        // Function to add header
+        const addHeader = () => {
+            // Beni Logo and Title
+            doc.setFontSize(20);
+            doc.setTextColor(79, 70, 229); // Indigo color
+            doc.setFont('helvetica', 'bold');
+            doc.text('Your Photography Bookings', pageWidth / 2, 25, { align: 'center' });
+
+            // Subtitle
+            doc.setFontSize(12);
+            doc.setTextColor(100, 116, 139); // Slate color
+            doc.setFont('helvetica', 'normal');
+            doc.text('Curate and manage your upcoming photo sessions with ease', pageWidth / 2, 28, { align: 'center' });
+
+            // Decorative line
+            doc.setDrawColor(79, 70, 229); // Indigo color
+            doc.setLineWidth(0.5);
+            doc.line(margin, 35, pageWidth - margin, 35);
+
+            return 40; // Return the new yPosition
+        };
+
+        // Function to add footer
+        const addFooter = (pageNumber: number, totalPages: number) => {
+            const footerY = doc.internal.pageSize.getHeight() - 15;
+            
+            // Footer line
+            doc.setDrawColor(226, 232, 240); // Light slate color
+            doc.setLineWidth(0.2);
+            doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+            // Contact information
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Beni Photography Studio', margin, footerY);
+            doc.text('Email: contact@beniphotography.com', margin, footerY + 4);
+            doc.text('Phone: +1 (555) 123-4567', margin, footerY + 8);
+
+            // Page number
+            doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
+        };
+
+        // Add first page header
+        yPosition = addHeader();
+
+        // Add each booking
         bookings.forEach((booking, index) => {
-            // Add new page if needed
-            if (yPosition > pageHeight) {
+            // Check if we need a new page
+            if (yPosition > doc.internal.pageSize.getHeight() - 50) {
                 doc.addPage();
-                yPosition = margin;
+                yPosition = addHeader();
             }
 
             // Booking header
-            doc.setFontSize(14);
-            doc.setTextColor(79, 70, 229); // Indigo color
+            doc.setFontSize(16);
+            doc.setTextColor(79, 70, 229);
             doc.setFont('helvetica', 'bold');
             doc.text(`Booking #${index + 1}`, margin, yPosition);
             yPosition += 10;
 
-            // Package name
+            // Package details
             doc.setFontSize(12);
-            doc.setTextColor(51, 65, 85); // Slate color
+            doc.setTextColor(51, 65, 85);
             doc.setFont('helvetica', 'bold');
             doc.text('Package:', margin, yPosition);
             doc.setFont('helvetica', 'normal');
             doc.text(booking.packageName, margin + 25, yPosition);
             yPosition += 8;
 
-            // Date and Time
+            // Price
             doc.setFont('helvetica', 'bold');
-            doc.text('Date & Time:', margin, yPosition);
+            doc.text('Price:', margin, yPosition);
             doc.setFont('helvetica', 'normal');
-            doc.text(new Date(booking.dateTime).toLocaleString(), margin + 35, yPosition);
+            doc.text(`Rs ${booking.price.toFixed(2)}`, margin + 25, yPosition);
             yPosition += 8;
 
-            // Status with colored badge
+            // Status
             doc.setFont('helvetica', 'bold');
             doc.text('Status:', margin, yPosition);
             doc.setFont('helvetica', 'normal');
             const statusColor = getStatusColor(booking.bookingStatus);
             let statusRGB;
             if (statusColor === 'bg-red-100 text-red-800') {
-                statusRGB = { r: 220, g: 38, b: 38 }; // Red
+                statusRGB = { r: 220, g: 38, b: 38 };
             } else if (statusColor === 'bg-green-100 text-green-800') {
-                statusRGB = { r: 22, g: 163, b: 74 }; // Green
+                statusRGB = { r: 22, g: 163, b: 74 };
             } else if (statusColor === 'bg-blue-100 text-blue-800') {
-                statusRGB = { r: 29, g: 78, b: 216 }; // Blue
+                statusRGB = { r: 29, g: 78, b: 216 };
             } else {
-                statusRGB = { r: 51, g: 65, b: 85 }; // Slate
+                statusRGB = { r: 51, g: 65, b: 85 };
             }
             doc.setTextColor(statusRGB.r, statusRGB.g, statusRGB.b);
             doc.text(booking.bookingStatus, margin + 25, yPosition);
             yPosition += 8;
 
-            // Location
+            // Date and Time
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(51, 65, 85);
+            doc.text('Date & Time:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(new Date(booking.dateTime).toLocaleString(), margin + 35, yPosition);
+            yPosition += 8;
+
+            // Location
+            doc.setFont('helvetica', 'bold');
             doc.text('Location:', margin, yPosition);
             doc.setFont('helvetica', 'normal');
             doc.text(booking.location, margin + 25, yPosition);
             yPosition += 8;
 
-            // Payment Status
+            // Photographer
             doc.setFont('helvetica', 'bold');
-            doc.text('Payment:', margin, yPosition);
+            doc.text('Photographer:', margin, yPosition);
             doc.setFont('helvetica', 'normal');
-            doc.text(booking.paymentStatus, margin + 25, yPosition);
+            doc.text(booking.assignedStaffName || 'To be assigned', margin + 35, yPosition);
             yPosition += 8;
 
-            // Add decorative separator
-            doc.setDrawColor(226, 232, 240); // Light slate color
+            // Payment Status
+            doc.setFont('helvetica', 'bold');
+            doc.text('Payment Status:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(booking.paymentStatus, margin + 35, yPosition);
+            yPosition += 8;
+
+            // Contact
+            doc.setFont('helvetica', 'bold');
+            doc.text('Contact:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(booking.phoneNumber, margin + 25, yPosition);
+            yPosition += 8;
+
+            // Email
+            doc.setFont('helvetica', 'bold');
+            doc.text('Email:', margin, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(booking.email, margin + 25, yPosition);
+            yPosition += 15;
+
+            // Add separator
+            doc.setDrawColor(226, 232, 240);
             doc.setLineWidth(0.2);
-            doc.line(margin, yPosition, 190, yPosition);
+            doc.line(margin, yPosition, pageWidth - margin, yPosition);
             yPosition += 15;
         });
 
-        // Add footer
+        // Add footers to all pages
         const pageCount = doc.internal.pages.length;
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Page ${i} of ${pageCount}`, 105, 287, { align: 'center' });
+            addFooter(i, pageCount);
         }
 
-        doc.save('bookings-list.pdf');
+        doc.save('beni-bookings.pdf');
     };
 
     const generateSingleBookingPDF = (booking: Booking) => {
@@ -231,84 +285,124 @@ const BookingList = () => {
             format: 'a4'
         });
 
-        // Add header with logo and title
-        doc.setFontSize(24);
-        doc.setTextColor(79, 70, 229); // Indigo color
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 25;
+        let yPosition = 0;
+
+        // Add header
+        doc.setFontSize(20);
+        doc.setTextColor(79, 70, 229);
         doc.setFont('helvetica', 'bold');
-        doc.text('Booking Details', 105, 25, { align: 'center' });
+        doc.text('Your Photography Bookings', pageWidth / 2, 25, { align: 'center' });
 
-        // Add subtitle
         doc.setFontSize(12);
-        doc.setTextColor(100, 116, 139); // Slate color
+        doc.setTextColor(100, 116, 139);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' });
+        doc.text('Curate and manage your upcoming photo sessions with ease', pageWidth / 2, 33, { align: 'center' });
 
-        // Add decorative line
-        doc.setDrawColor(79, 70, 229); // Indigo color
+        // Decorative line
+        doc.setDrawColor(79, 70, 229);
         doc.setLineWidth(0.5);
-        doc.line(20, 40, 190, 40);
+        doc.line(margin, 40, pageWidth - margin, 40);
 
-        let yPosition = 50;
-        const margin = 20;
+        yPosition = 50;
 
-        // Package name
-        doc.setFontSize(14);
-        doc.setTextColor(79, 70, 229); // Indigo color
+        // Package details
+        doc.setFontSize(16);
+        doc.setTextColor(79, 70, 229);
         doc.setFont('helvetica', 'bold');
         doc.text('Package:', margin, yPosition);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(51, 65, 85); // Slate color
-        doc.text(booking.packageName, margin + 25, yPosition);
-        yPosition += 10;
+        doc.setTextColor(51, 65, 85);
+        doc.text(booking.packageName, margin + 35, yPosition);
+        yPosition += 12;
 
-        // Date and Time
+        // Price
         doc.setFont('helvetica', 'bold');
-        doc.text('Date & Time:', margin, yPosition);
+        doc.text('Price:', margin, yPosition);
         doc.setFont('helvetica', 'normal');
-        doc.text(new Date(booking.dateTime).toLocaleString(), margin + 35, yPosition);
-        yPosition += 10;
+        doc.text(`Rs ${booking.price.toFixed(2)}`, margin + 35, yPosition);
+        yPosition += 12;
 
-        // Status with colored badge
+        // Status
         doc.setFont('helvetica', 'bold');
         doc.text('Status:', margin, yPosition);
         doc.setFont('helvetica', 'normal');
         const statusColor = getStatusColor(booking.bookingStatus);
         let statusRGB;
         if (statusColor === 'bg-red-100 text-red-800') {
-            statusRGB = { r: 220, g: 38, b: 38 }; // Red
+            statusRGB = { r: 220, g: 38, b: 38 };
         } else if (statusColor === 'bg-green-100 text-green-800') {
-            statusRGB = { r: 22, g: 163, b: 74 }; // Green
+            statusRGB = { r: 22, g: 163, b: 74 };
         } else if (statusColor === 'bg-blue-100 text-blue-800') {
-            statusRGB = { r: 29, g: 78, b: 216 }; // Blue
+            statusRGB = { r: 29, g: 78, b: 216 };
         } else {
-            statusRGB = { r: 51, g: 65, b: 85 }; // Slate
+            statusRGB = { r: 51, g: 65, b: 85 };
         }
         doc.setTextColor(statusRGB.r, statusRGB.g, statusRGB.b);
-        doc.text(booking.bookingStatus, margin + 25, yPosition);
-        yPosition += 10;
+        doc.text(booking.bookingStatus, margin + 35, yPosition);
+        yPosition += 12;
+
+        // Date and Time
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(51, 65, 85);
+        doc.text('Date & Time:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(new Date(booking.dateTime).toLocaleString(), margin + 45, yPosition);
+        yPosition += 12;
 
         // Location
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(51, 65, 85);
         doc.text('Location:', margin, yPosition);
         doc.setFont('helvetica', 'normal');
-        doc.text(booking.location, margin + 25, yPosition);
-        yPosition += 10;
+        doc.text(booking.location, margin + 35, yPosition);
+        yPosition += 12;
+
+        // Photographer
+        doc.setFont('helvetica', 'bold');
+        doc.text('Photographer:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(booking.assignedStaffName || 'To be assigned', margin + 45, yPosition);
+        yPosition += 12;
 
         // Payment Status
         doc.setFont('helvetica', 'bold');
-        doc.text('Payment:', margin, yPosition);
+        doc.text('Payment Status:', margin, yPosition);
         doc.setFont('helvetica', 'normal');
-        doc.text(booking.paymentStatus, margin + 25, yPosition);
-        yPosition += 10;
+        doc.text(booking.paymentStatus, margin + 45, yPosition);
+        yPosition += 12;
+
+        // Contact
+        doc.setFont('helvetica', 'bold');
+        doc.text('Contact:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(booking.phoneNumber, margin + 35, yPosition);
+        yPosition += 12;
+
+        // Email
+        doc.setFont('helvetica', 'bold');
+        doc.text('Email:', margin, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(booking.email, margin + 35, yPosition);
+        yPosition += 20;
 
         // Add footer
+        const footerY = doc.internal.pageSize.getHeight() - 20;
+        
+        // Footer line
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.2);
+        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+        // Contact information
         doc.setFontSize(8);
         doc.setTextColor(100, 116, 139);
         doc.setFont('helvetica', 'normal');
-        doc.text('Page 1 of 1', 105, 287, { align: 'center' });
+        doc.text('Beni Photography Studio', margin, footerY);
+        doc.text('Email: contact@beniphotography.com', margin, footerY + 5);
+        doc.text('Phone: +1 (555) 123-4567', margin, footerY + 10);
 
-        doc.save(`booking-${booking.id}.pdf`);
+        doc.save(`beni-booking-${booking.id}.pdf`);
     };
 
     const handleCancelClick = (booking: Booking) => {
@@ -547,77 +641,111 @@ const BookingList = () => {
                         <div className="mt-6">
                             <a
                                 href="/bookings/create"
-                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                className="inline-flex items-center px-6 py-3 border border-transparent text-2xl font-bold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                style={{ fontFamily: "'Playfair Display', serif" }}
                             >
-                                Create Booking
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Create New Booking
                             </a>
                         </div>
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {bookings.map((booking) => (
-                            <div key={booking.id} className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-300">
-                                <div className="px-4 py-5 sm:p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center">
-                                            <div className="flex-shrink-0 bg-indigo-100 rounded-md p-2">
-                                                <svg className="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
-                                            <div className="ml-4">
-                                                <h3 className="text-lg font-medium text-gray-900 truncate">{booking.packageName}</h3>
-                                                <p className="text-sm text-gray-500">
-                                                    {new Date(booking.dateTime).toLocaleDateString()} at {new Date(booking.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                                </p>
-                                            </div>
+                            <div key={booking.id} className="bg-white overflow-hidden shadow-lg rounded-xl border border-gray-100 hover:shadow-xl transition-all duration-300">
+                                <div className="p-6">
+                                    {/* Header Section */}
+                                    <div className="flex flex-col items-center text-center mb-6">
+                                        <div className="flex-shrink-0 bg-indigo-100 rounded-lg p-3 mb-4">
+                                            <svg className="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
                                         </div>
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(booking.bookingStatus)}`}>
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                            {booking.packageName}
+                                        </h3>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.bookingStatus)}`}>
                                             {booking.bookingStatus}
                                         </span>
+                                        <p className="text-2xl font-bold text-indigo-600 mt-4">Rs {booking.price.toFixed(2)}</p>
+                                        <p className="text-xs text-gray-500">Total Amount</p>
                                     </div>
-                                    <div className="mt-4 border-t border-gray-200 pt-4">
-                                        <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500">Location</dt>
-                                                <dd className="mt-1 text-sm text-gray-900">{booking.location}</dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500">Payment</dt>
-                                                <dd className="mt-1 text-sm text-gray-900">{booking.paymentStatus}</dd>
-                                            </div>
-                                        </dl>
+
+                                    {/* Divider */}
+                                    <div className="border-t border-gray-100 my-6"></div>
+
+                                    {/* Details Section */}
+                                    <div className="space-y-6">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-500">Date & Time</p>
+                                            <p className="text-sm text-gray-900">{new Date(booking.dateTime).toLocaleString()}</p>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-500">Location</p>
+                                            <p className="text-sm text-gray-900">{booking.location}</p>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-500">Photographer</p>
+                                            <p className="text-sm text-gray-900">{booking.assignedStaffName || 'To be assigned'}</p>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-500">Payment Status</p>
+                                            <p className="text-sm text-gray-900">{booking.paymentStatus}</p>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-500">Contact</p>
+                                            <p className="text-sm text-gray-900">{booking.phoneNumber}</p>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-500">Email</p>
+                                            <p className="text-sm text-gray-900">{booking.email}</p>
+                                        </div>
                                     </div>
-                                    <div className="mt-5 flex space-x-2">
+
+                                    {/* Divider */}
+                                    <div className="border-t border-gray-100 my-6"></div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex flex-col space-y-3">
                                         <button
                                             onClick={() => handleCancelClick(booking)}
-                                            className="text-red-600 hover:text-red-800 font-medium"
+                                            className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                             disabled={booking.bookingStatus === 'cancelled'}
                                         >
-                                            Cancel
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancel Booking
                                         </button>
                                         <button
                                             onClick={() => handleReschedule(booking)}
                                             disabled={booking.bookingStatus.toLowerCase() === 'cancelled'}
-                                            className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white ${
+                                            className={`w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
                                                 booking.bookingStatus.toLowerCase() === 'cancelled' 
                                                     ? 'bg-gray-400 cursor-not-allowed' 
                                                     : 'bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500'
                                             }`}
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Reschedule
+                                            Reschedule Booking
                                         </button>
                                         <button
                                             onClick={() => generateSingleBookingPDF(booking)}
-                                            className="inline-flex items-center justify-center p-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                            title="Download PDF"
+                                            className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
+                                            Download PDF
                                         </button>
                                     </div>
                                 </div>
