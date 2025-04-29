@@ -12,4 +12,7 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
 
     List<Booking> findByDateTimeBetween(LocalDateTime dateTime, LocalDateTime dateTime2);
     long countByDateTimeBetween(LocalDateTime dateTime, LocalDateTime dateTime2);
+
+    // Find all bookings assigned to a specific staff member
+    List<Booking> findByAssignedStaffId(String staffId);
 }

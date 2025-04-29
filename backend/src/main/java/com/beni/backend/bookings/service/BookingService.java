@@ -174,4 +174,16 @@ public class BookingService {
     public Booking saveBooking(Booking booking) {
         return bookingRepository.save(booking);
     }
+
+    /**
+     * Gets all bookings assigned to a specific staff member
+     * @param staffId The ID of the staff member
+     * @return List of bookings assigned to the staff member
+     */
+    public List<Booking> getBookingsForStaff(String staffId) {
+        logger.info("Fetching bookings for staff: {}", staffId);
+        List<Booking> bookings = bookingRepository.findByAssignedStaffId(staffId);
+        logger.debug("Found {} bookings for staff: {}", bookings.size(), staffId);
+        return bookings;
+    }
 }
