@@ -11,9 +11,10 @@ interface EditFeedbackDialogProps {
     };
     onSave: (id: string, content: string, rating: number, packageName: string) => void;
     packages: Array<{ id: string; name: string }>;
+    validationErrors?: Record<string, string>;
 }
 
-export default function EditFeedbackDialog({ isOpen, onClose, feedback, onSave, packages }: EditFeedbackDialogProps) {
+export default function EditFeedbackDialog({ isOpen, onClose, feedback, onSave, packages, validationErrors = {}}: EditFeedbackDialogProps) {
     const [content, setContent] = useState(feedback.content);
     const [rating, setRating] = useState(feedback.rating);
     const [packageName, setPackageName] = useState(feedback.packageName);
@@ -45,6 +46,9 @@ export default function EditFeedbackDialog({ isOpen, onClose, feedback, onSave, 
                                 </option>
                             ))}
                         </select>
+                        {validationErrors?.packageName && (
+                            <p className="text-red-500 text-xs mt-1">{validationErrors.packageName}</p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">Rating</label>
@@ -76,6 +80,9 @@ export default function EditFeedbackDialog({ isOpen, onClose, feedback, onSave, 
                             rows={4}
                             required
                         />
+                        {validationErrors?.content && (
+                            <p className="text-red-500 text-xs mt-1">{validationErrors.content}</p>
+                        )}
                     </div>
                     <div className="flex justify-end gap-2">
                         <button
