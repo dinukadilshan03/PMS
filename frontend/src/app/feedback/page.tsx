@@ -52,6 +52,7 @@ export default function FeedbackPage() {
     const [selectedPackage, setSelectedPackage] = useState('');
     const [packages, setPackages] = useState<Package[]>([]);
     const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
 
     // Auto-fill form data from sessionStorage
@@ -108,6 +109,37 @@ export default function FeedbackPage() {
     useEffect(() => {
         setLoggedInUserEmail(sessionStorage.getItem('email'));
     }, []);
+
+    const checkUserBookings = async () => {
+        const userId = sessionStorage.getItem('userId');
+        if (!userId) {
+            router.push('/login');
+            return false;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/bookings/client`, {
+                headers: {
+                    'Userid': userId
+                }
+            });
+            if (!response.ok) throw new Error('Failed to check bookings');
+            const bookings = await response.json();
+            return bookings.length > 0;
+        } catch (err) {
+            setError('Failed to verify your bookings. Please try again later.');
+            return false;
+        }
+    };
+
+    const handleAddFeedback = async () => {
+        const hasBookings = await checkUserBookings();
+        if (hasBookings) {
+            router.push('/feedback/create');
+        } else {
+            setError('You must book a session before you can leave feedback. Please make a booking first.');
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -228,12 +260,18 @@ export default function FeedbackPage() {
         <div className="container mx-auto p-4 max-w-4xl">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-center">Feedback Management</h1>
-                <button
-                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-                    onClick={() => router.push('/feedback/create')}
-                >
-                    Add Feedback
-                </button>
+                {sessionStorage.getItem('userId') ? (
+                    <button
+                        className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                        onClick={handleAddFeedback}
+                    >
+                        Add Feedback
+                    </button>
+                ) : (
+                    <div className="text-gray-600">
+                        Please <a href="/login" className="text-blue-600 hover:underline">login</a> to add feedback
+                    </div>
+                )}
             </div>
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
