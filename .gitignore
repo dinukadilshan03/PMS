@@ -10,3 +10,5 @@
 
 ### upload folder ###
 /uploads/
+
+backend\src\main\java\com\beni\backend\WebConfig.java
