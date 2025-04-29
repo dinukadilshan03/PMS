@@ -9,8 +9,14 @@ import {
     Snackbar,
     Alert,
     Grid,
-    Divider
+    Divider,
+    Paper,
+    Stack
 } from '@mui/material';
+import EventIcon from '@mui/icons-material/Event';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CancelIcon from '@mui/icons-material/Cancel';
+import UpdateIcon from '@mui/icons-material/Update';
 
 interface BookingConfig {
     maxBookingsPerDay: number;
@@ -109,158 +115,238 @@ const BookingConfigForm: React.FC = () => {
 
     return (
         <Box component="form" onSubmit={handleSubmit} noValidate>
-            <Grid container spacing={4}>
-                <Grid item xs={12}>
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
-                            fontWeight: 500,
-                            color: 'text.primary',
-                            letterSpacing: '-0.5px'
-                        }}
-                    >
-                        Booking Limits
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        fullWidth
-                        label="Maximum Bookings Per Day"
-                        name="maxBookingsPerDay"
-                        type="number"
-                        value={formData.maxBookingsPerDay}
-                        onChange={handleChange}
-                        inputProps={{ min: 1 }}
-                        helperText="Maximum number of bookings allowed per day"
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'divider',
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        fullWidth
-                        label="Minimum Advance Booking Days"
-                        name="minAdvanceBookingDays"
-                        type="number"
-                        value={formData.minAdvanceBookingDays}
-                        onChange={handleChange}
-                        inputProps={{ min: 1 }}
-                        helperText="Minimum days in advance for booking"
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'divider',
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        fullWidth
-                        label="Maximum Advance Booking Days"
-                        name="maxAdvanceBookingDays"
-                        type="number"
-                        value={formData.maxAdvanceBookingDays}
-                        onChange={handleChange}
-                        inputProps={{ min: 1 }}
-                        helperText="Maximum days in advance for booking"
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'divider',
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 6, borderColor: 'divider' }} />
-
-            <Grid container spacing={4}>
-                <Grid item xs={12}>
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
-                            fontWeight: 500,
-                            color: 'text.primary',
-                            letterSpacing: '-0.5px'
-                        }}
-                    >
-                        Cancellation & Rescheduling
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        fullWidth
-                        label="Cancellation Deadline (Hours)"
-                        name="cancellationDeadlineHours"
-                        type="number"
-                        value={formData.cancellationDeadlineHours}
-                        onChange={handleChange}
-                        inputProps={{ min: 1 }}
-                        helperText="Hours before booking when cancellation is allowed"
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'divider',
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        fullWidth
-                        label="Rescheduling Deadline (Hours)"
-                        name="reschedulingDeadlineHours"
-                        type="number"
-                        value={formData.reschedulingDeadlineHours}
-                        onChange={handleChange}
-                        inputProps={{ min: 1 }}
-                        helperText="Hours before booking when rescheduling is allowed"
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'divider',
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-            </Grid>
-
-            <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    disabled={loading}
+            <Stack spacing={4}>
+                <Paper 
+                    elevation={0}
                     sx={{ 
-                        minWidth: 200,
-                        borderRadius: 0,
-                        textTransform: 'none',
-                        fontWeight: 500,
-                        boxShadow: 'none',
-                        '&:hover': {
-                            boxShadow: 'none',
-                        }
+                        p: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 2
                     }}
                 >
-                    {loading ? 'Saving...' : 'Save Configuration'}
-                </Button>
-            </Box>
+                    <Typography 
+                        variant="h6" 
+                        sx={{ 
+                            fontWeight: 500,
+                            color: 'success.main',
+                            letterSpacing: '-0.5px',
+                            mb: 3,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
+                        }}
+                    >
+                        <EventIcon color="success" />
+                        Booking Limits
+                    </Typography>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Maximum Bookings Per Day"
+                                name="maxBookingsPerDay"
+                                type="number"
+                                value={formData.maxBookingsPerDay}
+                                onChange={handleChange}
+                                inputProps={{ min: 1 }}
+                                helperText="Maximum number of bookings allowed per day"
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'success.light',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'success.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'success.main',
+                                        },
+                                    },
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: 'success.main',
+                                    },
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Minimum Advance Booking Days"
+                                name="minAdvanceBookingDays"
+                                type="number"
+                                value={formData.minAdvanceBookingDays}
+                                onChange={handleChange}
+                                inputProps={{ min: 1 }}
+                                helperText="Minimum days in advance for booking"
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'success.light',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'success.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'success.main',
+                                        },
+                                    },
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: 'success.main',
+                                    },
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Maximum Advance Booking Days"
+                                name="maxAdvanceBookingDays"
+                                type="number"
+                                value={formData.maxAdvanceBookingDays}
+                                onChange={handleChange}
+                                inputProps={{ min: 1 }}
+                                helperText="Maximum days in advance for booking"
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'success.light',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'success.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'success.main',
+                                        },
+                                    },
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: 'success.main',
+                                    },
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </Paper>
+
+                <Paper 
+                    elevation={0}
+                    sx={{ 
+                        p: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 2
+                    }}
+                >
+                    <Typography 
+                        variant="h6" 
+                        sx={{ 
+                            fontWeight: 500,
+                            color: 'error.main',
+                            letterSpacing: '-0.5px',
+                            mb: 3,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
+                        }}
+                    >
+                        <CancelIcon color="error" />
+                        Cancellation & Rescheduling
+                    </Typography>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Cancellation Deadline (Hours)"
+                                name="cancellationDeadlineHours"
+                                type="number"
+                                value={formData.cancellationDeadlineHours}
+                                onChange={handleChange}
+                                inputProps={{ min: 1 }}
+                                helperText="Hours before booking when cancellation is allowed"
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'error.light',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'error.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'error.main',
+                                        },
+                                    },
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: 'error.main',
+                                    },
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Rescheduling Deadline (Hours)"
+                                name="reschedulingDeadlineHours"
+                                type="number"
+                                value={formData.reschedulingDeadlineHours}
+                                onChange={handleChange}
+                                inputProps={{ min: 1 }}
+                                helperText="Hours before booking when rescheduling is allowed"
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'error.light',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'error.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'error.main',
+                                        },
+                                    },
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: 'error.main',
+                                    },
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </Paper>
+
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        size="large"
+                        disabled={loading}
+                        startIcon={<UpdateIcon />}
+                        color="success"
+                        sx={{ 
+                            minWidth: 200,
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                            '&:hover': {
+                                boxShadow: '0px 6px 16px rgba(0, 0, 0, 0.15)',
+                                transform: 'translateY(-1px)'
+                            },
+                            transition: 'all 0.2s ease-in-out'
+                        }}
+                    >
+                        {loading ? 'Saving...' : 'Save Configuration'}
+                    </Button>
+                </Box>
+            </Stack>
+
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
@@ -272,8 +358,8 @@ const BookingConfigForm: React.FC = () => {
                     severity={snackbar.severity}
                     sx={{ 
                         width: '100%',
-                        borderRadius: 0,
-                        boxShadow: 'none'
+                        borderRadius: 2,
+                        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'
                     }}
                 >
                     {snackbar.message}
