@@ -36,9 +36,15 @@ export default function StaffDashboard() {
     useEffect(() => {
         const token = sessionStorage.getItem('token');
         const email = sessionStorage.getItem('email');
+        const role = sessionStorage.getItem('role');
         
         if (!token || !email) {
             router.push('/login');
+            return;
+        }
+
+        if (role?.toLowerCase() !== 'staff') {
+            router.push('/');
             return;
         }
 
@@ -46,21 +52,40 @@ export default function StaffDashboard() {
             try {
                 const response = await fetch(`http://localhost:8080/api/staff/search?email=${encodeURIComponent(email)}`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        sessionStorage.clear();
+                        router.push('/login');
+                        return;
+                    }
                     throw new Error('Failed to fetch staff ID');
                 }
 
-                const staff = await response.json();
-                if (!staff || !staff.id) {
+                const text = await response.text();
+                if (!text) {
+                    throw new Error('Empty response from server');
+                }
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', text);
+                    throw new Error('Invalid response from server');
+                }
+
+                if (!data || !data.id) {
                     throw new Error('Staff not found');
                 }
-                setStaffId(staff.id);
-                setStaffName(staff.name);
-                setStaffEmail(staff.email);
+
+                setStaffId(data.id);
+                setStaffName(data.name);
+                setStaffEmail(data.email);
             } catch (error) {
                 console.error('Error fetching staff ID:', error);
                 setError('Failed to load staff information');

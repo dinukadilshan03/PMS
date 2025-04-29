@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import EditFeedbackDialog from './components/EditFeedbackDialog';
 
 interface Feedback {
     id: string;
@@ -54,6 +55,12 @@ export default function FeedbackPage() {
     const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
+    const [editingFeedback, setEditingFeedback] = useState<{
+        id: string;
+        content: string;
+        rating: number;
+        packageName: string;
+    } | null>(null);
 
     // Auto-fill form data from sessionStorage
     useEffect(() => {
@@ -214,15 +221,33 @@ export default function FeedbackPage() {
     };
 
     const handleEdit = (feedback: Feedback) => {
-        setEditingId(feedback.id);
-        setFormData({
-            clientId: feedback.clientId,
-            clientName: feedback.clientName,
-            clientEmail: feedback.clientEmail,
+        setEditingFeedback({
+            id: feedback.id,
             content: feedback.content,
             rating: feedback.rating,
             packageName: feedback.packageName
         });
+    };
+
+    const handleSaveEdit = async (id: string, content: string, rating: number, packageName: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/feedbacks/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content, rating, packageName }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update feedback');
+            }
+
+            // Refresh the feedback list
+            fetchFeedbacks();
+        } catch (error) {
+            console.error('Error updating feedback:', error);
+        }
     };
 
     const handleDelete = async (id: string) => {
@@ -354,6 +379,16 @@ export default function FeedbackPage() {
                     </div>
                 )}
             </div>
+
+            {editingFeedback && (
+                <EditFeedbackDialog
+                    isOpen={!!editingFeedback}
+                    onClose={() => setEditingFeedback(null)}
+                    feedback={editingFeedback}
+                    onSave={handleSaveEdit}
+                    packages={packages}
+                />
+            )}
         </div>
     );
 }
