@@ -100,15 +100,18 @@ public class BookingService {
     /**
      * Cancels a booking
      * @param bookingId The ID of the booking to cancel
-     * @throws BookingException if the booking doesn't exist
+     * @throws BookingException if the booking doesn't exist or cancellation window validation fails
      */
     public Booking cancelBooking(String bookingId) {
         logger.info("Attempting to cancel booking: {}", bookingId);
         try {
+            // Validate cancellation window first
+            validationService.validateCancellation(bookingId);
+            
             Booking booking = bookingRepository.findById(bookingId)
                     .orElseThrow(() -> new BookingException("Booking not found"));
             
-            booking.setBookingStatus("Cancelled");
+            booking.setBookingStatus("cancelled");
             Booking cancelledBooking = bookingRepository.save(booking);
             logger.info("Successfully cancelled booking: {}", bookingId);
             return cancelledBooking;
