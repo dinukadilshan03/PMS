@@ -1,6 +1,8 @@
 "use client"
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Album } from "@/app/Album-Portfolio/types/album";
+import Link from "next/link";
 
 export default function ProfilePage() {
     const [user, setUser] = useState({
@@ -14,6 +16,7 @@ export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [hasMounted, setHasMounted] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [favoriteAlbums, setFavoriteAlbums] = useState<Album[]>([]);
     const router = useRouter();
 
     useEffect(() => {
@@ -51,6 +54,13 @@ export default function ProfilePage() {
                     contactNumber: data.contactNumber || '',
                     role: data.role
                 });
+
+                // Fetch favorite albums
+                const favoritesResponse = await fetch(`http://localhost:8080/api/users/${userId}/favorites`);
+                if (favoritesResponse.ok) {
+                    const favoritesData = await favoritesResponse.json();
+                    setFavoriteAlbums(favoritesData);
+                }
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load profile');
                 if (err instanceof Error && err.message === 'Unauthorized') {
@@ -155,6 +165,38 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Favorite Albums Section */}
+            <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Favorite Albums</h2>
+                {favoriteAlbums.length === 0 ? (
+                    <p className="text-gray-500">No favorite albums yet</p>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {favoriteAlbums.map((album) => (
+                            <Link 
+                                key={album.id} 
+                                href={`/Album-Portfolio/album/pages/user/${album.id}`}
+                                className="block"
+                            >
+                                <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform transform hover:scale-105 h-[200px] w-full">
+                                    <div className="h-[140px] w-full">
+                                        <img
+                                            src={album.images?.[0] ? `http://localhost:8080/uploads/${album.images[0]}` : '/images/album-placeholder.jpg'}
+                                            alt={album.name}
+                                            className="object-cover w-full h-full"
+                                        />
+                                    </div>
+                                    <div className="p-2 h-[60px]">
+                                        <h3 className="text-sm font-medium text-gray-800 truncate">{album.name}</h3>
+                                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{album.description}</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
