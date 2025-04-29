@@ -53,9 +53,11 @@ export default function LoginPage() {
 
             window.dispatchEvent(new Event('loginStateChange'));
             
-            // Redirect based on user role
-            if (data.role === 'staff') {
-                router.push('/staff/dashboard');
+
+            // Redirect based on role
+            if (data.role === 'ADMIN') {
+                router.push('/admin');
+
             } else {
                 router.push('/');
             }

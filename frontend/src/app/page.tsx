@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -172,10 +173,13 @@ export default function Home() {
                     <div className="lg:flex lg:items-center lg:justify-between">
                         <div className="lg:w-1/2 lg:pr-12 order-2">
                             <div className="relative">
-                                <div className="aspect-w-1 aspect-h-1 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <svg className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
+                                <div className="aspect-w-1 aspect-h-1 rounded-2xl overflow-hidden shadow-2xl">
+                                    <img
+                                        src="/images/album-placeholder.jpg"
+                                        alt="Photo Albums Collection"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => console.error('Error loading image:', e)}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -279,10 +283,13 @@ export default function Home() {
                         </div>
                         <div className="mt-10 lg:mt-0 lg:w-1/2">
                             <div className="relative">
-                                <div className="aspect-w-16 aspect-h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                                    <svg className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
+                                <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-2xl">
+                                    <img
+                                        src="/images/portfolo placeholder.jpg"
+                                        alt="Photography Packages"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => console.error('Error loading image:', e)}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -296,10 +303,13 @@ export default function Home() {
                     <div className="lg:flex lg:items-center lg:justify-between">
                         <div className="lg:w-1/2 lg:pr-12 order-2">
                             <div className="relative">
-                                <div className="aspect-w-1 aspect-h-1 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <svg className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                    </svg>
+                                <div className="aspect-w-1 aspect-h-1 rounded-2xl overflow-hidden shadow-2xl">
+                                    <img
+                                        src="/images/port placeholder.jpg"
+                                        alt="Portfolio Showcase"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => console.error('Error loading image:', e)}
+                                    />
                                 </div>
                             </div>
                         </div>

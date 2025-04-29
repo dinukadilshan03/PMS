@@ -1,7 +1,8 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -19,6 +20,23 @@ export default function AdminLayout({
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
+    const [userEmail, setUserEmail] = useState<string>('');
+    const [userRole, setUserRole] = useState<string>('');
+
+    useEffect(() => {
+        // Only access sessionStorage on the client side
+        const email = sessionStorage.getItem('email') || '';
+        const role = sessionStorage.getItem('role') || '';
+        setUserEmail(email);
+        setUserRole(role);
+    }, []);
+
+    const handleLogout = () => {
+        sessionStorage.clear();
+        window.dispatchEvent(new Event('loginStateChange'));
+        router.push('/login');
+    };
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -58,32 +76,31 @@ export default function AdminLayout({
                                 );
                             })}
                         </nav>
-                    </div>
-                </div>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white shadow md:hidden">
-                <button
-                    type="button"
-                    className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                >
-                    <span className="sr-only">Open sidebar</span>
-                    <svg
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
-                <div className="flex flex-1 justify-between px-4">
-                    <div className="flex flex-1">
-                        <h1 className="text-xl font-bold text-gray-900 my-auto">Admin Panel</h1>
+                        <div className="mt-auto p-4 border-t border-gray-700">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                                    <span className="text-lg font-semibold text-gray-700">
+                                        {userEmail.charAt(0).toUpperCase()}
+                                    </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-white truncate">
+                                        {userEmail}
+                                    </p>
+                                    <p className="text-xs text-gray-400">
+                                        {userRole}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-gray-400 hover:text-white"
+                                >
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
