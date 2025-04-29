@@ -51,7 +51,13 @@ export default function LoginPage() {
             sessionStorage.setItem('email', data.email);
 
             window.dispatchEvent(new Event('loginStateChange'));
-            router.push('/');
+            
+            // Redirect based on role
+            if (data.role === 'ADMIN') {
+                router.push('/admin');
+            } else {
+                router.push('/');
+            }
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);

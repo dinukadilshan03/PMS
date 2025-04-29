@@ -130,6 +130,10 @@ export default function AlbumList() {
 
     // Delete album from backend
     const handleDelete = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this album? This action cannot be undone.')) {
+            return;
+        }
+
         try {
             const response = await fetch(`http://localhost:8080/api/albums/${id}`, {
                 method: 'DELETE',
