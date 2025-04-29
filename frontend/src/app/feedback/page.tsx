@@ -41,7 +41,7 @@ export default function FeedbackPage() {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
-        clientId: 'demo-user', // Replace with actual client ID in real app
+        clientId: '',
         clientName: '',
         clientEmail: '',
         content: '',
@@ -53,7 +53,6 @@ export default function FeedbackPage() {
     const [selectedPackage, setSelectedPackage] = useState('');
     const [packages, setPackages] = useState<Package[]>([]);
     const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
     const [editingFeedback, setEditingFeedback] = useState<{
         id: string;
@@ -61,26 +60,64 @@ export default function FeedbackPage() {
         rating: number;
         packageName: string;
     } | null>(null);
+    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-    // Auto-fill form data from sessionStorage
+    // Initialize user data from session storage
     useEffect(() => {
         const userEmail = sessionStorage.getItem('email');
+        const userId = sessionStorage.getItem('userId');
         const userRole = sessionStorage.getItem('role');
-        
+
+        // Set logged in user email for permission checks
+        setLoggedInUserEmail(userEmail);
+
+        // Auto-fill form data if user is logged in
         if (userEmail) {
             setFormData(prev => ({
                 ...prev,
+                clientId: userId || '',
                 clientEmail: userEmail,
-                clientName: userRole || 'User' // Use role as name if available, otherwise 'User'
+                clientName: userRole || 'User'
             }));
         }
     }, []);
+
+    // Validate form fields
+    const validateForm = () => {
+        const errors: Record<string, string> = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!formData.clientName.trim()) {
+            errors.clientName = 'Client name is required';
+        } else if (/\d/.test(formData.clientName)) {
+            errors.clientName = 'Name cannot contain numbers';
+        }
+
+        if (!formData.clientEmail) {
+            errors.clientEmail = 'Email is required';
+        } else if (!emailRegex.test(formData.clientEmail)) {
+            errors.clientEmail = 'Invalid email format';
+        }
+
+        if (!formData.content) {
+            errors.content = 'Feedback content is required';
+        } else if (formData.content.length > 500) {
+            errors.content = 'Content cannot exceed 500 characters';
+        }
+
+        if (!formData.packageName) {
+            errors.packageName = 'Package selection is required';
+        }
+
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
 
     // Fetch packages from backend
     useEffect(() => {
         const fetchPackages = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/packages');
+                const response = await fetch(`${API_BASE_URL}/api/packages`);
                 if (!response.ok) throw new Error('Failed to fetch packages');
                 const data = await response.json();
                 setPackages(data);
@@ -91,14 +128,15 @@ export default function FeedbackPage() {
         fetchPackages();
     }, []);
 
-    // Fetch all active feedbacks
+    // Fetch feedbacks based on selected package filter
     const fetchFeedbacks = async () => {
         try {
             setLoading(true);
             const url = selectedPackage
                 ? `${API_BASE_URL}/api/feedbacks/active?packageName=${selectedPackage}`
                 : `${API_BASE_URL}/api/feedbacks/active`;
-            const response = await fetch(url); // Use the constructed URL here
+
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch feedbacks');
             const data = await response.json();
             setFeedbacks(data);
@@ -109,14 +147,12 @@ export default function FeedbackPage() {
         }
     };
 
+    // Refresh feedbacks when package filter changes
     useEffect(() => {
         fetchFeedbacks();
     }, [selectedPackage]);
 
-    useEffect(() => {
-        setLoggedInUserEmail(sessionStorage.getItem('email'));
-    }, []);
-
+    // Check if user has bookings before allowing feedback creation
     const checkUserBookings = async () => {
         const userId = sessionStorage.getItem('userId');
         if (!userId) {
@@ -139,6 +175,7 @@ export default function FeedbackPage() {
         }
     };
 
+    // Handle navigation to create feedback page after validation
     const handleAddFeedback = async () => {
         const hasBookings = await checkUserBookings();
         if (hasBookings) {
@@ -148,78 +185,39 @@ export default function FeedbackPage() {
         }
     };
 
+    // Handle form input changes with validation
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
         setFormData(prev => {
             if (name === "rating") {
-                // ✅ Ensure rating stays between 1 and 5
                 return { ...prev, [name]: Math.max(1, Math.min(5, parseInt(value))) };
             }
             if (name === "clientName" && /\d/.test(value)) {
-                // ✅ Prevent numbers in client name
                 return prev;
             }
-
             if (name === "content" && value.length > 500) {
-                // ✅ Limit feedback content length
                 return prev;
             }
             return { ...prev, [name]: value };
         });
+
+        // Clear validation error when user starts typing
+        if (validationErrors[name]) {
+            setValidationErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
     };
 
+    // Handle package filter changes
     const handlePackageFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedPackage(e.target.value);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-
-        // ✅ Add: Email validation regex
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        // ✅ Add: Client-side validation before submission
-        if (!formData.clientName.trim()) {
-            setError('Client name is required.');
-            return;
-        }
-        if (!formData.clientEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-            setError('Invalid email format.');
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const url = editingId
-                ? `${API_BASE_URL}/api/feedbacks/${editingId}`
-                : `${API_BASE_URL}/api/feedbacks`;
-
-            const method = editingId ? 'PUT' : 'POST';
-
-            // Generate reply based on rating and content
-            const reply = generateReply(formData.rating, formData.content);
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...formData, reply }),
-            });
-
-            if (!response.ok) throw new Error(`Failed to ${editingId ? 'update' : 'create'} feedback`);
-
-            await fetchFeedbacks(); // Refresh the list
-            resetForm();
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Operation failed');
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Handle feedback edit action
     const handleEdit = (feedback: Feedback) => {
         setEditingFeedback({
             id: feedback.id,
@@ -229,7 +227,27 @@ export default function FeedbackPage() {
         });
     };
 
+    // Validate and save edited feedback
     const handleSaveEdit = async (id: string, content: string, rating: number, packageName: string) => {
+        setLoading(true);
+        // Validate edited fields
+        const errors: Record<string, string> = {};
+
+        if (!content) {
+            errors.content = 'Feedback content is required';
+        } else if (content.length > 500) {
+            errors.content = 'Content cannot exceed 500 characters';
+        }
+
+        if (!packageName) {
+            errors.packageName = 'Package selection is required';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
+
         try {
             const response = await fetch(`${API_BASE_URL}/api/feedbacks/${id}`, {
                 method: 'PUT',
@@ -240,16 +258,24 @@ export default function FeedbackPage() {
             });
 
             if (!response.ok) {
+                const errorData = await response.json();
                 throw new Error('Failed to update feedback');
             }
 
-            // Refresh the feedback list
-            fetchFeedbacks();
+            // Refresh feedback list and user data
+            await fetchFeedbacks();
+            setLoggedInUserEmail(sessionStorage.getItem('email'));
+            setValidationErrors({});
         } catch (error) {
             console.error('Error updating feedback:', error);
+            setError('Failed to update feedback');
+        } finally {
+            setLoading(false);
+            setEditingFeedback(null);
         }
     };
 
+    // Handle feedback deletion
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this feedback?')) return;
 
@@ -261,24 +287,13 @@ export default function FeedbackPage() {
 
             if (!response.ok) throw new Error('Failed to delete feedback');
 
-            await fetchFeedbacks(); // Refresh the list
+            await fetchFeedbacks();
+            setLoggedInUserEmail(sessionStorage.getItem('email'));
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Delete failed');
         } finally {
             setLoading(false);
         }
-    };
-
-    const resetForm = () => {
-        setEditingId(null);
-        setFormData({
-            clientId: 'demo-user',
-            clientName: '',
-            clientEmail: '',
-            content: '',
-            rating: 5,
-            packageName: ''
-        });
     };
 
     return (
@@ -298,11 +313,13 @@ export default function FeedbackPage() {
                     </div>
                 )}
             </div>
+
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {error}
                 </div>
             )}
+
             {/* Feedback List */}
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">
@@ -320,6 +337,7 @@ export default function FeedbackPage() {
                         ))}
                     </select>
                 </div>
+
                 {loading && feedbacks.length === 0 ? (
                     <p className="text-center py-4">Loading feedbacks...</p>
                 ) : feedbacks.length === 0 ? (
@@ -334,27 +352,26 @@ export default function FeedbackPage() {
                                         <p className="text-sm text-gray-600">{feedback.clientEmail}</p>
                                         <p className="text-sm text-gray-600">Package: {feedback.packageName}</p>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        {loggedInUserEmail === feedback.clientEmail && (
-                                            <>
-                                                <button
-                                                    onClick={() => handleEdit(feedback)}
-                                                    disabled={loading}
-                                                    className="text-blue-600 hover:text-blue-800 text-sm disabled:text-blue-300"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(feedback.id)}
-                                                    disabled={loading}
-                                                    className="text-red-600 hover:text-red-800 text-sm disabled:text-red-300"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
+                                    {/* Show edit/delete buttons only for the logged-in user's feedback */}
+                                            {loggedInUserEmail === feedback.clientEmail && (
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => handleEdit(feedback)}
+                                                        disabled={loading}
+                                                        className="text-blue-600 hover:text-blue-800 text-sm disabled:text-blue-300"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(feedback.id)}
+                                                        disabled={loading}
+                                                        className="text-red-600 hover:text-red-800 text-sm disabled:text-red-300"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                 <div className="mt-2">
                                     <div className="text-yellow-500">
                                         {'★'.repeat(feedback.rating)}{'☆'.repeat(5 - feedback.rating)}
@@ -380,6 +397,7 @@ export default function FeedbackPage() {
                 )}
             </div>
 
+            {/* Edit Feedback Dialog */}
             {editingFeedback && (
                 <EditFeedbackDialog
                     isOpen={!!editingFeedback}
@@ -387,6 +405,7 @@ export default function FeedbackPage() {
                     feedback={editingFeedback}
                     onSave={handleSaveEdit}
                     packages={packages}
+                    validationErrors={validationErrors}
                 />
             )}
         </div>
