@@ -14,7 +14,10 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
 
     @PostMapping
-    public ResponseEntity<Feedback> createFeedback(@RequestBody Feedback feedback) {
+    public ResponseEntity<Feedback> createFeedback(
+            @RequestBody Feedback feedback,
+            @RequestHeader("Userid") String clientId) {
+        feedback.setClientId(clientId);
         return ResponseEntity.ok(feedbackService.createFeedback(feedback));
     }
 

@@ -11,7 +11,7 @@ const API_BASE_URL = 'http://localhost:8080';
 
 export default function CreateFeedbackPage() {
     const [formData, setFormData] = useState({
-        clientId: 'demo-user',
+        clientId: '',
         clientName: '',
         clientEmail: '',
         content: '',
@@ -24,8 +24,15 @@ export default function CreateFeedbackPage() {
     const router = useRouter();
 
     useEffect(() => {
+        const userId = sessionStorage.getItem('userId');
         const userEmail = sessionStorage.getItem('email');
         const userRole = sessionStorage.getItem('role');
+        
+        if (!userId) {
+            router.push('/login');
+            return;
+        }
+
         if (userEmail) {
             setFormData(prev => ({
                 ...prev,
@@ -33,7 +40,7 @@ export default function CreateFeedbackPage() {
                 clientName: userRole || 'User'
             }));
         }
-    }, []);
+    }, [router]);
 
     useEffect(() => {
         const fetchPackages = async () => {
@@ -78,14 +85,30 @@ export default function CreateFeedbackPage() {
         }
         try {
             setLoading(true);
+            const userId = sessionStorage.getItem('userId');
+            if (!userId) {
+                setError('You must be logged in to submit feedback.');
+                return;
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/feedbacks`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Userid': userId
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) throw new Error('Failed to create feedback');
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (errorData.message?.includes('Only customers who have booked a session can add feedback')) {
+                    setError('You must book a session before you can leave feedback. Please make a booking first.');
+                    return;
+                }
+                throw new Error(errorData.message || 'Failed to create feedback');
+            }
+            
             router.push('/feedback');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Operation failed');
