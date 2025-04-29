@@ -52,7 +52,7 @@ export default function LoginPage() {
             sessionStorage.setItem('token', data.token);
 
             window.dispatchEvent(new Event('loginStateChange'));
-            
+
             // Redirect based on role (case-insensitive check)
             const userRole = data.role?.toUpperCase();
             if (userRole === 'ADMIN') {
