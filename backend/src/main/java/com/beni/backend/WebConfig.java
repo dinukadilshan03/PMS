@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:C:/Users/gdinu/Desktop/PMS/backend/uploads")
+                .addResourceLocations("file:C:\\Users\\gdinu\\OneDrive\\Documents\\projects\\PMS\\backend\\uploads")
                 .setCachePeriod(3600);
     }
 }
