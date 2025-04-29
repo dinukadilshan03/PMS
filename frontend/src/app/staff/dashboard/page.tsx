@@ -264,12 +264,7 @@ export default function StaffDashboard() {
                                                 {assignment.bookingStatus}
                                             </span>
                                             <div className="flex space-x-3">
-                                                <button 
-                                                    className="flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all duration-200 shadow-sm hover:shadow-md border border-indigo-100"
-                                                >
-                                                    <span className="text-sm font-medium">View Details</span>
-                                                    <FaChevronRight className="ml-2 h-3 w-3" />
-                                                </button>
+                                                
                                                 <PDFDownloadLink
                                                     document={<AssignmentPDF assignment={assignment} />}
                                                     fileName={`assignment-${assignment.id}.pdf`}
