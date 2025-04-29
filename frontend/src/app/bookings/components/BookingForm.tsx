@@ -69,6 +69,14 @@ interface FormErrors {
     form: string;
 }
 
+interface BookingConfig {
+    maxBookingsPerDay: number;
+    minAdvanceBookingDays: number;
+    maxAdvanceBookingDays: number;
+    cancellationWindowHours: number;
+    rescheduleWindowHours: number;
+}
+
 const CreateBookingForm = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -101,6 +109,7 @@ const CreateBookingForm = () => {
         title: '',
         message: ''
     });
+    const [bookingConfig, setBookingConfig] = useState<BookingConfig | null>(null);
 
     // Fetch packages from backend
     useEffect(() => {
@@ -121,6 +130,29 @@ const CreateBookingForm = () => {
             }
         };
         fetchPackages();
+    }, []);
+
+    // Fetch booking configuration
+    useEffect(() => {
+        const fetchBookingConfig = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/bookings/config");
+                if (!response.ok) {
+                    throw new Error('Failed to fetch booking configuration');
+                }
+                const data = await response.json();
+                setBookingConfig({
+                    maxBookingsPerDay: data.maxBookingsPerDay,
+                    minAdvanceBookingDays: data.minAdvanceBookingDays,
+                    maxAdvanceBookingDays: data.maxAdvanceBookingDays,
+                    cancellationWindowHours: data.cancellationWindowHours,
+                    rescheduleWindowHours: data.rescheduleWindowHours
+                });
+            } catch (error) {
+                console.error("Error fetching booking configuration:", error);
+            }
+        };
+        fetchBookingConfig();
     }, []);
 
     // Set the selected package when page loads or packages change
@@ -319,31 +351,31 @@ const CreateBookingForm = () => {
                                 <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Maximum 3 bookings allowed per day
+                                Maximum {bookingConfig?.maxBookingsPerDay || 3} bookings allowed per day
                             </li>
                             <li className="flex items-start">
                                 <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Bookings must be made at least 24 hours in advance
+                                Bookings must be made at least {bookingConfig?.minAdvanceBookingDays || 1} day(s) in advance
                             </li>
                             <li className="flex items-start">
                                 <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                New bookings must be within 30 days from today
+                                New bookings must be within {bookingConfig?.maxAdvanceBookingDays || 30} days from today
                             </li>
                             <li className="flex items-start">
                                 <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Cancellations must be made at least 24 hours before the booking time
+                                Cancellations must be made at least {bookingConfig?.cancellationWindowHours || 24} hours before the booking time
                             </li>
                             <li className="flex items-start">
                                 <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Rescheduling must be done at least 24 hours before the current booking time
+                                Rescheduling must be done at least {bookingConfig?.rescheduleWindowHours || 24} hours before the current booking time
                             </li>
                         </ul>
                     </div>

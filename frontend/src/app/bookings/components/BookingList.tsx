@@ -12,6 +12,14 @@ import {
     Box
 } from '@mui/material';
 
+interface BookingConfig {
+    maxBookingsPerDay: number;
+    minAdvanceBookingDays: number;
+    maxAdvanceBookingDays: number;
+    cancellationWindowHours: number;
+    rescheduleWindowHours: number;
+}
+
 const BookingList = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [error, setError] = useState<string>('');
@@ -19,6 +27,7 @@ const BookingList = () => {
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [newDateTime, setNewDateTime] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [bookingConfig, setBookingConfig] = useState<BookingConfig | null>(null);
     const [limitDialog, setLimitDialog] = useState<{
         open: boolean;
         title: string;
@@ -66,6 +75,29 @@ const BookingList = () => {
         };
 
         fetchBookings();
+    }, []);
+
+    // Fetch booking configuration
+    useEffect(() => {
+        const fetchBookingConfig = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/bookings/config");
+                if (!response.ok) {
+                    throw new Error('Failed to fetch booking configuration');
+                }
+                const data = await response.json();
+                setBookingConfig({
+                    maxBookingsPerDay: data.maxBookingsPerDay,
+                    minAdvanceBookingDays: data.minAdvanceBookingDays,
+                    maxAdvanceBookingDays: data.maxAdvanceBookingDays,
+                    cancellationWindowHours: data.cancellationWindowHours,
+                    rescheduleWindowHours: data.rescheduleWindowHours
+                });
+            } catch (error) {
+                console.error("Error fetching booking configuration:", error);
+            }
+        };
+        fetchBookingConfig();
     }, []);
 
     const generatePDF = () => {
@@ -594,10 +626,10 @@ const BookingList = () => {
                                             <div className="bg-yellow-50 p-4 rounded-md">
                                                 <h4 className="text-base font-medium text-yellow-800 mb-3">Scheduling Rules:</h4>
                                                 <ul className="text-base text-yellow-700 space-y-2 list-disc list-inside">
-                                                    <li>Maximum 3 bookings allowed per day</li>
-                                                    <li>Bookings must be made at least 24 hours in advance</li>
-                                                    <li>Rescheduling must be done at least 24 hours before the current booking time</li>
-                                                    <li>New date must be within 30 days from today</li>
+                                                    <li>Maximum {bookingConfig?.maxBookingsPerDay || 3} bookings allowed per day</li>
+                                                    <li>Bookings must be made at least {bookingConfig?.minAdvanceBookingDays || 1} day(s) in advance</li>
+                                                    <li>Rescheduling must be done at least {bookingConfig?.rescheduleWindowHours || 24} hours before the current booking time</li>
+                                                    <li>New date must be within {bookingConfig?.maxAdvanceBookingDays || 30} days from today</li>
                                                 </ul>
                                             </div>
 
