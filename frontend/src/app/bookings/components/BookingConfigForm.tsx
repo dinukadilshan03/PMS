@@ -22,16 +22,16 @@ interface BookingConfig {
     maxBookingsPerDay: number;
     minAdvanceBookingDays: number;
     maxAdvanceBookingDays: number;
-    cancellationDeadlineHours: number;
-    reschedulingDeadlineHours: number;
+    cancellationWindowHours: number;
+    rescheduleWindowHours: number;
 }
 
 const defaultConfig: BookingConfig = {
     maxBookingsPerDay: 3,
     minAdvanceBookingDays: 1,
     maxAdvanceBookingDays: 30,
-    cancellationDeadlineHours: 24,
-    reschedulingDeadlineHours: 24
+    cancellationWindowHours: 24,
+    rescheduleWindowHours: 24
 };
 
 const BookingConfigForm: React.FC = () => {
@@ -58,8 +58,8 @@ const BookingConfigForm: React.FC = () => {
                 maxBookingsPerDay: data.maxBookingsPerDay ?? defaultConfig.maxBookingsPerDay,
                 minAdvanceBookingDays: data.minAdvanceBookingDays ?? defaultConfig.minAdvanceBookingDays,
                 maxAdvanceBookingDays: data.maxAdvanceBookingDays ?? defaultConfig.maxAdvanceBookingDays,
-                cancellationDeadlineHours: data.cancellationDeadlineHours ?? defaultConfig.cancellationDeadlineHours,
-                reschedulingDeadlineHours: data.reschedulingDeadlineHours ?? defaultConfig.reschedulingDeadlineHours
+                cancellationWindowHours: data.cancellationWindowHours ?? defaultConfig.cancellationWindowHours,
+                rescheduleWindowHours: data.rescheduleWindowHours ?? defaultConfig.rescheduleWindowHours
             });
         } catch (error) {
             setSnackbar({
@@ -263,10 +263,10 @@ const BookingConfigForm: React.FC = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Cancellation Deadline (Hours)"
-                                name="cancellationDeadlineHours"
+                                label="Cancellation Window (Hours)"
+                                name="cancellationWindowHours"
                                 type="number"
-                                value={formData.cancellationDeadlineHours}
+                                value={formData.cancellationWindowHours}
                                 onChange={handleChange}
                                 inputProps={{ min: 1 }}
                                 helperText="Hours before booking when cancellation is allowed"
@@ -292,10 +292,10 @@ const BookingConfigForm: React.FC = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Rescheduling Deadline (Hours)"
-                                name="reschedulingDeadlineHours"
+                                label="Reschedule Window (Hours)"
+                                name="rescheduleWindowHours"
                                 type="number"
-                                value={formData.reschedulingDeadlineHours}
+                                value={formData.rescheduleWindowHours}
                                 onChange={handleChange}
                                 inputProps={{ min: 1 }}
                                 helperText="Hours before booking when rescheduling is allowed"

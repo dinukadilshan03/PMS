@@ -45,6 +45,12 @@ public class BookingConfigService {
         if (newConfig.getRescheduleLimitDays() != null) {
             existingConfig.setRescheduleLimitDays(newConfig.getRescheduleLimitDays());
         }
+        if (newConfig.getRescheduleWindowHours() != null) {
+            existingConfig.setRescheduleWindowHours(newConfig.getRescheduleWindowHours());
+        }
+        if (newConfig.getCancellationWindowHours() != null) {
+            existingConfig.setCancellationWindowHours(newConfig.getCancellationWindowHours());
+        }
 
         return bookingConfigRepository.save(existingConfig);
     }

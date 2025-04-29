@@ -36,6 +36,7 @@ export default function CreateFeedbackPage() {
         if (userEmail) {
             setFormData(prev => ({
                 ...prev,
+                clientId: userId || '',
                 clientEmail: userEmail,
                 clientName: userRole || 'User'
             }));
