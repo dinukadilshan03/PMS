@@ -82,7 +82,7 @@ public class AuthenticationController {
 
         // Set default role if not provided
         if (newUser.getRole() == null) {
-            newUser.setRole("USER"); // or whatever default role you want
+            newUser.setRole("CUSTOMER"); // or whatever default role you want
         }
 
         // Save the new user

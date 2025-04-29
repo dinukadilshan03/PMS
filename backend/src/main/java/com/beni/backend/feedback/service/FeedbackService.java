@@ -2,6 +2,8 @@ package com.beni.backend.feedback.service;
 
 import com.beni.backend.feedback.model.Feedback;
 import com.beni.backend.feedback.repository.FeedbackRepository;
+import com.beni.backend.bookings.repository.BookingRepository;
+import com.beni.backend.bookings.model.Booking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -11,8 +13,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
+    private final BookingRepository bookingRepository;
 
     public Feedback createFeedback(Feedback feedback) {
+        // Check if the customer has any bookings
+        List<Booking> customerBookings = bookingRepository.findByClientId(feedback.getClientId());
+        if (customerBookings.isEmpty()) {
+            throw new RuntimeException("Only customers who have booked a session can add feedback");
+        }
+
         feedback.setCreatedAt(LocalDateTime.now());
         feedback.setUpdatedAt(LocalDateTime.now());
         feedback.setActive(true);

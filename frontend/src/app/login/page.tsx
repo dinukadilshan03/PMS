@@ -49,12 +49,15 @@ export default function LoginPage() {
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('role', data.role);
             sessionStorage.setItem('email', data.email);
+            sessionStorage.setItem('token', data.token);
 
             window.dispatchEvent(new Event('loginStateChange'));
             
+
             // Redirect based on role
             if (data.role === 'ADMIN') {
                 router.push('/admin');
+
             } else {
                 router.push('/');
             }
