@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "http://localhost:3000",
-                    "http://localhost:3001", 
+                    "http://localhost:3001",
                     "http://localhost:3002",
                     "http://localhost:3003"
                 )
@@ -26,7 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:C:/Users/gdinu/Desktop/PMS/backend/uploads")
+                .addResourceLocations("file:C:/Users/gdinu/OneDrive/Documents/projects/PMS/backend/uploads")
                 .setCachePeriod(3600);
     }
 }
+
