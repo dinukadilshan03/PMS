@@ -74,102 +74,144 @@ const CustomerDashboard = () => {
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
 
-        // Colors
-        const colorBackground = '#e2dacf';
-        const colorSurface = '#f7f6f2';
-        const colorText = '#2d2926';
-        const colorAccent = '#b6a489';
-        const colorBorder = '#e5e1da';
+        // Define colors
+        const colors = {
+            primary: '#937d5e',      // Your accent color
+            secondary: '#b8a088',    // Lighter accent
+            text: '#2d2926',         // Dark text
+            lightText: '#6B7280',    // Gray text
+            highlight: '#e63946',    // Bright accent for important info
+            background: '#f7f6f2',   // Light background
+            success: '#059669'       // Green for checkmarks
+        };
 
-        // HEADER
-        doc.setFillColor(colorBackground);
-        doc.rect(0, 0, pageWidth, 70, 'F');
-        doc.setFontSize(22);
-        doc.setTextColor(colorText);
+        // Add background
+        doc.setFillColor(colors.background);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+        // Header with gradient-like effect
+        doc.setFillColor(colors.primary);
+        doc.rect(0, 0, pageWidth, 120, 'F');
+        doc.setFillColor(colors.secondary);
+        doc.rect(0, 120, pageWidth, 10, 'F');
+
+        // Logo/Title Section
+        doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
-        doc.text('PhotoStudio', 40, 45);
-        doc.setFontSize(12);
+        doc.setFontSize(32);
+        doc.text('PhotoStudio', 40, 60);
+        
+        doc.setFontSize(16);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(colorAccent);
-        doc.text('Package Details', 40, 62);
-        doc.setDrawColor(colorBorder);
-        doc.setLineWidth(1);
-        doc.line(40, 75, pageWidth - 40, 75);
+        doc.text('Package Details', 40, 90);
 
-        // MAIN CONTENT BACKGROUND
-        const contentTop = 95;
-        const contentHeight = pageHeight - 180;
-        doc.setFillColor(colorSurface);
-        doc.roundedRect(30, contentTop, pageWidth - 60, contentHeight, 16, 16, 'F');
+        // Package Name & Type
+        const startY = 180;
+        let currentY = startY;
 
-        // BODY
-        let y = contentTop + 35;
-        const left = 60;
+        doc.setTextColor(colors.text);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(24);
+        doc.text(pkg.name, 40, currentY);
+        currentY += 30;
+
+        doc.setTextColor(colors.primary);
+        doc.setFontSize(16);
+        doc.text(pkg.packageType, 40, currentY);
+        
+        // Price in highlighted box
+        doc.setFillColor(colors.primary);
+        const priceText = `${pkg.investment.toLocaleString()} LKR`;
+        const priceWidth = doc.getTextWidth(priceText) + 40;
+        doc.roundedRect(pageWidth - priceWidth - 40, currentY - 20, priceWidth, 30, 5, 5, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.text(priceText, pageWidth - 40, currentY, { align: 'right' });
+        currentY += 50;
+
+        // Services Section
+        doc.setTextColor(colors.text);
         doc.setFontSize(18);
-        doc.setTextColor(colorText);
-        doc.setFont('helvetica', 'bold');
-        doc.text(pkg.name, left, y);
-        y += 28;
-        doc.setFontSize(13);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(colorAccent);
-        doc.text(pkg.packageType, left, y);
-        doc.setTextColor(colorText);
-        doc.text(`${pkg.investment.toLocaleString()} LKR`, pageWidth - left, y, { align: 'right' });
-        y += 18;
+        doc.text('Services Included', 40, currentY);
+        currentY += 20;
 
-        // Services Included
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(15);
-        doc.setTextColor(colorAccent);
-        doc.text('Services Included', left, y);
-        y += 20;
-        doc.setFont('helvetica', 'normal');
+        // Add decorative line
+        doc.setDrawColor(colors.secondary);
+        doc.setLineWidth(2);
+        doc.line(40, currentY, pageWidth - 40, currentY);
+        currentY += 30;
+
+        // Services list with checkmarks
+        doc.setTextColor(colors.text);
         doc.setFontSize(12);
-        doc.setTextColor(colorText);
-        pkg.servicesIncluded.forEach((service, idx) => {
-            doc.text(`• ${service}`, left + 15, y);
-            y += 18;
+        doc.setFont('helvetica', 'normal');
+        pkg.servicesIncluded?.forEach((service) => {
+            // Checkmark circle
+            doc.setFillColor(colors.success);
+            doc.circle(50, currentY - 4, 4, 'F');
+            
+            // Service text
+            doc.text(service, 70, currentY);
+            currentY += 25;
         });
-        y += 18;
+        currentY += 20;
 
-        // Additional Items
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(15);
-        doc.setTextColor(colorAccent);
-        doc.text('Additional Items', left, y);
-        y += 20;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(12);
-        doc.setTextColor(colorText);
-        if (pkg.additionalItems.editedImages)
-            doc.text(`Edited Images: ${pkg.additionalItems.editedImages}`, left + 15, y), y += 18;
-        if (pkg.additionalItems.uneditedImages)
-            doc.text(`Unedited Images: ${pkg.additionalItems.uneditedImages}`, left + 15, y), y += 18;
-        if (pkg.additionalItems.thankYouCards)
-            doc.text(`Thank You Cards: ${pkg.additionalItems.thankYouCards}`, left + 15, y), y += 18;
-        if (pkg.additionalItems.albums && pkg.additionalItems.albums.length > 0) {
-            pkg.additionalItems.albums.forEach((album, idx) => {
-                doc.text(`Album: ${album.size}, ${album.type}, ${album.spreadCount} spreads`, left + 15, y);
-                y += 18;
-            });
-        }
-        if (pkg.additionalItems.framedPortraits && pkg.additionalItems.framedPortraits.length > 0) {
-            pkg.additionalItems.framedPortraits.forEach((portrait, idx) => {
-                doc.text(`Framed Portrait: ${portrait.size}, Quantity: ${portrait.quantity}`, left + 15, y);
-                y += 18;
-            });
+        // Additional Items Section
+        if (pkg.additionalItems) {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text('Additional Items', 40, currentY);
+            currentY += 20;
+
+            // Add decorative line
+            doc.setDrawColor(colors.secondary);
+            doc.setLineWidth(2);
+            doc.line(40, currentY, pageWidth - 40, currentY);
+            currentY += 30;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+
+            // Function to add item with icon indicator
+            const addItem = (text: string) => {
+                doc.setFillColor(colors.secondary);
+                doc.circle(50, currentY - 4, 4, 'F');
+                doc.text(text, 70, currentY);
+                currentY += 25;
+            };
+
+            if (pkg.additionalItems.editedImages) {
+                addItem(`Edited Images: ${pkg.additionalItems.editedImages}`);
+            }
+            if (pkg.additionalItems.uneditedImages) {
+                addItem(`Unedited Images: ${pkg.additionalItems.uneditedImages}`);
+            }
+            if (pkg.additionalItems.thankYouCards) {
+                addItem(`Thank You Cards: ${pkg.additionalItems.thankYouCards}`);
+            }
+            if (pkg.additionalItems.albums) {
+                pkg.additionalItems.albums.forEach(album => {
+                    addItem(`Album: ${album.size}, ${album.type}, ${album.spreadCount} spreads`);
+                });
+            }
+            if (pkg.additionalItems.framedPortraits) {
+                pkg.additionalItems.framedPortraits.forEach(portrait => {
+                    addItem(`Framed Portrait: ${portrait.size}, Quantity: ${portrait.quantity}`);
+                });
+            }
         }
 
-        // FOOTER
-        doc.setFillColor(colorSurface);
-        doc.rect(0, pageHeight - 50, pageWidth, 50, 'F');
+        // Footer
+        const footerY = pageHeight - 40;
+        doc.setFillColor(colors.primary);
+        doc.rect(0, footerY - 20, pageWidth, 60, 'F');
+        
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(10);
-        doc.setTextColor(colorText);
-        doc.text('Contact: info@photostudio.com | +94 77 123 4567 | www.photostudio.com', 40, pageHeight - 25);
+        doc.text('Contact: info@photostudio.com | +94 77 123 4567 | www.photostudio.com', 40, footerY + 5);
+        
         doc.setFontSize(9);
-        doc.setTextColor(colorAccent);
-        doc.text('Capturing Moments, Creating Memories', 40, pageHeight - 10);
+        doc.setTextColor(colors.background);
+        doc.text('Capturing Moments, Creating Memories', 40, footerY + 20);
 
         doc.save(`${pkg.name || 'custom-package'}.pdf`);
     };
@@ -191,132 +233,145 @@ const CustomerDashboard = () => {
     return (
         <div className={styles.dashboardContainer}>
             {/* <div className={styles.header}>
-                <h1 className={styles.packageTitle}>Photography Packages</h1>
+                <h1 className={styles.dashboardTitle}>Photography Packages</h1>
             </div> */}
 
             <div className={styles.searchContainer}>
-                <input
-                    type="text"
-                    placeholder="Search packages..."
-                    className={styles.searchInput}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                <div className={styles.searchInputWrapper}>
+                    <input
+                        type="text"
+                        placeholder="Search packages..."
+                        className={styles.searchInput}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <MagnifyingGlassIcon className={styles.searchIcon} />
+                </div>
                 <div className={styles.priceFilter}>
-                    <input
-                        type="number"
-                        placeholder="Min price"
-                        className={styles.priceInput}
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
-                    />
-                    <span>to</span>
-                    <input
-                        type="number"
-                        placeholder="Max price"
-                        className={styles.priceInput}
-                        value={maxPrice}
-                        onChange={(e) => setMaxPrice(e.target.value)}
-                    />
+                    <div className={styles.priceInputWrapper}>
+                        <input
+                            type="number"
+                            placeholder="Min price"
+                            className={styles.priceInput}
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                        />
+                        <CurrencyDollarIcon className={styles.priceIcon} />
+                    </div>
+                    <span className={styles.priceSeparator}>to</span>
+                    <div className={styles.priceInputWrapper}>
+                        <input
+                            type="number"
+                            placeholder="Max price"
+                            className={styles.priceInput}
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                        />
+                        <CurrencyDollarIcon className={styles.priceIcon} />
+                    </div>
                 </div>
             </div>
 
-            <div className={styles.packageList}>
-                {filteredPackages.map((pkg) => (
-                    <div key={pkg.id} className={styles.packageCard} style={{ position: 'relative' }}>
-                        <div className={styles.packageCardContent}>
-                            {/* Wishlist Button in top right */}
-                            <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 2 }}>
-                                <WishlistButton
-                                    packageId={pkg.id}
-                                    packageType={pkg.packageType}
-                                    packageName={pkg.name}
-                                    price={pkg.investment}
-                                    imageUrl={pkg.image}
-                                />
-                            </div>
-                            <CameraIcon className={styles.packageIcon} />
-                            <h2 className={styles.packageTitle}>{pkg.name}</h2>
-                            <div className={styles.packageType}>{pkg.packageType}</div>
-                            <div className={styles.packagePrice}>{pkg.investment.toLocaleString()} LKR</div>
-                            
-                            <div className={styles.packageDetails}>
-                                <div className={styles.additionalItems}>
-                                    <div className={styles.additionalItemTitle}>Services Included:</div>
-                                    <ul className={styles.servicesList}>
-                                        {pkg.servicesIncluded?.map((service, index) => (
-                                            <li key={index} className={styles.serviceItem}>
-                                                <CheckIcon className="w-5 h-5" />
-                                                <span>{service}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
+            {loading ? (
+                <div className={styles.loading} />
+            ) : (
+                <div className={styles.packageList}>
+                    {filteredPackages.map((pkg) => (
+                        <div key={pkg.id} className={styles.packageCard} style={{ position: 'relative' }}>
+                            <div className={styles.packageCardContent}>
+                                {/* Wishlist Button in top right */}
+                                <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 2 }}>
+                                    <WishlistButton
+                                        packageId={pkg.id}
+                                        packageType={pkg.packageType}
+                                        packageName={pkg.name}
+                                        price={pkg.investment}
+                                        imageUrl={pkg.image}
+                                    />
                                 </div>
+                                <CameraIcon className={styles.packageIcon} />
+                                <h2 className={styles.packageTitle}>{pkg.name}</h2>
+                                <div className={styles.packageType}>{pkg.packageType}</div>
+                                <div className={styles.packagePrice}>{pkg.investment.toLocaleString()} LKR</div>
+                                
+                                <div className={styles.packageDetails}>
+                                    <div className={styles.additionalItems}>
+                                        <div className={styles.additionalItemTitle}>Services Included:</div>
+                                        <ul className={styles.servicesList}>
+                                            {pkg.servicesIncluded?.map((service, index) => (
+                                                <li key={index} className={styles.serviceItem}>
+                                                    <CheckIcon className="w-5 h-5" />
+                                                    <span>{service}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
 
-                                <div className={styles.additionalItems}>
-                                    <div className={styles.additionalItemTitle}>Additional Items:</div>
-                                    <div className={styles.servicesList}>
-                                        {pkg.additionalItems?.editedImages && (
-                                            <div className={styles.serviceItem}>
-                                                <PhotoIcon className="w-5 h-5" />
-                                                <span>Edited Images: {pkg.additionalItems.editedImages}</span>
-                                            </div>
-                                        )}
-                                        {pkg.additionalItems?.uneditedImages && (
-                                            <div className={styles.serviceItem}>
-                                                <CameraIcon className="w-5 h-5" />
-                                                <span>Unedited Images: {pkg.additionalItems.uneditedImages}</span>
-                                            </div>
-                                        )}
-                                        {pkg.additionalItems?.thankYouCards && (
-                                            <div className={styles.serviceItem}>
-                                                <DocumentArrowDownIcon className="w-5 h-5" />
-                                                <span>Thank You Cards: {pkg.additionalItems.thankYouCards}</span>
-                                            </div>
-                                        )}
-                                        {pkg.additionalItems?.albums?.map((album, index) => (
-                                            <div key={index} className={styles.serviceItem}>
-                                                <PhotoIcon className="w-5 h-5" />
-                                                <span>Album: {album.size}, {album.type}, {album.spreadCount} spreads</span>
-                                            </div>
-                                        ))}
-                                        {pkg.additionalItems?.framedPortraits?.map((portrait, index) => (
-                                            <div key={index} className={styles.serviceItem}>
-                                                <PhotoIcon className="w-5 h-5" />
-                                                <span>Framed Portrait: {portrait.size}, Quantity: {portrait.quantity}</span>
-                                            </div>
-                                        ))}
+                                    <div className={styles.additionalItems}>
+                                        <div className={styles.additionalItemTitle}>Additional Items:</div>
+                                        <div className={styles.servicesList}>
+                                            {pkg.additionalItems?.editedImages && (
+                                                <div className={styles.serviceItem}>
+                                                    <PhotoIcon className="w-5 h-5" />
+                                                    <span>Edited Images: {pkg.additionalItems.editedImages}</span>
+                                                </div>
+                                            )}
+                                            {pkg.additionalItems?.uneditedImages && (
+                                                <div className={styles.serviceItem}>
+                                                    <CameraIcon className="w-5 h-5" />
+                                                    <span>Unedited Images: {pkg.additionalItems.uneditedImages}</span>
+                                                </div>
+                                            )}
+                                            {pkg.additionalItems?.thankYouCards && (
+                                                <div className={styles.serviceItem}>
+                                                    <DocumentArrowDownIcon className="w-5 h-5" />
+                                                    <span>Thank You Cards: {pkg.additionalItems.thankYouCards}</span>
+                                                </div>
+                                            )}
+                                            {pkg.additionalItems?.albums?.map((album, index) => (
+                                                <div key={index} className={styles.serviceItem}>
+                                                    <PhotoIcon className="w-5 h-5" />
+                                                    <span>Album: {album.size}, {album.type}, {album.spreadCount} spreads</span>
+                                                </div>
+                                            ))}
+                                            {pkg.additionalItems?.framedPortraits?.map((portrait, index) => (
+                                                <div key={index} className={styles.serviceItem}>
+                                                    <PhotoIcon className="w-5 h-5" />
+                                                    <span>Framed Portrait: {portrait.size}, Quantity: {portrait.quantity}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className={styles.buttonContainer}>
-                                <button
-                                    onClick={() => handleBooking(pkg)}
-                                    className={`${styles.button} ${styles.bookButton}`}
-                                >
-                                    <ShoppingCartIcon className="w-5 h-5" />
-                                    Book Now
-                                </button>
-                                <button
-                                    onClick={() => handleCustomize(pkg)}
-                                    className={`${styles.button} ${styles.customizeButton}`}
-                                >
-                                    <PencilIcon className="w-5 h-5" />
-                                    Customize
-                                </button>
-                                <button
-                                    onClick={() => handleDownloadPDF(pkg)}
-                                    className={styles.downloadButton}
-                                    aria-label="Download PDF"
-                                >
-                                    <DocumentArrowDownIcon className="w-5 h-5" />
-                                </button>
+                                <div className={styles.buttonContainer}>
+                                    <button
+                                        onClick={() => handleBooking(pkg)}
+                                        className={`${styles.button} ${styles.bookButton}`}
+                                    >
+                                        <ShoppingCartIcon className="w-5 h-5" />
+                                        Book Now
+                                    </button>
+                                    <button
+                                        onClick={() => handleCustomize(pkg)}
+                                        className={`${styles.button} ${styles.customizeButton}`}
+                                    >
+                                        <PencilIcon className="w-5 h-5" />
+                                        Customize
+                                    </button>
+                                    <button
+                                        onClick={() => handleDownloadPDF(pkg)}
+                                        className={styles.downloadButton}
+                                        aria-label="Download PDF"
+                                    >
+                                        <DocumentArrowDownIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
 
             <div className={styles.chatbotContainer}>
                 <Chatbot 
