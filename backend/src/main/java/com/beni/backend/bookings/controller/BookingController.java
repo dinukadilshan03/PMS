@@ -184,4 +184,24 @@ public class BookingController {
             return ResponseEntity.status(500).body("Error unassigning staff: " + e.getMessage());
         }
     }
+
+    // Get bookings assigned to a staff member
+    @GetMapping("/staff/{staffId}")
+    public ResponseEntity<?> getBookingsForStaff(@PathVariable String staffId) {
+        logger.info("Fetching bookings for staff: {}", staffId);
+
+        if (staffId == null || staffId.isEmpty()) {
+            logger.error("Missing staff ID in request");
+            return ResponseEntity.status(400).body("Staff ID is required");
+        }
+
+        try {
+            List<Booking> bookings = bookingService.getBookingsForStaff(staffId);
+            logger.info("Successfully retrieved {} bookings for staff: {}", bookings.size(), staffId);
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            logger.error("Error fetching bookings: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error fetching bookings: " + e.getMessage());
+        }
+    }
 }

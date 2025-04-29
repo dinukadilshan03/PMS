@@ -49,9 +49,16 @@ export default function LoginPage() {
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('role', data.role);
             sessionStorage.setItem('email', data.email);
+            sessionStorage.setItem('token', data.token);
 
             window.dispatchEvent(new Event('loginStateChange'));
-            router.push('/');
+            
+            // Redirect based on user role
+            if (data.role === 'staff') {
+                router.push('/staff/dashboard');
+            } else {
+                router.push('/');
+            }
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);
