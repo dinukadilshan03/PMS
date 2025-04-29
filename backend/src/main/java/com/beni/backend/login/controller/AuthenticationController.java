@@ -70,4 +70,27 @@ public class AuthenticationController {
         User savedUser = userRepository.save(existingUser);
         return ResponseEntity.ok(savedUser);
     }
+
+    //new
+    // Add this to AuthenticationController.java
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponseDTO> register(@RequestBody User newUser) {
+        // Check if email already exists
+        if (userRepository.findByEmail(newUser.getEmail()) != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new LoginResponseDTO("Email already exists"));
+        }
+
+        // Set default role if not provided
+        if (newUser.getRole() == null) {
+            newUser.setRole("USER"); // or whatever default role you want
+        }
+
+        // Save the new user
+        User savedUser = userRepository.save(newUser);
+
+        // Return success response with user data
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new LoginResponseDTO(savedUser.getId(), savedUser.getRole(), savedUser.getEmail())
+        );
+    }
 }

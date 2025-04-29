@@ -5,51 +5,60 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [contactNumber, setContactNumber] = useState('');
     const [error, setError] = useState('');
+    const [isRegistering, setIsRegistering] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        // Add event listener for tab/window close
         const handleTabClose = () => {
             sessionStorage.clear();
         };
 
         window.addEventListener('beforeunload', handleTabClose);
-
-        return () => {
-            window.removeEventListener('beforeunload', handleTabClose);
-        };
+        return () => window.removeEventListener('beforeunload', handleTabClose);
     }, []);
 
-    const handleLogin = async () => {
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
         try {
-            const res = await fetch('http://localhost:8080/api/auth/login', {
+            const url = isRegistering
+                ? 'http://localhost:8080/api/auth/register'
+                : 'http://localhost:8080/api/auth/login';
+
+            const body = isRegistering
+                ? JSON.stringify({ name, email, password, contactNumber })
+                : JSON.stringify({ email, password });
+
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body,
                 credentials: 'include'
             });
 
             if (!res.ok) {
-                setError('Invalid email or password');
-                return;
+                const errorData = await res.json();
+                throw new Error(errorData.message || (isRegistering ? 'Registration failed' : 'Login failed'));
             }
 
             const data = await res.json();
-            console.log('Login successful:', data);
-
-            // Store user data in session storage
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('role', data.role);
-            sessionStorage.setItem('email', data.email); // Store email from response
+            sessionStorage.setItem('email', data.email);
 
-            // Dispatch custom event for login state change
             window.dispatchEvent(new Event('loginStateChange'));
-
             router.push('/');
         } catch (err) {
-            setError('Something went wrong');
-            console.log(err);
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unexpected error occurred');
+            }
+            console.error(err);
         }
     };
 
@@ -58,10 +67,10 @@ export default function LoginPage() {
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
                 <div className="text-center">
                     <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                        Welcome Back
+                        {isRegistering ? 'Create Account' : 'Welcome Back'}
                     </h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Sign in to your account to continue
+                        {isRegistering ? 'Create a new account' : 'Sign in to your account to continue'}
                     </p>
                 </div>
 
@@ -80,8 +89,55 @@ export default function LoginPage() {
                     </div>
                 )}
 
-                <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="space-y-4">
+                        {isRegistering && (
+                            <>
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                                        Full Name
+                                    </label>
+                                    <div className="mt-1 relative rounded-md shadow-sm">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            id="name"
+                                            type="text"
+                                            required
+                                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            placeholder="Your Name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700">
+                                        Contact Number
+                                    </label>
+                                    <div className="mt-1 relative rounded-md shadow-sm">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            id="contactNumber"
+                                            type="tel"
+                                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            placeholder="Phone Number"
+                                            value={contactNumber}
+                                            onChange={(e) => setContactNumber(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                 Email address
@@ -122,8 +178,12 @@ export default function LoginPage() {
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    minLength={isRegistering ? 8 : undefined}
                                 />
                             </div>
+                            {isRegistering && (
+                                <p className="mt-1 text-xs text-gray-500">Password must be at least 8 characters</p>
+                            )}
                         </div>
                     </div>
 
@@ -132,10 +192,27 @@ export default function LoginPage() {
                             type="submit"
                             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
                         >
-                            Sign in
+                            {isRegistering ? 'Sign Up' : 'Sign In'}
                         </button>
                     </div>
                 </form>
+
+                <div className="text-center">
+                    <button
+                        type="button"
+                        className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                        onClick={() => {
+                            setIsRegistering(!isRegistering);
+                            setError('');
+                            setEmail('');
+                            setPassword('');
+                        }}
+                    >
+                        {isRegistering
+                            ? 'Already have an account? Sign In'
+                            : "Don't have an account? Sign Up"}
+                    </button>
+                </div>
             </div>
         </div>
     );
