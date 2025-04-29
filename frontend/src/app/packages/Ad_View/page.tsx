@@ -25,7 +25,8 @@ import {
     TagIcon,
     CreditCardIcon,
     CubeIcon,
-    PlusIcon
+    PlusIcon,
+    ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 
 const HomePage = () => {
@@ -216,10 +217,13 @@ const HomePage = () => {
         <div className="min-h-screen bg-[#e9e5dc] py-16 px-4 font-sans">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-12">
-                    <div className="text-center">
-                        <h1 className="text-4xl font-serif font-light text-[#2d2926] mb-2 tracking-wide">Packages</h1>
-                        <div className="w-16 h-1 bg-[#937d5e] mx-auto mb-6" />
-                        {/* <p className="text-center text-base text-[#2d2926]/80 mb-8 font-light">Manage and view all photography packages</p> */}
+                    <div className="flex items-center gap-4">
+                        <Link href="/admin" className="group">
+                            <div className="w-12 h-12 rounded-full bg-[#f7f6f2] flex items-center justify-center border-2 border-[#e5e1da] shadow-lg group-hover:bg-[#ede7df] group-hover:border-[#937d5e] transition-all duration-300">
+                                <ArrowLeftIcon className="w-6 h-6 text-[#937d5e]" />
+                            </div>
+                        </Link>
+                        <h1 className="text-4xl font-serif font-light text-[#2d2926] tracking-wide">Packages</h1>
                     </div>
                     <Link
                         href="/packages/create"

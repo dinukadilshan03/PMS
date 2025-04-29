@@ -156,10 +156,15 @@ export default function Home() {
                         </div>
                         <div className="mt-10 lg:mt-0 lg:w-1/2">
                             <div className="relative">
-                                <div className="aspect-w-16 aspect-h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                                    <svg className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
+                                <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-2xl">
+                                    <Image
+                                        src="/images/imgp.jpg"
+                                        alt="Event Booking"
+                                        width={800}
+                                        height={450}
+                                        className="w-full h-full object-cover"
+                                        priority
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -171,7 +176,7 @@ export default function Home() {
             <section className="bg-gray-50 py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="lg:flex lg:items-center lg:justify-between">
-                        <div className="lg:w-1/2 lg:pr-12 order-2">
+                        <div className="mt-10 lg:mt-0 lg:w-1/2">
                             <div className="relative">
                                 <div className="aspect-w-1 aspect-h-1 rounded-2xl overflow-hidden shadow-2xl">
                                     <img
@@ -183,7 +188,7 @@ export default function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="lg:w-1/2 order-1">
+                        <div className="lg:w-1/2 lg:pl-12">
                             <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
                                 <span className="block text-black">PHOTO ALBUMS</span>
                             </h2>
@@ -274,7 +279,7 @@ export default function Home() {
                             </div>
                             <div className="mt-8">
                                 <button
-                                    onClick={() => router.push('/packages')}
+                                    onClick={() => router.push('/packages/Dashboard')}
                                     className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-black hover:bg-gray-800 transition duration-150"
                                 >
                                     View Packages
@@ -301,7 +306,7 @@ export default function Home() {
             <section className="bg-gray-50 py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="lg:flex lg:items-center lg:justify-between">
-                        <div className="lg:w-1/2 lg:pr-12 order-2">
+                        <div className="mt-10 lg:mt-0 lg:w-1/2">
                             <div className="relative">
                                 <div className="aspect-w-1 aspect-h-1 rounded-2xl overflow-hidden shadow-2xl">
                                     <img
@@ -313,7 +318,7 @@ export default function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="lg:w-1/2 order-1">
+                        <div className="lg:w-1/2 lg:pl-12">
                             <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
                                 <span className="block text-black">PORTFOLIO</span>
                             </h2>
@@ -380,7 +385,7 @@ export default function Home() {
                         </div>
                         <div className="ml-3 inline-flex rounded-md shadow">
                             <button
-                                onClick={() => router.push('/packages')}
+                                onClick={() => router.push('/packages/Dashboard')}
                                 className="inline-flex items-center justify-center px-5 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-gray-900"
                             >
                                 View Packages
