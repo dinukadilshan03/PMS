@@ -53,11 +53,12 @@ export default function LoginPage() {
 
             window.dispatchEvent(new Event('loginStateChange'));
             
-
-            // Redirect based on role
-            if (data.role === 'ADMIN') {
+            // Redirect based on role (case-insensitive check)
+            const userRole = data.role?.toUpperCase();
+            if (userRole === 'ADMIN') {
                 router.push('/admin');
-
+            } else if (userRole === 'STAFF') {
+                router.push('/staff/dashboard');
             } else {
                 router.push('/');
             }
