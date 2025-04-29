@@ -17,7 +17,6 @@ export default function AlbumList() {
     const generatePDF = (album: Album) => {
         const doc = new jsPDF();
 
-        const doc1 = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         const margin = 10;
