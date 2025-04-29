@@ -37,6 +37,15 @@ const BookingList = () => {
         title: '',
         message: ''
     });
+    const [cancelDialog, setCancelDialog] = useState<{
+        open: boolean;
+        bookingId: string | null;
+        bookingDetails: string;
+    }>({
+        open: false,
+        bookingId: null,
+        bookingDetails: ''
+    });
     const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -302,35 +311,53 @@ const BookingList = () => {
         doc.save(`booking-${booking.id}.pdf`);
     };
 
-    const handleCancel = async (bookingId: string) => {
-        const userId = sessionStorage.getItem('userId');
-        if (!userId) {
-            setError('User not logged in');
-            return;
-        }
+    const handleCancelClick = (booking: Booking) => {
+        setCancelDialog({
+            open: true,
+            bookingId: booking.id,
+            bookingDetails: `${booking.packageName} scheduled for ${new Date(booking.dateTime).toLocaleString()}`
+        });
+    };
 
+    const handleCancel = async (bookingId: string) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/bookings/cancel/${bookingId}`, {
-                method: 'PATCH',
+            const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/cancel`, {
+                method: 'PUT',
                 headers: {
-                    'userId': userId,
                     'Content-Type': 'application/json',
                 },
             });
 
             if (!response.ok) {
-                const errorMessage = await response.text();
-                throw new Error(errorMessage);
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to cancel booking');
             }
 
-            setBookings(bookings.map(booking =>
-                booking.id === bookingId ? { ...booking, bookingStatus: 'cancelled' } : booking
-            ));
-        } catch (err) {
-            const message = (err as Error).message;
-            setError(message);
-            alert(message);
-            console.error(err);
+            // Update the booking status in the local state
+            setBookings(prevBookings =>
+                prevBookings.map(booking =>
+                    booking.id === bookingId
+                        ? { ...booking, bookingStatus: 'cancelled' }
+                        : booking
+                )
+            );
+
+            // Close the cancel dialog
+            setCancelDialog(prev => ({ ...prev, open: false }));
+
+            // Show success message
+            setLimitDialog({
+                open: true,
+                title: 'Success',
+                message: 'Booking cancelled successfully'
+            });
+        } catch (error) {
+            console.error('Error cancelling booking:', error);
+            setLimitDialog({
+                open: true,
+                title: 'Error',
+                message: error instanceof Error ? error.message : 'Failed to cancel booking'
+            });
         }
     };
 
@@ -362,16 +389,24 @@ const BookingList = () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                if (errorData.message?.includes('Cannot create more than')) {
+                const errorText = await response.text();
+                let errorMessage = 'Failed to reschedule booking';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    errorMessage = errorText || errorMessage;
+                }
+                
+                if (errorMessage.includes('Cannot create more than')) {
                     setLimitDialog({
                         open: true,
                         title: 'Booking Limit Reached',
-                        message: errorData.message
+                        message: errorMessage
                     });
                     return;
                 }
-                throw new Error(errorData.message || 'Failed to reschedule booking');
+                throw new Error(errorMessage);
             }
 
             const updatedBooking = await response.json();
@@ -555,17 +590,10 @@ const BookingList = () => {
                                     </div>
                                     <div className="mt-5 flex space-x-2">
                                         <button
-                                            onClick={() => handleCancel(booking.id)}
-                                            disabled={booking.bookingStatus.toLowerCase() === 'cancelled'}
-                                            className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white ${
-                                                booking.bookingStatus.toLowerCase() === 'cancelled' 
-                                                    ? 'bg-gray-400 cursor-not-allowed' 
-                                                    : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
-                                            }`}
+                                            onClick={() => handleCancelClick(booking)}
+                                            className="text-red-600 hover:text-red-800 font-medium"
+                                            disabled={booking.bookingStatus === 'cancelled'}
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
                                             Cancel
                                         </button>
                                         <button
@@ -680,35 +708,165 @@ const BookingList = () => {
                 onClose={() => setLimitDialog(prev => ({ ...prev, open: false }))}
                 PaperProps={{
                     sx: {
-                        borderRadius: 0,
-                        boxShadow: 'none',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        maxWidth: '400px',
+                        width: '100%',
+                        mx: 2,
                         border: '1px solid',
-                        borderColor: 'divider'
+                        borderColor: 'divider',
+                        overflow: 'hidden'
                     }
                 }}
             >
                 <DialogTitle sx={{ 
-                    fontWeight: 500,
-                    color: 'text.primary',
-                    letterSpacing: '-0.5px'
+                    fontWeight: 600,
+                    color: 'error.main',
+                    fontSize: '1.25rem',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    py: 2,
+                    px: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
                 }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
                     {limitDialog.title}
                 </DialogTitle>
-                <DialogContent>
-                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                <DialogContent sx={{ 
+                    py: 3,
+                    px: 3,
+                }}>
+                    <Typography variant="body1" sx={{ 
+                        color: 'text.secondary',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        fontSize: '0.95rem',
+                        lineHeight: 1.5
+                    }}>
                         {limitDialog.message}
                     </Typography>
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{ 
+                    px: 3,
+                    py: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    justifyContent: 'flex-end',
+                    gap: 1
+                }}>
                     <Button 
                         onClick={() => setLimitDialog(prev => ({ ...prev, open: false }))}
+                        variant="contained"
                         sx={{
                             textTransform: 'none',
                             fontWeight: 500,
-                            borderRadius: 0
+                            borderRadius: '8px',
+                            backgroundColor: 'error.main',
+                            '&:hover': {
+                                backgroundColor: 'error.dark'
+                            },
+                            px: 3
                         }}
                     >
                         Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Add Cancellation Confirmation Dialog */}
+            <Dialog
+                open={cancelDialog.open}
+                onClose={() => setCancelDialog(prev => ({ ...prev, open: false }))}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        maxWidth: '400px',
+                        width: '100%',
+                        mx: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        overflow: 'hidden'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ 
+                    fontWeight: 600,
+                    color: 'error.main',
+                    fontSize: '1.25rem',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    py: 2,
+                    px: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Cancel Booking
+                </DialogTitle>
+                <DialogContent sx={{ 
+                    py: 3,
+                    px: 3,
+                }}>
+                    <Typography variant="body1" sx={{ 
+                        color: 'text.secondary',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        fontSize: '0.95rem',
+                        lineHeight: 1.5
+                    }}>
+                        Are you sure you want to cancel this booking for {cancelDialog.bookingDetails}?
+                        This action cannot be undone.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ 
+                    px: 3,
+                    py: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    justifyContent: 'flex-end',
+                    gap: 1
+                }}>
+                    <Button 
+                        onClick={() => setCancelDialog(prev => ({ ...prev, open: false }))}
+                        variant="outlined"
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            borderRadius: '8px',
+                            borderColor: 'grey.300',
+                            color: 'text.primary',
+                            '&:hover': {
+                                backgroundColor: 'grey.50',
+                                borderColor: 'grey.400'
+                            },
+                            px: 3
+                        }}
+                    >
+                        Keep Booking
+                    </Button>
+                    <Button 
+                        onClick={() => cancelDialog.bookingId && handleCancel(cancelDialog.bookingId)}
+                        variant="contained"
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            borderRadius: '8px',
+                            backgroundColor: 'error.main',
+                            '&:hover': {
+                                backgroundColor: 'error.dark'
+                            },
+                            px: 3
+                        }}
+                    >
+                        Cancel Booking
                     </Button>
                 </DialogActions>
             </Dialog>

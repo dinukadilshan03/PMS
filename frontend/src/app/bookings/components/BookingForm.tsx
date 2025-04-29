@@ -309,16 +309,24 @@ const CreateBookingForm = () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                if (errorData.message?.includes('Cannot create more than')) {
+                const errorText = await response.text();
+                let errorMessage = 'Failed to create booking';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    errorMessage = errorText || errorMessage;
+                }
+                
+                if (errorMessage.includes('Cannot create more than')) {
                     setLimitDialog({
                         open: true,
                         title: 'Booking Limit Reached',
-                        message: errorData.message
+                        message: errorMessage
                     });
                     return;
                 }
-                throw new Error(errorData.message || 'Failed to create booking');
+                throw new Error(errorMessage);
             }
 
             const newBooking = await response.json();
@@ -386,25 +394,35 @@ const CreateBookingForm = () => {
                             sx: {
                                 borderRadius: '12px',
                                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                                maxWidth: '320px',
+                                maxWidth: '400px',
                                 width: '100%',
-                                mx: 2
+                                mx: 2,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                overflow: 'hidden'
                             }
                         }}
                     >
                         <DialogTitle sx={{ 
                             fontWeight: 600,
                             color: 'error.main',
-                            fontSize: '1.1rem',
-                            textAlign: 'center',
-                            py: 2
+                            fontSize: '1.25rem',
+                            borderBottom: '1px solid',
+                            borderColor: 'divider',
+                            py: 2,
+                            px: 3,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
                         }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
                             {limitDialog.title}
                         </DialogTitle>
                         <DialogContent sx={{ 
-                            py: 2,
+                            py: 3,
                             px: 3,
-                            textAlign: 'center'
                         }}>
                             <Typography variant="body1" sx={{ 
                                 color: 'text.secondary',
@@ -419,21 +437,23 @@ const CreateBookingForm = () => {
                         <DialogActions sx={{ 
                             px: 3,
                             py: 2,
-                            justifyContent: 'center'
+                            borderTop: '1px solid',
+                            borderColor: 'divider',
+                            justifyContent: 'flex-end',
+                            gap: 1
                         }}>
                             <Button 
                                 onClick={() => setLimitDialog(prev => ({ ...prev, open: false }))}
-                                variant="outlined"
+                                variant="contained"
                                 sx={{
                                     textTransform: 'none',
                                     fontWeight: 500,
                                     borderRadius: '8px',
-                                    borderColor: 'error.main',
-                                    color: 'error.main',
+                                    backgroundColor: 'error.main',
                                     '&:hover': {
-                                        backgroundColor: 'error.light',
-                                        borderColor: 'error.main'
-                                    }
+                                        backgroundColor: 'error.dark'
+                                    },
+                                    px: 3
                                 }}
                             >
                                 Close
