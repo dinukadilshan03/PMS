@@ -10,7 +10,7 @@ import {
     GiftIcon,
     CheckIcon,
     ArrowLeftIcon
-} from "@heroicons/react/20/solid";
+} from "@heroicons/react/24/outline";
 
 const CreatePackage = () => {
     const [name, setName] = useState("");
@@ -146,65 +146,65 @@ const CreatePackage = () => {
 
     return (
         <div className="min-h-screen bg-[#e9e5dc] py-16 px-4 font-sans">
-            <div className="max-w-3xl mx-auto bg-white rounded-[2.5rem_1rem_2.5rem_1rem] shadow-lg p-0" style={{ boxShadow: '0 8px 32px rgba(45,41,38,0.07)' }}>
+            <div className="max-w-3xl mx-auto bg-[#f7f6f2] rounded-[2.5rem_1rem_2.5rem_1rem] shadow-xl p-0" style={{ boxShadow: '0 8px 32px rgba(45,41,38,0.15)' }}>
                 {/* Section Heading */}
                 <div className="px-10 pt-10 pb-2">
-                    <h1 className="text-3xl font-serif font-light text-[#222] mb-2 tracking-wide">create package</h1>
-                    <div className="w-16 h-1 bg-black mb-6" />
-                    <p className="text-center text-base text-[#444] mb-8 font-light">Please fill out the form to create a new package.</p>
+                    <h1 className="text-4xl font-serif font-light text-[#2d2926] mb-2 tracking-wide">Create Package</h1>
+                    <div className="w-16 h-1 bg-[#937d5e] mb-6" />
+                    <p className="text-center text-base text-[#2d2926]/80 mb-8 font-light">Please fill out the form to create a new package.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="px-10 pb-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 mb-8">
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="name" className="text-xs font-medium text-[#222] tracking-widest uppercase">Package Name</label>
+                            <label htmlFor="name" className="text-sm font-medium text-[#2d2926] tracking-wider">Package Name</label>
                             <input
                                 type="text"
                                 id="name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                 placeholder="Enter package name"
                                 required
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="investment" className="text-xs font-medium text-[#222] tracking-widest uppercase">Investment (LKR)</label>
+                            <label htmlFor="investment" className="text-sm font-medium text-[#2d2926] tracking-wider">Investment (LKR)</label>
                             <input
                                 type="number"
                                 id="investment"
                                 value={investment}
                                 onChange={(e) => setInvestment(e.target.value)}
-                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                 placeholder="Enter investment"
                                 required
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="packageType" className="text-xs font-medium text-[#222] tracking-widest uppercase">Package Type</label>
+                            <label htmlFor="packageType" className="text-sm font-medium text-[#2d2926] tracking-wider">Package Type</label>
                             <input
                                 type="text"
                                 id="packageType"
                                 value={packageType}
                                 onChange={(e) => setPackageType(e.target.value)}
-                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                 placeholder="Enter package type"
                                 required
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-medium text-[#222] tracking-widest uppercase">Thank You Cards</label>
+                            <label className="text-sm font-medium text-[#2d2926] tracking-wider">Thank You Cards</label>
                             <input
                                 type="text"
                                 value={thankYouCards}
                                 onChange={(e) => setThankYouCards(e.target.value)}
-                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                 placeholder="Enter quantity"
                             />
                         </div>
                     </div>
                     {/* Services Included */}
                     <div className="mb-8">
-                        <label className="block text-xs font-medium text-[#222] tracking-widest uppercase mb-2">Services Included</label>
+                        <label className="block text-sm font-medium text-[#2d2926] tracking-wider mb-2">Services Included</label>
                         <div className="flex flex-col gap-2">
                             {servicesIncluded.map((service, index) => (
                                 <div key={index} className="flex gap-2 items-center">
@@ -212,14 +212,14 @@ const CreatePackage = () => {
                                         type="text"
                                         value={service}
                                         onChange={(e) => handleServiceChange(e, index)}
-                                        className="flex-1 border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        className="flex-1 border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                         placeholder="Enter service"
                                         required
                                     />
                                     <button
                                         type="button"
                                         onClick={() => removeService(index)}
-                                        className="p-1 text-[#bbb] hover:text-red-500 transition"
+                                        className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200"
                                     >
                                         <XMarkIcon className="h-5 w-5" />
                                     </button>
@@ -228,7 +228,7 @@ const CreatePackage = () => {
                             <button
                                 type="button"
                                 onClick={addService}
-                                className="inline-flex items-center gap-2 text-xs font-medium text-[#b6a489] hover:text-[#222] transition mt-2"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-[#937d5e] hover:text-[#2d2926] transition-colors mt-2"
                             >
                                 <PlusIcon className="h-4 w-4" /> Add Service
                             </button>
@@ -237,23 +237,23 @@ const CreatePackage = () => {
                     {/* Additional Items */}
                     <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-medium text-[#222] tracking-widest uppercase">Edited Images</label>
+                            <label className="text-sm font-medium text-[#2d2926] tracking-wider">Edited Images</label>
                             <input
                                 type="text"
                                 value={editedImages}
                                 onChange={(e) => setEditedImages(e.target.value)}
-                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                 placeholder="Enter edited images"
                                 required
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-medium text-[#222] tracking-widest uppercase">Unedited Images</label>
+                            <label className="text-sm font-medium text-[#2d2926] tracking-wider">Unedited Images</label>
                             <input
                                 type="text"
                                 value={uneditedImages}
                                 onChange={(e) => setUneditedImages(e.target.value)}
-                                className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                 placeholder="Enter unedited images"
                                 required
                             />
@@ -261,7 +261,7 @@ const CreatePackage = () => {
                     </div>
                     {/* Albums */}
                     <div className="mb-8">
-                        <label className="block text-xs font-medium text-[#222] tracking-widest uppercase mb-2">Albums</label>
+                        <label className="block text-sm font-medium text-[#2d2926] tracking-wider mb-2">Albums</label>
                         <div className="flex flex-col gap-2">
                             {albums.map((album, index) => (
                                 <div key={index} className="grid grid-cols-3 gap-2 items-center">
@@ -270,14 +270,14 @@ const CreatePackage = () => {
                                         value={album.size}
                                         onChange={(e) => handleAlbumChange(index, 'size', e.target.value)}
                                         placeholder="Size"
-                                        className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                     />
                                     <input
                                         type="text"
                                         value={album.type}
                                         onChange={(e) => handleAlbumChange(index, 'type', e.target.value)}
                                         placeholder="Type"
-                                        className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                     />
                                     <div className="flex gap-2 items-center">
                                         <input
@@ -285,12 +285,12 @@ const CreatePackage = () => {
                                             value={album.spreadCount}
                                             onChange={(e) => handleAlbumChange(index, 'spreadCount', e.target.value)}
                                             placeholder="Spread Count"
-                                            className="flex-1 border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                            className="flex-1 border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveAlbum(index)}
-                                            className="p-1 text-[#bbb] hover:text-red-500 transition"
+                                            className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200"
                                         >
                                             <XMarkIcon className="h-5 w-5" />
                                         </button>
@@ -300,7 +300,7 @@ const CreatePackage = () => {
                             <button
                                 type="button"
                                 onClick={handleAddAlbum}
-                                className="inline-flex items-center gap-2 text-xs font-medium text-[#b6a489] hover:text-[#222] transition mt-2"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-[#937d5e] hover:text-[#2d2926] transition-colors mt-2"
                             >
                                 <PlusIcon className="h-4 w-4" /> Add Album
                             </button>
@@ -308,7 +308,7 @@ const CreatePackage = () => {
                     </div>
                     {/* Framed Portraits */}
                     <div className="mb-8">
-                        <label className="block text-xs font-medium text-[#222] tracking-widest uppercase mb-2">Framed Portraits</label>
+                        <label className="block text-sm font-medium text-[#2d2926] tracking-wider mb-2">Framed Portraits</label>
                         <div className="flex flex-col gap-2">
                             {framedPortraits.map((portrait, index) => (
                                 <div key={index} className="grid grid-cols-2 gap-2 items-center">
@@ -317,7 +317,7 @@ const CreatePackage = () => {
                                         value={portrait.size}
                                         onChange={(e) => handlePortraitChange(index, 'size', e.target.value)}
                                         placeholder="Size"
-                                        className="border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                        className="border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                     />
                                     <div className="flex gap-2 items-center">
                                         <input
@@ -325,12 +325,12 @@ const CreatePackage = () => {
                                             value={portrait.quantity}
                                             onChange={(e) => handlePortraitChange(index, 'quantity', e.target.value)}
                                             placeholder="Quantity"
-                                            className="flex-1 border-b border-[#bbb] bg-transparent px-0 py-2 text-[#222] focus:outline-none focus:border-black transition placeholder:text-[#bbb]"
+                                            className="flex-1 border-b-2 border-[#e5e1da] bg-transparent px-0 py-2 text-[#2d2926] focus:outline-none focus:border-[#937d5e] transition-all duration-200 placeholder:text-[#2d2926]/50"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => handleRemovePortrait(index)}
-                                            className="p-1 text-[#bbb] hover:text-red-500 transition"
+                                            className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200"
                                         >
                                             <XMarkIcon className="h-5 w-5" />
                                         </button>
@@ -340,7 +340,7 @@ const CreatePackage = () => {
                             <button
                                 type="button"
                                 onClick={handleAddPortrait}
-                                className="inline-flex items-center gap-2 text-xs font-medium text-[#b6a489] hover:text-[#222] transition mt-2"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-[#937d5e] hover:text-[#2d2926] transition-colors mt-2"
                             >
                                 <PlusIcon className="h-4 w-4" /> Add Portrait
                             </button>
@@ -350,9 +350,9 @@ const CreatePackage = () => {
                     <div className="flex justify-center mt-10">
                         <button
                             type="submit"
-                            className="w-64 py-3 rounded-full bg-[#a08c6b] text-white text-base font-serif tracking-widest uppercase shadow hover:bg-[#7c6a53] transition"
+                            className="w-64 py-3 rounded-full bg-[#937d5e] text-white text-base font-medium tracking-wider hover:bg-[#7a674d] transition-colors shadow-md hover:shadow-lg"
                         >
-                            Submit
+                            Create Package
                         </button>
                     </div>
                 </form>

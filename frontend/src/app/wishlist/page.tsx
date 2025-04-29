@@ -3,6 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { useWishlist } from '../../context/WishlistContext';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import {
+    HeartIcon,
+    ShoppingCartIcon,
+    EyeIcon,
+    XMarkIcon,
+    PhotoIcon,
+    CameraIcon,
+    DocumentTextIcon,
+    CheckIcon
+} from '@heroicons/react/24/outline';
 
 interface FullPackage {
     id: string;
@@ -46,20 +56,20 @@ export default function WishlistPage() {
 
     if (loading || fetching) {
         return (
-            <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            <div className="min-h-screen bg-gradient-to-b from-[#f7f6f2] to-[#e2dacf] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#937d5e]"></div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-                <div className="text-center">
+            <div className="min-h-screen bg-gradient-to-b from-[#f7f6f2] to-[#e2dacf] flex items-center justify-center">
+                <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
                     <p className="text-red-500 mb-4">{error}</p>
                     <button
                         onClick={() => router.push('/')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                        className="px-6 py-3 bg-[#937d5e] text-white rounded-lg hover:bg-[#b8a088] transition-colors duration-300"
                     >
                         Go Home
                     </button>
@@ -69,69 +79,120 @@ export default function WishlistPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#b09f88] py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-b from-[#f7f6f2] to-[#e2dacf] py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">Wishlist</h1>
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-serif text-[#2d2926] mb-4">Your Wishlist</h1>
+                    <p className="text-[#6B7280]">Your favorite photography packages</p>
+                </div>
 
                 {wishlist.length === 0 ? (
-                    <div className="text-center py-12">
-                        <svg
-                            className="mx-auto h-12 w-12 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                            />
-                        </svg>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No items in wishlist</h3>
-                        <p className="mt-1 text-sm text-gray-500">
+                    <div className="text-center py-16 bg-white rounded-xl shadow-lg max-w-2xl mx-auto">
+                        <HeartIcon className="mx-auto h-16 w-16 text-[#937d5e] mb-4" />
+                        <h3 className="text-xl font-medium text-[#2d2926]">Your wishlist is empty</h3>
+                        <p className="mt-2 text-[#6B7280]">
                             Start adding packages to your wishlist to see them here.
                         </p>
-                        <div className="mt-6">
+                        <div className="mt-8">
                             <button
                                 onClick={() => router.push('/packages')}
-                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                className="inline-flex items-center px-6 py-3 bg-[#937d5e] text-white rounded-lg hover:bg-[#b8a088] transition-colors duration-300"
                             >
                                 Browse Packages
                             </button>
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {wishlist.map((item) => (
-                            <div
-                                key={item.id}
-                                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 p-4 flex flex-col gap-2"
-                            >
-                                <h3 className="text-lg font-medium text-gray-900">{item.packageName}</h3>
-                                <div className="mt-1 text-lg font-semibold text-indigo-600">{item.price.toLocaleString()} LKR</div>
-                                <div className="mt-4 flex justify-between gap-2">
-                                    <button
-                                        onClick={() => removeFromWishlist(item.packageId)}
-                                        className="text-sm font-medium text-red-600 hover:text-red-500 border border-red-200 rounded px-3 py-1"
-                                    >
-                                        Remove
-                                    </button>
-                                    <button
-                                        onClick={() => router.push(`/bookings/create?packageName=${encodeURIComponent(item.packageName)}`)}
-                                        className="text-sm font-medium text-green-600 hover:text-green-500 border border-green-200 rounded px-3 py-1"
-                                    >
-                                        Book Now
-                                    </button>
-                                    <button
-                                        onClick={() => router.push('/packages/Dashboard')}
-                                        className="text-sm font-medium text-indigo-600 hover:text-indigo-500 border border-indigo-200 rounded px-3 py-1"
-                                    >
-                                        View
-                                    </button>
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                        {wishlist.map((item) => {
+                            const pkg = packages[item.packageId];
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                                >
+                                    <div className="p-6">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <h3 className="text-xl font-serif text-[#2d2926]">{item.packageName}</h3>
+                                            <button
+                                                onClick={() => removeFromWishlist(item.packageId)}
+                                                className="text-[#937d5e] hover:text-red-500 transition-colors duration-300"
+                                            >
+                                                <XMarkIcon className="h-6 w-6" />
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <span className="px-3 py-1 bg-[#f7f6f2] text-[#937d5e] text-sm rounded-full">
+                                                {item.packageType}
+                                            </span>
+                                            <span className="text-xl font-serif text-[#2d2926]">
+                                                {item.price.toLocaleString()} LKR
+                                            </span>
+                                        </div>
+
+                                        {pkg && (
+                                            <div className="space-y-4">
+                                                <div className="space-y-2">
+                                                    <h4 className="text-sm font-medium text-[#6B7280]">Services Included</h4>
+                                                    <ul className="space-y-2">
+                                                        {pkg.servicesIncluded.map((service, index) => (
+                                                            <li key={index} className="flex items-center gap-2 text-sm">
+                                                                <CheckIcon className="h-4 w-4 text-[#937d5e]" />
+                                                                <span>{service}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <h4 className="text-sm font-medium text-[#6B7280]">Additional Items</h4>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        {pkg.additionalItems.editedImages && (
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                <PhotoIcon className="h-4 w-4 text-[#937d5e]" />
+                                                                <span>{pkg.additionalItems.editedImages} Edited Images</span>
+                                                            </div>
+                                                        )}
+                                                        {pkg.additionalItems.uneditedImages && (
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                <CameraIcon className="h-4 w-4 text-[#937d5e]" />
+                                                                <span>{pkg.additionalItems.uneditedImages} Unedited Images</span>
+                                                            </div>
+                                                        )}
+                                                        {pkg.additionalItems.thankYouCards && (
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                <DocumentTextIcon className="h-4 w-4 text-[#937d5e]" />
+                                                                <span>{pkg.additionalItems.thankYouCards} Thank You Cards</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="px-6 py-4 bg-[#f7f6f2] border-t border-[#e2dacf]">
+                                        <div className="flex justify-between gap-3">
+                                            <button
+                                                onClick={() => router.push(`/bookings/create?packageName=${encodeURIComponent(item.packageName)}`)}
+                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#937d5e] text-white rounded-lg hover:bg-[#b8a088] transition-colors duration-300"
+                                            >
+                                                <ShoppingCartIcon className="h-5 w-5" />
+                                                Book Now
+                                            </button>
+                                            <button
+                                                onClick={() => router.push('/packages/Dashboard')}
+                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white text-[#937d5e] border border-[#937d5e] rounded-lg hover:bg-[#f7f6f2] transition-colors duration-300"
+                                            >
+                                                <EyeIcon className="h-5 w-5" />
+                                                View
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
