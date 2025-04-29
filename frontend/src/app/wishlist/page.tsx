@@ -46,7 +46,7 @@ export default function WishlistPage() {
 
     if (loading || fetching) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
             </div>
         );
@@ -54,7 +54,7 @@ export default function WishlistPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-red-500 mb-4">{error}</p>
                     <button
@@ -69,9 +69,9 @@ export default function WishlistPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#b09f88] py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">My Wishlist</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-8">Wishlist</h1>
 
                 {wishlist.length === 0 ? (
                     <div className="text-center py-12">
