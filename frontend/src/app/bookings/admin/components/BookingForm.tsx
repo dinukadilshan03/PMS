@@ -248,53 +248,54 @@ const BookingForm: React.FC<BookingFormProps> = ({ bookingId }) => {
                 PaperProps={{
                     sx: {
                         borderRadius: '12px',
-                        padding: '16px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                         maxWidth: '400px',
                         width: '100%',
-                        border: '1px solid #ffebee'
+                        mx: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        overflow: 'hidden'
                     }
                 }}
             >
                 <DialogTitle sx={{ 
-                    padding: '16px 16px 8px',
+                    fontWeight: 600,
+                    color: 'error.main',
+                    fontSize: '1.25rem',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    py: 2,
+                    px: 3,
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    borderBottom: '1px solid #ffebee',
-                    '& .MuiTypography-root': {
-                        fontSize: '1.25rem',
-                        fontWeight: 600,
-                        color: '#d32f2f'
-                    }
+                    gap: 1
                 }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
                     {errorDialog.title}
-                    <IconButton
-                        onClick={() => setErrorDialog(prev => ({ ...prev, open: false }))}
-                        sx={{
-                            color: '#d32f2f',
-                            '&:hover': {
-                                backgroundColor: '#ffebee'
-                            }
-                        }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ 
-                    padding: '24px 16px',
-                    color: '#666',
-                    fontSize: '0.95rem',
-                    lineHeight: 1.5
+                    py: 3,
+                    px: 3,
                 }}>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ 
+                        color: 'text.secondary',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        fontSize: '0.95rem',
+                        lineHeight: 1.5
+                    }}>
                         {errorDialog.message}
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ 
-                    padding: '16px',
-                    gap: '8px',
-                    borderTop: '1px solid #ffebee'
+                    px: 3,
+                    py: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    justifyContent: 'flex-end',
+                    gap: 1
                 }}>
                     <Button 
                         onClick={() => setErrorDialog(prev => ({ ...prev, open: false }))}
@@ -302,12 +303,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ bookingId }) => {
                         sx={{
                             textTransform: 'none',
                             fontWeight: 500,
-                            padding: '8px 24px',
                             borderRadius: '8px',
-                            backgroundColor: '#d32f2f',
+                            backgroundColor: 'error.main',
                             '&:hover': {
-                                backgroundColor: '#b71c1c'
-                            }
+                                backgroundColor: 'error.dark'
+                            },
+                            px: 3
                         }}
                     >
                         Close

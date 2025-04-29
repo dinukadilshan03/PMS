@@ -537,44 +537,90 @@ const BookingTable = () => {
                 onClose={() => setDeleteDialog(prev => ({ ...prev, open: false }))}
                 PaperProps={{
                     sx: {
-                        borderRadius: 2,
-                        maxWidth: 400,
-                        width: '100%'
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        maxWidth: '400px',
+                        width: '100%',
+                        mx: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        overflow: 'hidden'
                     }
                 }}
             >
                 <DialogTitle sx={{ 
                     fontWeight: 600,
                     color: 'error.main',
-                    textAlign: 'center',
-                    py: 2
+                    fontSize: '1.25rem',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    py: 2,
+                    px: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
                 }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                     Delete {deleteDialog.bookingIds.length === 1 ? 'Booking' : 'Bookings'}
                 </DialogTitle>
-                <DialogContent sx={{ py: 2, px: 3 }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+                <DialogContent sx={{ 
+                    py: 3,
+                    px: 3,
+                }}>
+                    <Typography variant="body1" sx={{ 
+                        color: 'text.secondary',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        fontSize: '0.95rem',
+                        lineHeight: 1.5
+                    }}>
                         Are you sure you want to delete {deleteDialog.bookingDetails}?
                         This action cannot be undone.
                     </Typography>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, py: 2, justifyContent: 'center', gap: 2 }}>
+                <DialogActions sx={{ 
+                    px: 3,
+                    py: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    justifyContent: 'flex-end',
+                    gap: 1
+                }}>
                     <Button 
                         onClick={() => setDeleteDialog(prev => ({ ...prev, open: false }))}
                         variant="outlined"
-                        sx={{ borderRadius: 2 }}
-                        disabled={isDeleting}
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            borderRadius: '8px',
+                            borderColor: 'grey.300',
+                            color: 'text.primary',
+                            '&:hover': {
+                                backgroundColor: 'grey.50',
+                                borderColor: 'grey.400'
+                            },
+                            px: 3
+                        }}
                     >
                         Cancel
                     </Button>
                     <Button 
                         onClick={() => handleDelete(deleteDialog.bookingIds)}
                         variant="contained"
-                        color="error"
-                        sx={{ borderRadius: 2 }}
-                        disabled={isDeleting}
-                        startIcon={isDeleting ? <CircularProgress size={20} color="inherit" /> : null}
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            borderRadius: '8px',
+                            backgroundColor: 'error.main',
+                            '&:hover': {
+                                backgroundColor: 'error.dark'
+                            },
+                            px: 3
+                        }}
                     >
-                        {isDeleting ? 'Deleting...' : 'Delete'}
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>
