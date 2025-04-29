@@ -24,7 +24,11 @@ import {
     Stack,
     Container,
     Checkbox,
-    CircularProgress
+    CircularProgress,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -48,6 +52,7 @@ const BookingTable = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
     const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
@@ -79,31 +84,64 @@ const BookingTable = () => {
     }, []);
 
     const filteredBookings = useMemo(() => {
-        if (!searchTerm) return bookings;
-        const term = searchTerm.toLowerCase();
-        return bookings.filter(booking => {
-            return (
-                booking.id?.toLowerCase().includes(term) ||
-                booking.dateTime?.toLowerCase().includes(term) ||
-                booking.location?.toLowerCase().includes(term) ||
-                booking.packageName?.toLowerCase().includes(term) ||
-                booking.bookingStatus?.toLowerCase().includes(term) ||
-                booking.paymentStatus?.toLowerCase().includes(term)
+        let filtered = bookings;
+        
+        // Apply status filter
+        if (statusFilter !== "all") {
+            filtered = filtered.filter(booking => 
+                booking.bookingStatus.toLowerCase() === statusFilter.toLowerCase()
             );
-        });
-    }, [bookings, searchTerm]);
+        }
+        
+        // Apply search filter
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(booking => {
+                return (
+                    booking.id?.toLowerCase().includes(term) ||
+                    booking.dateTime?.toLowerCase().includes(term) ||
+                    booking.location?.toLowerCase().includes(term) ||
+                    booking.packageName?.toLowerCase().includes(term) ||
+                    booking.bookingStatus?.toLowerCase().includes(term) ||
+                    booking.paymentStatus?.toLowerCase().includes(term)
+                );
+            });
+        }
+        
+        return filtered;
+    }, [bookings, searchTerm, statusFilter]);
 
     const getStatusColor = (status: string) => {
         const lowerStatus = status?.toLowerCase() || '';
         switch (lowerStatus) {
             case 'upcoming':
-                return 'success';
+                return {
+                    bgcolor: '#e6f4ea',
+                    color: '#1e4620',
+                    icon: '🟢',
+                    label: 'Upcoming'
+                };
             case 'completed':
-                return 'warning';
+                return {
+                    bgcolor: '#fff3e0',
+                    color: '#e65100',
+                    icon: '✅',
+                    label: 'Completed'
+                };
             case 'cancelled':
-                return 'error';
+                return {
+                    bgcolor: '#ffebee',
+                    color: '#c62828',
+                    icon: '❌',
+                    label: 'Cancelled'
+                };
             default:
-                return 'default';
+                return {
+                    bgcolor: '#f5f5f5',
+                    color: '#616161',
+                    icon: '❓',
+                    label: status || 'Unknown'
+                };
         }
     };
 
@@ -111,13 +149,33 @@ const BookingTable = () => {
         const lowerStatus = status?.toLowerCase() || '';
         switch (lowerStatus) {
             case 'paid':
-                return 'success';
+                return {
+                    bgcolor: '#e8f5e9',
+                    color: '#2e7d32',
+                    icon: '💰',
+                    label: 'Paid'
+                };
             case 'pending':
-                return 'warning';
+                return {
+                    bgcolor: '#fff3e0',
+                    color: '#e65100',
+                    icon: '⏳',
+                    label: 'Pending'
+                };
             case 'refunded':
-                return 'error';
+                return {
+                    bgcolor: '#fce4ec',
+                    color: '#c2185b',
+                    icon: '↩️',
+                    label: 'Refunded'
+                };
             default:
-                return 'default';
+                return {
+                    bgcolor: '#f5f5f5',
+                    color: '#616161',
+                    icon: '❓',
+                    label: status || 'Unknown'
+                };
         }
     };
 
@@ -215,25 +273,45 @@ const BookingTable = () => {
                             All Bookings
                         </Typography>
                         <Chip 
-                            label={`${bookings.length} ${bookings.length === 1 ? 'booking' : 'bookings'}`}
+                            label={`${filteredBookings.length} ${filteredBookings.length === 1 ? 'booking' : 'bookings'}`}
                             color="primary"
                             size="small"
                         />
                     </Box>
-                    <TextField
-                        placeholder="Search bookings..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        size="small"
-                        sx={{ width: { xs: '100%', sm: 300 } }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
+                    <Box sx={{ 
+                        display: 'flex', 
+                        gap: 2,
+                        width: { xs: '100%', sm: 'auto' },
+                        flexDirection: { xs: 'column', sm: 'row' }
+                    }}>
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                            <InputLabel>Status</InputLabel>
+                            <Select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                label="Status"
+                            >
+                                <MenuItem value="all">All Statuses</MenuItem>
+                                <MenuItem value="upcoming">Upcoming</MenuItem>
+                                <MenuItem value="completed">Completed</MenuItem>
+                                <MenuItem value="cancelled">Cancelled</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            placeholder="Search bookings..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            size="small"
+                            sx={{ width: { xs: '100%', sm: 300 } }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </Box>
                 </Box>
 
             {isLoading ? (
@@ -354,16 +432,40 @@ const BookingTable = () => {
                                         </TableCell>
                                         <TableCell>
                                             <Chip 
-                                                label={booking.bookingStatus || '-'}
+                                                label={
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <span>{getStatusColor(booking.bookingStatus).icon}</span>
+                                                        <span>{getStatusColor(booking.bookingStatus).label}</span>
+                                                    </Box>
+                                                }
                                                 size="small"
-                                                color={getStatusColor(booking.bookingStatus)}
+                                                sx={{ 
+                                                    bgcolor: getStatusColor(booking.bookingStatus).bgcolor,
+                                                    color: getStatusColor(booking.bookingStatus).color,
+                                                    fontWeight: 500,
+                                                    '& .MuiChip-label': {
+                                                        px: 1
+                                                    }
+                                                }}
                                             />
                                         </TableCell>
                                         <TableCell>
                                             <Chip 
-                                                label={booking.paymentStatus || '-'}
+                                                label={
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <span>{getPaymentStatusColor(booking.paymentStatus).icon}</span>
+                                                        <span>{getPaymentStatusColor(booking.paymentStatus).label}</span>
+                                                    </Box>
+                                                }
                                                 size="small"
-                                                color={getPaymentStatusColor(booking.paymentStatus)}
+                                                sx={{ 
+                                                    bgcolor: getPaymentStatusColor(booking.paymentStatus).bgcolor,
+                                                    color: getPaymentStatusColor(booking.paymentStatus).color,
+                                                    fontWeight: 500,
+                                                    '& .MuiChip-label': {
+                                                        px: 1
+                                                    }
+                                                }}
                                             />
                                         </TableCell>
                                         <TableCell align="right">

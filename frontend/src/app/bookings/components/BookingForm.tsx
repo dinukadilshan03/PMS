@@ -312,6 +312,41 @@ const CreateBookingForm = () => {
                 </div>
             ) : (
                 <>
+                    <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+                        <h3 className="text-lg font-semibold text-yellow-800 mb-4">Booking Rules</h3>
+                        <ul className="space-y-2 text-yellow-700">
+                            <li className="flex items-start">
+                                <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Maximum 3 bookings allowed per day
+                            </li>
+                            <li className="flex items-start">
+                                <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Bookings must be made at least 24 hours in advance
+                            </li>
+                            <li className="flex items-start">
+                                <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                New bookings must be within 30 days from today
+                            </li>
+                            <li className="flex items-start">
+                                <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Cancellations must be made at least 24 hours before the booking time
+                            </li>
+                            <li className="flex items-start">
+                                <svg className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Rescheduling must be done at least 24 hours before the current booking time
+                            </li>
+                        </ul>
+                    </div>
                     <Dialog
                         open={limitDialog.open}
                         onClose={() => setLimitDialog(prev => ({ ...prev, open: false }))}
