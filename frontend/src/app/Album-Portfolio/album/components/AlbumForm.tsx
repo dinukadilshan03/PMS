@@ -13,25 +13,129 @@ export default function AlbumForm() {
         status: 'active',
     });
 
+    const [errors, setErrors] = useState({
+        name: '',
+        description: '',
+        category: '',
+        location: '',
+        images: '',
+        coverImage: '',
+    });
+
     const [images, setImages] = useState<File[]>([]);
     const [coverImage, setCoverImage] = useState<File | null>(null);
     const router = useRouter();  // Correct hook import for pages/ directory
 
+    const validateForm = () => {
+        let isValid = true;
+        const newErrors = {
+            name: '',
+            description: '',
+            category: '',
+            location: '',
+            images: '',
+            coverImage: '',
+        };
+
+        // Name validation
+        if (!formData.name.trim()) {
+            newErrors.name = 'Album name is required';
+            isValid = false;
+        } else if (formData.name.length < 3) {
+            newErrors.name = 'Album name must be at least 3 characters long';
+            isValid = false;
+        }
+
+        // Description validation
+        if (!formData.description.trim()) {
+            newErrors.description = 'Description is required';
+            isValid = false;
+        } else if (formData.description.length < 10) {
+            newErrors.description = 'Description must be at least 10 characters long';
+            isValid = false;
+        }
+
+        // Category validation
+        if (!formData.category.trim()) {
+            newErrors.category = 'Category is required';
+            isValid = false;
+        }
+
+        // Location validation
+        if (!formData.location.trim()) {
+            newErrors.location = 'Location is required';
+            isValid = false;
+        }
+
+        // Images validation
+        if (images.length === 0) {
+            newErrors.images = 'At least one image is required';
+            isValid = false;
+        } else {
+            // Validate each image
+            for (const image of images) {
+                if (!['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
+                    newErrors.images = 'Only JPG, PNG, and GIF files are allowed';
+                    isValid = false;
+                    break;
+                }
+                if (image.size > 10 * 1024 * 1024) { // 10MB
+                    newErrors.images = 'Each image must be less than 10MB';
+                    isValid = false;
+                    break;
+                }
+            }
+        }
+
+        // Cover image validation
+        if (!coverImage) {
+            newErrors.coverImage = 'Cover image is required';
+            isValid = false;
+        } else {
+            if (!['image/jpeg', 'image/png', 'image/gif'].includes(coverImage.type)) {
+                newErrors.coverImage = 'Only JPG, PNG, and GIF files are allowed';
+                isValid = false;
+            }
+            if (coverImage.size > 10 * 1024 * 1024) { // 10MB
+                newErrors.coverImage = 'Cover image must be less than 10MB';
+                isValid = false;
+            }
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        // Clear error when user starts typing
+        if (errors[e.target.name as keyof typeof errors]) {
+            setErrors({ ...errors, [e.target.name]: '' });
+        }
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) setImages(Array.from(e.target.files));
+        if (e.target.files) {
+            setImages(Array.from(e.target.files));
+            setErrors({ ...errors, images: '' });
+        }
     };
 
     const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) setCoverImage(e.target.files[0]);
+        if (e.target.files) {
+            setCoverImage(e.target.files[0]);
+            setErrors({ ...errors, coverImage: '' });
+        }
     };
 
     // Handle Submit Function
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+
         const formDataToSend = new FormData();
 
         // Append text fields
@@ -67,6 +171,14 @@ export default function AlbumForm() {
             });
             setImages([]);
             setCoverImage(null);
+            setErrors({
+                name: '',
+                description: '',
+                category: '',
+                location: '',
+                images: '',
+                coverImage: '',
+            });
         } catch (error) {
             console.error('Error creating album:', error);
         }
@@ -95,9 +207,13 @@ export default function AlbumForm() {
                                 placeholder="Enter album name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                required
+                                className={`mt-1 block w-full px-3 py-2 border ${
+                                    errors.name ? 'border-red-500' : 'border-gray-300'
+                                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
                             />
+                            {errors.name && (
+                                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                            )}
                         </div>
 
                         {/* Description */}
@@ -112,9 +228,13 @@ export default function AlbumForm() {
                                 placeholder="Describe your album..."
                                 value={formData.description}
                                 onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                required
+                                className={`mt-1 block w-full px-3 py-2 border ${
+                                    errors.description ? 'border-red-500' : 'border-gray-300'
+                                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
                             />
+                            {errors.description && (
+                                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                            )}
                         </div>
 
                         {/* Category & Location (2-column grid on larger screens) */}
@@ -130,9 +250,13 @@ export default function AlbumForm() {
                                     placeholder="e.g., Travel, Family"
                                     value={formData.category}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                    required
+                                    className={`mt-1 block w-full px-3 py-2 border ${
+                                        errors.category ? 'border-red-500' : 'border-gray-300'
+                                    } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
                                 />
+                                {errors.category && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+                                )}
                             </div>
 
                             <div>
@@ -146,9 +270,13 @@ export default function AlbumForm() {
                                     placeholder="e.g., Paris, France"
                                     value={formData.location}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                    required
+                                    className={`mt-1 block w-full px-3 py-2 border ${
+                                        errors.location ? 'border-red-500' : 'border-gray-300'
+                                    } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
                                 />
+                                {errors.location && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.location}</p>
+                                )}
                             </div>
                         </div>
 
@@ -172,7 +300,9 @@ export default function AlbumForm() {
                         {/* Images Upload */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Album Images</label>
-                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 ${
+                                errors.images ? 'border-red-500' : 'border-gray-300'
+                            } border-dashed rounded-md`}>
                                 <div className="space-y-1 text-center">
                                     <svg
                                         className="mx-auto h-12 w-12 text-gray-400"
@@ -211,12 +341,17 @@ export default function AlbumForm() {
                                     )}
                                 </div>
                             </div>
+                            {errors.images && (
+                                <p className="mt-1 text-sm text-red-600">{errors.images}</p>
+                            )}
                         </div>
 
                         {/* Cover Image Upload */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Cover Image</label>
-                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 ${
+                                errors.coverImage ? 'border-red-500' : 'border-gray-300'
+                            } border-dashed rounded-md`}>
                                 <div className="space-y-1 text-center">
                                     <svg
                                         className="mx-auto h-12 w-12 text-gray-400"
@@ -248,12 +383,15 @@ export default function AlbumForm() {
                                         </label>
                                         <p className="pl-1">or drag and drop</p>
                                     </div>
-                                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                                     {coverImage && (
-                                        <p className="text-sm text-green-600">1 cover image selected</p>
+                                        <p className="text-sm text-green-600">Cover image selected</p>
                                     )}
                                 </div>
                             </div>
+                            {errors.coverImage && (
+                                <p className="mt-1 text-sm text-red-600">{errors.coverImage}</p>
+                            )}
                         </div>
 
                         {/* Submit Button */}
