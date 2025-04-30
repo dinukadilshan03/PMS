@@ -8,10 +8,14 @@ import com.beni.backend.bookings.service.BookingValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import com.beni.backend.staff.model.Staff;
+import com.beni.backend.staff.repository.StaffRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing bookings
@@ -23,6 +27,8 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final LocationPricingService locationPricingService;
     private final BookingValidationService validationService;
+    @Autowired
+    private StaffRepository staffRepository;
 
     public BookingService(
             BookingRepository bookingRepository,
@@ -67,6 +73,16 @@ public class BookingService {
     public List<Booking> getBookingsForClient(String clientId) {
         logger.info("Fetching bookings for client: {}", clientId);
         List<Booking> bookings = bookingRepository.findByClientId(clientId);
+        
+        // Add staff information to each booking
+        bookings = bookings.stream().map(booking -> {
+            if (booking.getAssignedStaffId() != null) {
+                Optional<Staff> staff = staffRepository.findById(booking.getAssignedStaffId());
+                staff.ifPresent(s -> booking.setAssignedStaffName(s.getName()));
+            }
+            return booking;
+        }).collect(Collectors.toList());
+        
         logger.debug("Found {} bookings for client: {}", bookings.size(), clientId);
         return bookings;
     }

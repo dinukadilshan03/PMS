@@ -83,7 +83,14 @@ const BookingList = () => {
             }
         };
 
+        // Initial fetch
         fetchBookings();
+
+        // Set up periodic refresh every 30 seconds
+        const intervalId = setInterval(fetchBookings, 30000);
+
+        // Clean up interval on component unmount
+        return () => clearInterval(intervalId);
     }, []);
 
     // Fetch booking configuration

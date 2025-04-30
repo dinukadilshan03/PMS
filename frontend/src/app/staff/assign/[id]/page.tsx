@@ -83,6 +83,12 @@ export default function AssignStaffToBooking() {
                 body: JSON.stringify({ staffId })
             });
 
+            // Refresh the bookings data
+            const bookingsResponse = await fetch('http://localhost:8080/admin/bookings');
+            if (!bookingsResponse.ok) throw new Error('Failed to fetch bookings');
+            const bookingsData = await bookingsResponse.json();
+            setBookings(bookingsData);
+
             alert("Staff assigned successfully!");
             router.push("/staff/stafflist");
         } catch (err) {
