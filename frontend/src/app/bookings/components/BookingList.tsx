@@ -415,8 +415,8 @@ const BookingList = () => {
 
     const handleCancel = async (bookingId: string) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/cancel`, {
-                method: 'PUT',
+            const response = await fetch(`http://localhost:8080/api/bookings/cancel/${bookingId}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
