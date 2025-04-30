@@ -569,16 +569,20 @@ const BookingList = () => {
     };
 
     const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
+        switch (status) {
             case 'upcoming':
                 return 'bg-blue-100 text-blue-800';
             case 'completed':
-                return 'bg-green-100 text-green-800';
+                return 'bg-gray-100 text-gray-800';
             case 'cancelled':
                 return 'bg-red-100 text-red-800';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
+    };
+
+    const isBookingGreyedOut = (status: string) => {
+        return status === 'completed';
     };
 
     return (
@@ -661,100 +665,57 @@ const BookingList = () => {
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {bookings.map((booking) => (
-                            <div key={booking.id} className="bg-white overflow-hidden shadow-lg rounded-xl border border-gray-100 hover:shadow-xl transition-all duration-300">
-                                <div className="p-6">
-                                    {/* Header Section */}
-                                    <div className="flex flex-col items-center text-center mb-6">
-                                        <div className="flex-shrink-0 bg-indigo-100 rounded-lg p-3 mb-4">
-                                            <svg className="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                            {booking.packageName}
-                                        </h3>
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.bookingStatus)}`}>
+                            <div 
+                                key={booking.id} 
+                                className={`p-4 rounded-lg shadow-md mb-4 ${
+                                    isBookingGreyedOut(booking.bookingStatus) 
+                                        ? 'bg-gray-50 opacity-75' 
+                                        : 'bg-white'
+                                }`}
+                            >
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-lg font-semibold">{booking.packageName}</h3>
+                                        <p className="text-gray-600">Date: {new Date(booking.dateTime).toLocaleString()}</p>
+                                        <p className="text-gray-600">Location: {booking.location}</p>
+                                        <p className="text-gray-600">Photographer: {booking.assignedStaffName || 'To be assigned'}</p>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className={`px-2 py-1 rounded-full text-sm ${getStatusColor(booking.bookingStatus)}`}>
                                             {booking.bookingStatus}
                                         </span>
-                                        <p className="text-2xl font-bold text-indigo-600 mt-4">Rs {booking.price.toFixed(2)}</p>
-                                        <p className="text-xs text-gray-500">Total Amount</p>
+                                        <span className={`px-2 py-1 rounded-full text-sm mt-2 ${
+                                            booking.paymentStatus === 'paid' 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                            {booking.paymentStatus}
+                                        </span>
                                     </div>
-
-                                    {/* Divider */}
-                                    <div className="border-t border-gray-100 my-6"></div>
-
-                                    {/* Details Section */}
-                                    <div className="space-y-6">
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-500">Date & Time</p>
-                                            <p className="text-sm text-gray-900">{new Date(booking.dateTime).toLocaleString()}</p>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-500">Location</p>
-                                            <p className="text-sm text-gray-900">{booking.location}</p>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-500">Photographer</p>
-                                            <p className="text-sm text-gray-900">{booking.assignedStaffName || 'To be assigned'}</p>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-500">Payment Status</p>
-                                            <p className="text-sm text-gray-900">{booking.paymentStatus}</p>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-500">Contact</p>
-                                            <p className="text-sm text-gray-900">{booking.phoneNumber}</p>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-500">Email</p>
-                                            <p className="text-sm text-gray-900">{booking.email}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Divider */}
-                                    <div className="border-t border-gray-100 my-6"></div>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex flex-col space-y-3">
-                                        <button
-                                            onClick={() => handleCancelClick(booking)}
-                                            className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled={booking.bookingStatus === 'cancelled'}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                            Cancel Booking
-                                        </button>
-                                        <button
-                                            onClick={() => handleReschedule(booking)}
-                                            disabled={booking.bookingStatus.toLowerCase() === 'cancelled' || booking.bookingStatus.toLowerCase() === 'completed'}
-                                            className={`w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                                                booking.bookingStatus.toLowerCase() === 'cancelled' || booking.bookingStatus.toLowerCase() === 'completed'
-                                                    ? 'bg-gray-400 cursor-not-allowed' 
-                                                    : 'bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500'
-                                            }`}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            Reschedule Booking
-                                        </button>
-                                        <button
-                                            onClick={() => generateSingleBookingPDF(booking)}
-                                            className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            Download PDF
-                                        </button>
-                                    </div>
+                                </div>
+                                <div className="mt-4 flex justify-end space-x-2">
+                                    {!isBookingGreyedOut(booking.bookingStatus) && (
+                                        <>
+                                            <button
+                                                onClick={() => handleReschedule(booking)}
+                                                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            >
+                                                Reschedule
+                                            </button>
+                                            <button
+                                                onClick={() => handleCancelClick(booking)}
+                                                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </>
+                                    )}
+                                    <button
+                                        onClick={() => generateSingleBookingPDF(booking)}
+                                        className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                    >
+                                        Download PDF
+                                    </button>
                                 </div>
                             </div>
                         ))}
