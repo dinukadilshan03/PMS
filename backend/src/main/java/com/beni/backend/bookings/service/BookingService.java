@@ -98,10 +98,18 @@ public class BookingService {
         logger.info("Attempting to reschedule booking: {} to: {}", bookingId, newDateTime);
         
         try {
-            validationService.validateReschedule(bookingId, newDateTime);
-            
             Booking booking = bookingRepository.findById(bookingId)
                     .orElseThrow(() -> new BookingException("Booking not found"));
+            
+            // Check if booking is cancelled or completed
+            if ("cancelled".equals(booking.getBookingStatus())) {
+                throw new BookingException("Cannot reschedule a cancelled booking");
+            }
+            if ("completed".equals(booking.getBookingStatus())) {
+                throw new BookingException("Cannot reschedule a completed booking");
+            }
+            
+            validationService.validateReschedule(bookingId, newDateTime);
             
             booking.setDateTime(newDateTime);
             Booking updatedBooking = bookingRepository.save(booking);
@@ -121,11 +129,19 @@ public class BookingService {
     public Booking cancelBooking(String bookingId) {
         logger.info("Attempting to cancel booking: {}", bookingId);
         try {
-            // Validate cancellation window first
-            validationService.validateCancellation(bookingId);
-            
             Booking booking = bookingRepository.findById(bookingId)
                     .orElseThrow(() -> new BookingException("Booking not found"));
+            
+            // Check if booking is cancelled or completed
+            if ("cancelled".equals(booking.getBookingStatus())) {
+                throw new BookingException("Booking is already cancelled");
+            }
+            if ("completed".equals(booking.getBookingStatus())) {
+                throw new BookingException("Cannot cancel a completed booking");
+            }
+            
+            // Validate cancellation window first
+            validationService.validateCancellation(bookingId);
             
             booking.setBookingStatus("cancelled");
             Booking cancelledBooking = bookingRepository.save(booking);
