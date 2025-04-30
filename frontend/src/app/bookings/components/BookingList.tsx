@@ -733,9 +733,9 @@ const BookingList = () => {
                                         </button>
                                         <button
                                             onClick={() => handleReschedule(booking)}
-                                            disabled={booking.bookingStatus.toLowerCase() === 'cancelled'}
+                                            disabled={booking.bookingStatus.toLowerCase() === 'cancelled' || booking.bookingStatus.toLowerCase() === 'completed'}
                                             className={`w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                                                booking.bookingStatus.toLowerCase() === 'cancelled' 
+                                                booking.bookingStatus.toLowerCase() === 'cancelled' || booking.bookingStatus.toLowerCase() === 'completed'
                                                     ? 'bg-gray-400 cursor-not-allowed' 
                                                     : 'bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500'
                                             }`}
